@@ -1,0 +1,125 @@
+version: "3"
+
+services:
+  traefik:
+    image: traefik:v2.9
+    container_name: traefik
+    command:
+    - "--api.insecure=true"
+    - "--api.debug=true"
+    - "--providers.docker=true"
+    - "--providers.docker.exposedbydefault=false"
+    - "--providers.docker.network=external"
+    - "--entrypoints.web.address=:80"
+    - "--entrypoints.websecure.address=:443"
+    - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+    - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+    - "--entrypoints.web.http.redirections.entryPoint.permanent=true"
+    - "--certificatesresolvers.http.acme.httpchallenge=true"
+    - "--certificatesresolvers.http.acme.httpchallenge.entrypoint=web"
+    - "--certificatesresolvers.http.acme.email=acme@bhasher.com"
+    - "--certificatesresolvers.http.acme.storage=acme.json"
+    #- "--log.level=DEBUG"
+    environment:
+    - TZ=Europe/Paris
+    restart: always
+    ports:
+    - "80:80"
+    - "443:443"
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    - type: bind
+      source: /home/pi/docker/storage/traefik/acme.json
+      target: /acme.json
+    networks:
+    - external
+  
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:latest
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.lln.bhasher.com`)"
+      - "traefik.http.routers.portainer.entrypoints=websecure"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+      - "traefik.http.routers.portainer.tls=true"
+      - "traefik.http.routers.portainer.tls.certresolver=http"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/pi/docker/storage/portainer:/data
+    networks:
+      - external
+
+  mealie:
+    container_name: mealie
+    image: hkotel/mealie:latest
+    restart: always
+    environment:
+    - PUID=1000
+    - PGID=1000
+    - TZ= Europe/Paris
+    - RECIPE_PUBLIC=true
+    - RECIPE_SHOW_NUTRITION=true
+    - RECIPE_SHOW_ASSETS=true
+    - RECIPE_LANDSCAPE_VIEW=true
+    - RECIPE_DISABLE_COMMENTS=true
+    - RECIPE_DISABLE_AMOUNT=false
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.mealie.rule=Host(`mealie.bhasher.com`)"
+    - "traefik.http.services.mealie.loadbalancer.server.port=80"
+    - "traefik.http.routers.mealie.tls=true"
+    - "traefik.http.routers.mealie.tls.certresolver=http"
+    - "traefik.http.routers.mealie.entrypoints=websecure"
+    volumes:
+    - /home/pi/docker/storage/mealie/:/app/data
+    networks:
+    - external
+
+  baikal:
+    container_name: baikal
+    image: ckulka/baikal:nginx
+    restart: on-failure
+    volumes:
+    - /home/pi/docker/storage/baikal/config:/var/www/baikal/config
+    - /home/pi/docker/storage/baikal/data:/var/www/baikal/Specific
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.baikal.rule=Host(`baikal.bhasher.com`)"
+    - "traefik.http.services.baikal.loadbalancer.server.port=80"
+    - "traefik.http.routers.baikal.tls=true"
+    - "traefik.http.routers.baikal.tls.certresolver=http"
+    - "traefik.http.routers.baikal.entrypoints=websecure"
+    networks:
+    - external
+
+  wireguard:
+    image: lscr.io/linuxserver/wireguard:latest
+    container_name: wireguard
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      - SERVERURL=wireguard.louvainlinux.org
+      - SERVERPORT=51855
+      - PEERS=5
+      - PEERDNS=1.1.1.1
+      - INTERNAL_SUBNET=10.13.13.0
+      - ALLOWEDIPS=0.0.0.0/0
+      - LOG_CONFS=true
+    volumes:
+      - /home/pi/docker/storage/wireguard:/config:rw
+      - /lib/modules:/lib/modules:ro
+    ports:
+      - 51855:51820/udp
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: always
+ 
+networks:
+  external:
+    external: true
