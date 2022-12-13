@@ -1,4 +1,4 @@
-version: "3"
+version: "3.2"
 
 services:
   traefik:
@@ -19,7 +19,7 @@ services:
     - "--certificatesresolvers.http.acme.httpchallenge.entrypoint=web"
     - "--certificatesresolvers.http.acme.email=acme@bhasher.com"
     - "--certificatesresolvers.http.acme.storage=acme.json"
-    #- "--log.level=DEBUG"
+    # - "--log.level=DEBUG"
     environment:
     - TZ=Europe/Paris
     restart: always
@@ -39,17 +39,19 @@ services:
     image: portainer/portainer-ce:latest
     restart: always
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.portainer.rule=Host(`portainer.lln.bhasher.com`)"
-      - "traefik.http.routers.portainer.entrypoints=websecure"
-      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
-      - "traefik.http.routers.portainer.tls=true"
-      - "traefik.http.routers.portainer.tls.certresolver=http"
+    - "traefik.enable=true"
+    - "traefik.http.routers.portainer.rule=Host(`portainer.lln.bhasher.com`)"
+    - "traefik.http.routers.portainer.entrypoints=websecure"
+    - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+    - "traefik.http.routers.portainer.tls=true"
+    - "traefik.http.routers.portainer.tls.certresolver=http"
+    environment:
+    - TZ=Europe/Paris
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /home/pi/docker/storage/portainer:/data
+    - /var/run/docker.sock:/var/run/docker.sock
+    - /home/pi/docker/storage/portainer:/data
     networks:
-      - external
+    - external
 
   mealie:
     container_name: mealie
@@ -58,7 +60,7 @@ services:
     environment:
     - PUID=1000
     - PGID=1000
-    - TZ= Europe/Paris
+    - TZ=Europe/Paris
     - RECIPE_PUBLIC=true
     - RECIPE_SHOW_NUTRITION=true
     - RECIPE_SHOW_ASSETS=true
@@ -81,6 +83,8 @@ services:
     container_name: baikal
     image: ckulka/baikal:nginx
     restart: on-failure
+    environment:
+    - TZ=Europe/Paris
     volumes:
     - /home/pi/docker/storage/baikal/config:/var/www/baikal/config
     - /home/pi/docker/storage/baikal/data:/var/www/baikal/Specific
@@ -122,4 +126,4 @@ services:
  
 networks:
   external:
-    external: true
+
