@@ -1,0 +1,200 @@
+version: '3.8'
+
+services:
+  traefik:
+    image: traefik:v2.9
+    container_name: traefik
+    command:
+    - "--providers.docker=true"
+    - "--api.insecure=true"
+    - "--api.debug=true"
+    - "--providers.docker.exposedbydefault=false"
+    - "--providers.docker.network=external"
+    - "--entrypoints.web.address=:80"
+    - "--entrypoints.websecure.address=:443"
+    - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+    - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+    - "--entrypoints.web.http.redirections.entryPoint.permanent=true"
+    - "--certificatesresolvers.http.acme.httpchallenge=true"
+    - "--certificatesresolvers.http.acme.httpchallenge.entrypoint=web"
+    - "--certificatesresolvers.http.acme.email=acme@bhasher.com"
+    - "--certificatesresolvers.http.acme.storage=acme.json"
+    #- "--log.level=DEBUG"
+    environment:
+    - TZ=Europe/Paris
+    restart: always
+    ports:
+    - "80:80"
+    - "443:443"
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    - type: bind
+      source: /etc/letsencrypt/acme.json
+      target: /acme.json
+    networks:
+    - external
+
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:latest
+    restart: on-failure
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.portainer.rule=Host(`portainer.vps.bhasher.com`)"
+    - "traefik.http.routers.portainer.entrypoints=websecure"
+    - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+    - "traefik.http.routers.portainer.tls=true"
+    - "traefik.http.routers.portainer.tls.certresolver=http"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /home/debian/containers/portainer:/data
+    networks:
+    - external
+
+  mailserver:
+    image: docker.io/mailserver/docker-mailserver:latest
+    container_name: mailserver
+    hostname: mail
+    domainname: bdubois.io
+    ports:
+    - "25:25"
+    - 143:143
+    - 465:465
+    - 587:587
+    - 993:993
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.sieve.rule=Host(`sieve.bdubois.io`)"
+    - "traefik.http.routers.sieve.entrypoints=websecure"
+    - "traefik.http.services.sieve.loadbalancer.server.port=4190"
+    - "traefik.http.routers.sieve.tls=true"
+    - "traefik.http.routers.sieve.tls.certresolver=http"
+    volumes:
+      - /home/debian/containers/mailserver/mail-data/:/var/mail/:rw
+      - /home/debian/containers/mailserver/docker-data/mail-state/:/var/mail-state/:rw
+      - /home/debian/containers/mailserver/mail-logs/:/var/log/mail/:rw
+      - /home/debian/containers/mailserver/config/:/tmp/docker-mailserver/:rw
+      - /home/debian/containers/stepca/issued/bdubois.io:/certs:ro
+      - /etc/localtime:/etc/localtime:ro
+      - type: bind
+        source: /etc/letsencrypt/acme.json
+        target: /etc/letsencrypt/acme.json
+    cap_add:
+      - NET_ADMIN
+      - SYS_PTRACE
+    restart: on-failure
+    environment:
+      # SSL
+      - SSL_TYPE=letsencrypt
+      - SSL_DOMAIN=bdubois.io
+      - LETSENCRYPT_DOMAIN=bdubois.io
+      - TLS_LEVEL=modern
+      
+      # DEBUGING
+      - LOG_LEVEL=info
+      - SUPERVISOR_LOGLEVEL=info
+      - AMAVIS_LOGLEVEL=0
+      - PFLOGSUMM_TRIGGER=logrotate
+      - LOGROTATE_INTERVAL=weekly
+      - PFLOGSUMM_RECIPIENT=pflog@bdubois.io
+      - PFLOGSUMM_SENDER=report@bdubois.io
+      - LOGWATCH_INTERVAL=weekly
+      - LOGWATCH_RECIPIENT=watchlog@bdubois.io
+      - LOGWATCH_SENDER=report@bdubois.io
+      
+      # UPDATE
+      - ENABLE_UPDATE_CHECK=1
+      - UPDATE_CHECK_INTERVAL=7d
+      
+      # NETWORKING
+      - NETWORK_INTERFACE=eth0
+      - PERMIT_DOCKER=none
+      - POSTFIX_INET_PROTOCOLS=ipv4
+      - DOVECOT_INET_PROTOCOLS=ipv4
+      
+      # PERSISTENCE
+      - ONE_DIR=1
+      
+      # FILTERING
+      - ENABLE_AMAVIS=0
+      - ENABLE_SPAMASSASSIN=0
+      - ENABLE_CLAMAV=0
+      - ENABLE_MANAGESIEVE=1
+      #- ENABLE_AMAVIS=1  # Link between MTA & ClamAV/SpamAssassin
+      - ENABLE_DNSBL=0  # DNS-based source rejection
+      #- ENABLE_CLAMAV=1  # Antivirus
+      - VIRUSMAILS_DELETE_DELAY=7
+      - POSTSCREEN_ACTION=enforce
+      #- ENABLE_SPAMASSASSIN=1  # Antispam
+      - SPAMASSASSIN_SPAM_TO_INBOX=1
+      #- ENABLE_SPAMASSASSIN_KAM=1  # Extended rules set
+      - MOVE_SPAM_TO_JUNK=1
+      - SA_TAG=2.0  # Spam info header level
+      - SA_TAG2=6.31  # Spam level
+      - SA_KILL=6.31
+      - SA_SPAM_SUBJECT=***SPAM*****
+      
+      # SECURITY
+      - ENABLE_FAIL2BAN=1
+      - FAIL2BAN_BLOCKTYPE=drop
+      - SPOOF_PROTECTION=0  # 1
+      
+      # CONNECTIVITY
+      - ENABLE_POP3=
+      - SMTP_ONLY=
+      - ENABLE_SRS=0
+      - ENABLE_POSTFIX_VIRTUAL_TRANSPORT=
+      - ENABLE_LDAP=
+      - ENABLE_POSTGREY=0
+      - ENABLE_SASLAUTHD=0
+      
+      # LIMITATIONS
+      #POSTFIX_MAILBOX_SIZE_LIMIT=
+      - ENABLE_QUOTAS=1
+      - POSTFIX_MESSAGE_SIZE_LIMIT=104857600  # 100 MB
+      #CLAMAV_MESSAGE_SIZE_LIMIT=
+      
+      # CONFIGURATION
+      - POSTMASTER_ADDRESS=
+      - DOVECOT_MAILBOX_FORMAT=maildir  # One mail per file
+    networks:
+    - external
+
+  autodiscover:
+    image: jsmitsnl/docker-email-autodiscover:latest
+    hostname: autodiscover
+    domainname: bdubois.io
+    container_name: autodiscover
+    restart: unless-stopped
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.autodiscover.rule=Host(`autodiscover.bdubois.io`, `autodiscover.bhasher.com`)"
+    - "traefik.http.services.autodiscover.loadbalancer.server.port=80"
+    - "traefik.http.routers.autodiscover.tls=true"
+    - "traefik.http.routers.autodiscover.tls.certresolver=http"
+    - "traefik.http.routers.autodiscover.entrypoints=websecure"
+    environment:
+    - COMPANY_NAME=BDUBOIS
+    #- SUPPORT_URL=https://support.domain.com
+    - DOMAIN=bdubois.io
+    - IMAP_HOST=imap.bdubois.io
+    - IMAP_SOCKET=SSL
+    - SMTP_HOST=smtp.bdubois.io
+    - SMTP_SOCKET=SSL
+    networks:
+    - external
+
+  whoami:
+    container_name: whoami
+    image: docker.io/traefik/whoami:latest
+    labels:
+       - "traefik.http.routers.whoami.tls.domains[0].main=bdubois.io"
+       - "traefik.http.routers.whoami.tls.domains[0].sans=*.bdubois.io"
+       #- "traefik.http.routers.whoami.rule=Host(`*.bdubois.io`)"
+       - "traefik.http.routers.whoami.tls=true"
+       - "traefik.http.routers.whoami.tls.certresolver=http"
+    networks:
+    - external
+
+networks:
+  external:
