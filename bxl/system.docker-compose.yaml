@@ -1,0 +1,78 @@
+version: "3.7"
+
+services:
+  traefik:
+    container_name: traefik
+    image: traefik:v2.9
+    command:
+    - "--providers.docker=true"
+    - "--providers.docker.exposedbydefault=false"
+    - "--providers.docker.network=external"
+    - "--entrypoints.web.address=:80"
+    - "--entrypoints.websecure.address=:443"
+    - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+    - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+    - "--entrypoints.web.http.redirections.entryPoint.permanent=true"
+    - "--certificatesresolvers.http.acme.httpchallenge=true"
+    - "--certificatesresolvers.http.acme.httpchallenge.entrypoint=web"
+    - "--certificatesresolvers.http.acme.email=acme@bhasher.com"
+    - "--certificatesresolvers.http.acme.storage=acme.json"
+    environment:
+    - TZ=Europe/Paris
+    restart: always
+    ports:
+    - "80:80"
+    - "443:443"
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    - type: bind
+      source: /mnt/Main/containers/traefik/acme.json
+      target: /acme.json
+    networks:
+    - external
+
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:latest
+    restart: on-failure
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.portainer.rule=Host(`portainer.nas.bhasher.com`)"
+    - "traefik.http.routers.portainer.entrypoints=websecure"
+    - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+    - "traefik.http.routers.portainer.tls=true"
+    - "traefik.http.routers.portainer.tls.certresolver=http"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /home/debian/containers/portainer:/data
+    networks:
+    - external
+
+
+  wireguard:
+    container_name: wireguard
+    image: lscr.io/linuxserver/wireguard:latest
+    volumes:
+    - /mnt/Main/containers/wireguard/config:/config
+    - /lib/modules:/lib/modules
+    ports:
+    - 51820:51820/udp
+    environment:
+    TZ: Europe/Paris
+    SERVERURL: vpn.bhasher.com
+    SERVERPORT: 51820
+    PEERS: 5
+    PEERDNS: auto
+    INTERNAL_SUBNET: 10.13.13.0
+    ALLOWEDIPS: 0.0.0.0/0
+    cap_add:
+    - NET_ADMIN
+    - SYS_MODULE
+    sysctls:
+    - net.ipv4.conf.all.src_valid_mark=1
+    restart: always
+
+
+networks:
+  external:
+    name: external
