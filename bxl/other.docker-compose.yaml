@@ -31,8 +31,6 @@ services:
     environment:
     - PUID=33
     - PGID=33
-    ports:
-    - 8384:8384
     volumes:
     - /mnt/Main/containers/syncthing:/var/syncthing:rw
     - /mnt/Main/redondant/brieuc/SyncDocuments:/mnt/SyncDocuments:rw
