@@ -1,0 +1,29 @@
+version: "3.7"
+services:
+  jellyfin:
+    container_name: jellyfin
+    image: linuxserver/jellyfin:latest
+    volumes:
+      - /mnt/Main/containers/jellyfin/config:/config
+      - /mnt/Main/local/movies/series:/data/tvshows
+      - /mnt/Main/local/movies/movies:/data/movies
+    environment:
+      - TZ=Europe/Paris
+      - PUID=1000
+      - PGID=1000
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.bhasher.com`)"
+    - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
+    - "traefik.http.routers.jellyfin.tls=true"
+    - "traefik.http.routers.jellyfin.tls.certresolver=http"
+    - "traefik.http.routers.jellyfin.entrypoints=internalsecure,externalsecure"
+    devices:
+      - /dev/dri:/dev/dri 
+    restart: unless-stopped
+    networks:
+    - external
+ 
+networks:
+  external:
+    external: true
