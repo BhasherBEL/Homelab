@@ -23,7 +23,137 @@ services:
     restart: unless-stopped
     networks:
     - external
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /mnt/Main/containers/media-manager/radarr:/config
+      - /mnt/Main/local/movies/movies:/movies
+      - /mnt/Main/local/movies/tmp:/downloads
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.radarr.rule=Host(`radarr.bhasher.com`)"
+    - "traefik.http.services.radarr.loadbalancer.server.port=7878"
+    - "traefik.http.routers.radarr.tls=true"
+    - "traefik.http.routers.radarr.tls.certresolver=http"
+    - "traefik.http.routers.radarr.entrypoints=internalsecure"
+    restart: unless-stopped
+    networks:
+    - external
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /mnt/Main/containers/media-manager/sonarr:/config
+      - /mnt/Main/local/movies/series:/tv
+      - /mnt/Main/local/movies/tmp:/downloads
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.sonarr.rule=Host(`sonarr.bhasher.com`)"
+    - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
+    - "traefik.http.routers.sonarr.tls=true"
+    - "traefik.http.routers.sonarr.tls.certresolver=http"
+    - "traefik.http.routers.sonarr.entrypoints=internalsecure"
+    ports:
+    - 8989:8989
+    restart: unless-stopped
+    networks:
+    - external
+
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      - USER=transmission
+      - PASS=wo5ciQCMrQTOjx21d3jefyoN
+    volumes:
+      - /mnt/Main/containers/media-manager/transmission:/config
+      - /mnt/Main/local/movies/tmp:/downloads
+      - /mnt/Main/local/movies/torrents:/watch
+    ports:
+      - 51413:51413/tcp
+      - 51413:51413/udp
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.transmission.rule=Host(`transmission.bhasher.com`)"
+    - "traefik.http.services.transmission.loadbalancer.server.port=9091"
+    - "traefik.http.routers.transmission.tls=true"
+    - "traefik.http.routers.transmission.tls.certresolver=http"
+    - "traefik.http.routers.transmission.entrypoints=internalsecure"
+    restart: unless-stopped
+    networks:
+    - external
+    
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      - AUTO_UPDATE=true
+    volumes:
+      - /mnt/Main/containers/media-manager/jackett:/config
+      - /mnt/Main/local/movies/torrents:/downloads
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.jackett.rule=Host(`jackett.bhasher.com`)"
+    - "traefik.http.services.jackett.loadbalancer.server.port=8117"
+    - "traefik.http.routers.jackett.tls=true"
+    - "traefik.http.routers.jackett.tls.certresolver=http"
+    - "traefik.http.routers.jackett.entrypoints=internalsecure"
+    restart: unless-stopped
+    networks:
+    - external
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=info
+      - LOG_HTML=false
+      - CAPTCHA_SOLVER=none
+      - TZ=Europe/Paris
+    #ports:
+    #  - 8191:8191
+    restart: unless-stopped
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /mnt/Main/containers/media-manager/bazarr:/config
+      - /mnt/Main/local/movies/movies:/movies
+      - /mnt/Main/local/movies/series:/tv
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.bazarr.rule=Host(`bazarr.bhasher.com`)"
+    - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
+    - "traefik.http.routers.bazarr.tls=true"
+    - "traefik.http.routers.bazarr.tls.certresolver=http"
+    - "traefik.http.routers.bazarr.entrypoints=internalsecure"
+    restart: unless-stopped
+    networks:
+    - external
  
+
 networks:
   external:
     external: true
