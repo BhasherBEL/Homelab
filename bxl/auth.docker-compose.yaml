@@ -1,0 +1,90 @@
+version: '3.7'
+
+services:
+  openldap:
+    container_name: openldap
+    image: osixia/openldap:latest
+    ports:
+    - '389:389'
+    restart: unless-stopped
+    environment:
+    - LDAP_ADMIN_USERNAME=admin
+    - LDAP_ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    - LDAP_READONLY_USER=true
+    - LDAP_READONLY_USER_USERNAME=readonly
+    - LDAP_READONLY_USER_PASSWORD=${READONLY_PASSWORD}
+    - LDAP_DOMAIN=bhasher.com
+    - LDAP_ORGANISATION=Bhasher
+    - LDAP_RFC2307BIS_SCHEMA=true
+    - LDAP_TLS=false
+    volumes:
+    - /mnt/Main/containers/openldap/ldap:/var/lib/ldap
+    - /mnt/Main/containers/openldap/slapd.d:/etc/ldap/slapd.d
+    networks:
+    - ldap
+  
+  ldapusermanager:
+    container_name: ldapusermanager
+    image: wheelybird/ldap-user-manager:latest
+    restart: unless-stopped
+    environment:
+    - LDAP_URI=ldap://openldap
+    - LDAP_BASE_DN=dc=bhasher,dc=com
+    - LDAP_ADMIN_BIND_DN=cn=admin,dc=bhasher,dc=com
+    - LDAP_ADMINS_GROUP=admin
+    - SERVER_HOSTNAME=lum.bhasher.com
+    - NO_HTTPS=true
+    - ORGANISATION_NAME=Bhasher
+    - LDAP_REQUIRE_STARTTLS=false
+    - FORCE_RFC2307BIS=true
+    - SHOW_POSIX_ATTRIBUTES=false
+    - LDAP_ADMIN_BIND_PWD=${ADMIN_PASSWORD}
+    - LDAP_USER_OU=users
+    - LDAP_GROUP_OU=groups
+    - LDAP_ACCOUNT_ATTRIBUTE=uid
+    - LDAP_GROUP_ATTRIBUTE=cn
+    - USERNAME_FORMAT={first_name}.{last_name}
+    - ENFORCE_SAFE_SYSTEM_NAMES=false
+    - PASSWORD_HASH=SHA512CRYPT
+    - ACCEPT_WEAK_PASSWORDS=false
+    - LDAP_ACCOUNT_ADDITIONAL_ATTRIBUTES=jpegPhoto^:Profile picture,sshpubkey^+:SSH public key
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.lum.rule=Host(`lum.bhasher.com`)"
+    - "traefik.http.routers.lum.entrypoints=internalsecure"
+    - "traefik.http.services.lum.loadbalancer.server.port=80"
+    - "traefik.http.routers.lum.tls=true"
+    - "traefik.http.routers.lum.tls.certresolver=http"
+    ports:
+    - 4587:80
+    networks:
+    - ldap
+    - external
+
+  authelia:
+    container_name: authelia
+    image: authelia/authelia:latest
+    restart: unless-stopped
+    environment:
+    - TZ=Europe/Paris
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.authelia.rule=Host(`idp.bhasher.com`)"
+    - "traefik.http.routers.authelia.entrypoints=internalsecure"
+    - "traefik.http.services.authelia.loadbalancer.server.port=9091"
+    - "traefik.http.routers.authelia.tls=true"
+    - "traefik.http.routers.authelia.tls.certresolver=http"
+    volumes:
+    - /mnt/Main/containers/authelia:/config
+    networks:
+    - ldap
+    - external
+    - storage
+
+
+networks:
+  ldap:
+  external:
+    external: true
+  storage:
+    external: true

@@ -1,0 +1,26 @@
+version: '3.7'
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+    - /mnt/Main/containers/postgres:/var/lib/postgresql/data
+    networks:
+    - storage
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: unless-stopped
+    networks:
+    - storage
+
+
+networks:
+  storage:
+    name: storage
