@@ -7,6 +7,7 @@ services:
       - /mnt/Main/containers/jellyfin/config:/config
       - /mnt/Main/local/movies/series:/data/tvshows
       - /mnt/Main/local/movies/movies:/data/movies
+      - /mnt/Main/local/movies/musics:/data/musics
     environment:
       - TZ=Europe/Paris
       - PUID=1000
