@@ -65,8 +65,28 @@ services:
     - "traefik.http.routers.sonarr.tls=true"
     - "traefik.http.routers.sonarr.tls.certresolver=http"
     - "traefik.http.routers.sonarr.entrypoints=internalsecure"
-    ports:
-    - 8989:8989
+    restart: unless-stopped
+    networks:
+    - external
+
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /mnt/Main/containers/media-manager/lidarr:/config
+      - /mnt/Main/local/movies/musics:/music
+      - /mnt/Main/local/movies/tmp:/downloads
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.sonarr.rule=Host(`lidarr.bhasher.com`)"
+    - "traefik.http.services.sonarr.loadbalancer.server.port=8686"
+    - "traefik.http.routers.sonarr.tls=true"
+    - "traefik.http.routers.sonarr.tls.certresolver=http"
+    - "traefik.http.routers.sonarr.entrypoints=internalsecure"
     restart: unless-stopped
     networks:
     - external
