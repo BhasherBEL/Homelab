@@ -82,11 +82,11 @@ services:
       - /mnt/Main/local/movies/tmp:/downloads
     labels:
     - "traefik.enable=true"
-    - "traefik.http.routers.sonarr.rule=Host(`lidarr.bhasher.com`)"
-    - "traefik.http.services.sonarr.loadbalancer.server.port=8686"
-    - "traefik.http.routers.sonarr.tls=true"
-    - "traefik.http.routers.sonarr.tls.certresolver=http"
-    - "traefik.http.routers.sonarr.entrypoints=internalsecure"
+    - "traefik.http.routers.lidarr.rule=Host(`lidarr.bhasher.com`)"
+    - "traefik.http.services.lidarr.loadbalancer.server.port=8686"
+    - "traefik.http.routers.lidarr.tls=true"
+    - "traefik.http.routers.lidarr.tls.certresolver=http"
+    - "traefik.http.routers.lidarr.entrypoints=internalsecure"
     restart: unless-stopped
     networks:
     - external
