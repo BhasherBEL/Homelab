@@ -1,0 +1,28 @@
+version: '3.7'
+services:
+  hass:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    volumes:
+    - /mnt/nfs/hass:/config
+    - /etc/localtime:/etc/localtime:ro
+    networks:
+    - external
+    ports:
+    - 5683:5683
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        max_attempts: 3
+      labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.hass.rule=Host(`hass.bxl.bhasher.com`)"
+      - "traefik.http.routers.hass.entrypoints=internalsecure"
+      - "traefik.http.services.hass.loadbalancer.server.port=8123"
+      - "traefik.http.routers.hass.tls=true"
+      - "traefik.http.routers.hass.tls.certresolver=http"
+
+networks:
+  external:
+    external: true
