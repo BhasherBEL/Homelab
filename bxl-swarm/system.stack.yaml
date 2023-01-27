@@ -1,0 +1,93 @@
+version: '3.2'
+
+services:
+  traefik:
+    image: traefik:v2.9
+    command:
+    #- "--api.insecure=true"
+    - "--providers.docker=true"
+    - "--providers.docker.exposedbydefault=false"
+    - "--providers.docker.network=external"
+    - "--providers.docker.swarmmode=true"
+    - "--entrypoints.internal.address=:80"
+    - "--entrypoints.internalsecure.address=:443"
+    - "--entrypoints.internal.http.redirections.entryPoint.to=internalsecure"
+    - "--entrypoints.internal.http.redirections.entryPoint.scheme=https"
+    - "--entrypoints.internal.http.redirections.entryPoint.permanent=true"
+    - "--certificatesresolvers.http.acme.httpchallenge=true"
+    - "--certificatesresolvers.http.acme.httpchallenge.entrypoint=external"
+    - "--certificatesresolvers.http.acme.email=acme@bhasher.com"
+    - "--certificatesresolvers.http.acme.storage=acme.json"
+    - "--entrypoints.external.address=:81"
+    - "--entrypoints.externalsecure.address=:444"
+    - "--entrypoints.external.http.redirections.entryPoint.to=externalsecure"
+    - "--entrypoints.external.http.redirections.entryPoint.scheme=https"
+    - "--entrypoints.external.http.redirections.entryPoint.permanent=true"
+    #- "--log.level=DEBUG"
+    environment:
+    - TZ=Europe/Paris
+    ports:
+    - "80:80"
+    - "443:443"
+    - "81:81"
+    - "444:444"
+    #- "8080:8080"
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    - type: bind
+      source: /mnt/nfs/traefik/acme.json
+      target: /acme.json
+    networks:
+    - external
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        max_attempts: 3
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    command: -H tcp://tasks.agent:9001 --tlsskipverify
+    ports:
+    - "9443:9443"
+    volumes:
+    - /mnt/nfs/portainer_data:/data:rw
+    - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+    - external
+    - agent_network
+    deploy:
+      labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.bxl.bhasher.com`)"
+      - "traefik.http.routers.portainer.entrypoints=externalsecure,internalsecure"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+      - "traefik.http.routers.portainer.tls=true"
+      - "traefik.http.routers.portainer.tls.certresolver=http"
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        max_attempts: 3
+      placement:
+        constraints: [node.role == manager]
+
+  agent:
+    image: portainer/agent:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    #  - /var/lib/docker/volumes:/var/lib/docker/volumes
+    networks:
+      - agent_network
+    deploy:
+      mode: global
+      placement:
+        constraints: [node.platform.os == linux]
+
+networks:
+  external:
+    external: true
+  agent_network:
+    driver: overlay
+    attachable: true

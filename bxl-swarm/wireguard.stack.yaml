@@ -1,0 +1,31 @@
+version: '3.7'
+services:
+  wireguard:
+    image: lscr.io/linuxserver/wireguard:latest
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        max_attempts: 3
+    volumes:
+    - /mnt/nfs/wireguard:/config
+    - /lib/modules:/lib/modules
+    ports:
+    - mode: host
+      protocol: udp
+      published: 51821
+      target: 51820
+    environment:
+    - TZ=Europe/Paris
+    - SERVERURL=vpn.bhasher.com
+    - SERVERPORT=51821
+    - PEERS=5
+    - PEERDNS=auto
+    - INTERNAL_SUBNET=10.13.14.0
+    - ALLOWEDIPS=0.0.0.0/0
+    cap_add:
+    - NET_ADMIN
+    - SYS_MODULE
+    sysctls:
+    - net.ipv4.conf.all.src_valid_mark=1
