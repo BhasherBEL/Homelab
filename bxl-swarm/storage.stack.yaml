@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+    volumes:
+    - /mnt/nfs/postgres:/var/lib/postgresql/data
+    networks:
+    - storage
+    secrets:
+    - postgres_password
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        max_attempts: 3
+
+  redis:
+    image: redis:latest
+    networks:
+    - storage
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        max_attempts: 3
+
+networks:
+  storage:
+    external: true
+
+secrets:
+  postgres_password:
+    external: true
