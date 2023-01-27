@@ -23,7 +23,7 @@ services:
     - "--entrypoints.external.http.redirections.entryPoint.to=externalsecure"
     - "--entrypoints.external.http.redirections.entryPoint.scheme=https"
     - "--entrypoints.external.http.redirections.entryPoint.permanent=true"
-    #- "--log.level=DEBUG"
+    - "--log.level=DEBUG"
     environment:
     - TZ=Europe/Paris
     ports:
