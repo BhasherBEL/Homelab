@@ -19,7 +19,7 @@ services:
     - "--certificatesresolvers.http.acme.httpchallenge.entrypoint=web"
     - "--certificatesresolvers.http.acme.email=acme@bhasher.com"
     - "--certificatesresolvers.http.acme.storage=acme.json"
-    #- "--log.level=DEBUG"
+    - "--log.level=DEBUG"
     environment:
     - TZ=Europe/Paris
     restart: always
@@ -196,6 +196,68 @@ services:
     networks:
     - external
 
+  invoicenginx:
+    container_name: invoice_nginx
+    image: nginx:latest
+    restart: on-failure
+    volumes:
+    - /home/debian/containers/invoiceninja/in-vhost.conf:/etc/nginx/conf.d/in-vhost.conf:ro
+    - /home/debian/containers/invoiceninja/app/public:/var/www/app/public:ro
+    environment:
+    - TRUSTED_PROXIES='*'
+    depends_on:
+      - invoiceninja
+    networks:
+    - invoice
+    - external
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.invoice.rule=Host(`invoice.vps.bhasher.com`)"
+    - "traefik.http.services.invoice.loadbalancer.server.port=80"
+    - "traefik.http.routers.invoice.tls=true"
+    - "traefik.http.routers.invoice.tls.certresolver=http"
+    - "traefik.http.routers.invoice.entrypoints=websecure"
+
+  invoiceninja:
+    image: invoiceninja/invoiceninja:5
+    container_name: invoice_ninja
+    environment:
+    - APP_URL=https://invoice.vps.bhasher.com
+    - APP_KEY=base64:p4rqG3iLEKieXE6D84hVdjkwJK3TDPSDOu5AdH0XEu8=
+    - REQUIRE_HTTPS=true
+    - PHANTOMJS_PDF_GENERATION=false
+    - PDF_GENERATOR=snappdf
+    - QUEUE_CONNECTION=database
+    - DB_HOST=invoicedb
+    - DB_DATABASE=ninja
+    - DB_USERNAME=ninja
+    - DB_PASSWORD=ninja
+    - IN_USER_EMAIL=invoice@bhasher.com
+    - IN_PASSWORD=zDcUZAVQk03aDHJJo4QccSpHXQMxgTEI
+    - TRUSTED_PROXIES='*'
+    restart: on-failure
+    volumes:
+    - /home/debian/containers/invoiceninja/app/public:/var/www/app/public:rw
+    - /home/debian/containers/invoiceninja/app/storage:/var/www/app/storage:rw
+    depends_on:
+    - invoicedb
+    networks:
+    - invoice
+
+  invoicedb:
+    container_name: invoice_db
+    image: mariadb:latest
+    restart: on-failure
+    environment:
+    - MYSQL_ROOT_PASSWORD=ninjaAdm1nPassword
+    - MYSQL_USER=ninja
+    - MYSQL_PASSWORD=ninja
+    - MYSQL_DATABASE=ninja
+    volumes:
+    - /home/debian/containers/invoiceninja/mariadb/data:/var/lib/mysql:rw
+    networks:
+    - invoice
+  
 networks:
   external:
-
+  invoice:
