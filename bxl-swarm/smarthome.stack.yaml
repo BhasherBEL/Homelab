@@ -7,8 +7,6 @@ services:
     - /etc/localtime:/etc/localtime:ro
     networks:
     - external
-    ports:
-    - 5683:5683
     deploy:
       mode: replicated
       replicas: 1
@@ -22,6 +20,23 @@ services:
       - "traefik.http.services.hass.loadbalancer.server.port=8123"
       - "traefik.http.routers.hass.tls=true"
       - "traefik.http.routers.hass.tls.certresolver=http"
+
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    volumes:
+    - /mnt/nfs/mosquitto/config:/mosquitto/config
+    - /mnt/nfs/mosquitto/data:/mosquitto/data
+    ports:
+    - 1883:1883
+    - 9001:9001
+    networks:
+    - external
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        max_attempts: 3
 
 networks:
   external:
