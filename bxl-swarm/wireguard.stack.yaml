@@ -7,15 +7,15 @@ services:
       replicas: 1
       restart_policy:
         condition: any
-        max_attempts: 3
+        delay: 30s
+      placement:
+        constraints:
+        - node.labels.POWER == true
     volumes:
     - /mnt/nfs/wireguard:/config
     - /lib/modules:/lib/modules
     ports:
-    - mode: host
-      protocol: udp
-      published: 51821
-      target: 51820
+    - 51821:51820/udp
     environment:
     - TZ=Europe/Paris
     - SERVERURL=vpn.bhasher.com
@@ -29,3 +29,6 @@ services:
     - SYS_MODULE
     sysctls:
     - net.ipv4.conf.all.src_valid_mark=1
+    depends_on:
+    - system_keepalived
+    - system_nfs

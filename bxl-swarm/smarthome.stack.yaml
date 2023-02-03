@@ -20,6 +20,12 @@ services:
       - "traefik.http.services.hass.loadbalancer.server.port=8123"
       - "traefik.http.routers.hass.tls=true"
       - "traefik.http.routers.hass.tls.certresolver=http"
+      placement:
+        constraints:
+        - node.labels.POWER == true
+    depends_on:
+    - system_traefik
+    - system_nfs
 
   mosquitto:
     image: eclipse-mosquitto:latest
@@ -37,6 +43,11 @@ services:
       restart_policy:
         condition: any
         max_attempts: 3
+      placement:
+        constraints:
+        - node.labels.POWER == true
+    depends_on:
+    - system_nfs
 
 networks:
   external:

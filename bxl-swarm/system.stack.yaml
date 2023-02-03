@@ -48,6 +48,12 @@ services:
       restart_policy:
         condition: any
         max_attempts: 3
+      placement:
+        constraints:
+        - node.labels.POWER == true
+    depends_on:
+    - system_nfs
+    - system_keepalived
 
   portainer:
     image: portainer/portainer-ce:latest
@@ -68,13 +74,17 @@ services:
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
       - "traefik.http.routers.portainer.tls=true"
       - "traefik.http.routers.portainer.tls.certresolver=http"
-      mode: replicated
-      replicas: 1
       restart_policy:
         condition: any
+        delay: 30s
         max_attempts: 3
       placement:
-        constraints: [node.role == manager]
+        constraints:
+        - node.role == manager
+        - node.labels.POWER == true
+    depends_on:
+    - system_nfs
+    - system_keepalived
 
   agent:
     image: portainer/agent:latest
@@ -87,6 +97,8 @@ services:
       mode: global
       placement:
         constraints: [node.platform.os == linux]
+    depends_on:
+    - system_portainer
 
   keepalived:
     image: linkvt/osixia_keepalived:stable
@@ -105,7 +117,19 @@ services:
     deploy:
       mode: global
       placement:
-        constraints: [node.role == manager]
+        constraints:
+        - node.role == manager
+
+  nfs:
+    image: traefik/whoami:latest
+    volumes:
+    - /mnt/nfs/check:/tmp/check
+    deploy:
+      mode: global
+      placement:
+        constraints:
+        - node.role == manager
+  
 
 networks:
   external:

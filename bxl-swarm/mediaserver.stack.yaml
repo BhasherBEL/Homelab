@@ -19,7 +19,8 @@ services:
         condition: on-failure
         max_attempts: 3
       placement:
-        constraints: [node.labels.HWA == true]
+        constraints:
+        - node.labels.HWA == true
       labels:
       - "traefik.enable=true"
       - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.bhasher.com`)"
@@ -27,6 +28,9 @@ services:
       - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
       - "traefik.http.routers.jellyfin.tls=true"
       - "traefik.http.routers.jellyfin.tls.certresolver=http"
+    depends_on:
+    - system_traefik
+    - system_nfs
 
   radarr:
     image: lscr.io/linuxserver/radarr:latest
@@ -42,6 +46,9 @@ services:
       restart_policy:
         condition: on-failure
         max_attempts: 3
+      placement:
+        constraints:
+        - node.labels.POWER == true
       labels:
       - "traefik.enable=true"
       - "traefik.http.routers.radarr.rule=Host(`radarr.bhasher.com`)"
@@ -52,6 +59,9 @@ services:
     networks:
     - internal
     - external
+    depends_on:
+    - system_traefik
+    - system_nfs
 
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
@@ -69,6 +79,9 @@ services:
       restart_policy:
         condition: on-failure
         max_attempts: 3
+      placement:
+        constraints:
+        - node.labels.POWER == true
       labels:
       - "traefik.enable=true"
       - "traefik.http.routers.sonarr.rule=Host(`sonarr.bhasher.com`)"
@@ -79,6 +92,9 @@ services:
     networks:
     - internal
     - external
+    depends_on:
+    - system_traefik
+    - system_nfs
 
   lidarr:
     image: lscr.io/linuxserver/lidarr:latest
@@ -96,6 +112,9 @@ services:
       restart_policy:
         condition: on-failure
         max_attempts: 3
+      placement:
+        constraints:
+        - node.labels.POWER == true
       labels:
       - "traefik.enable=true"
       - "traefik.http.routers.lidarr.rule=Host(`lidarr.bhasher.com`)"
@@ -106,6 +125,9 @@ services:
     networks:
     - internal
     - external
+    depends_on:
+    - system_traefik
+    - system_nfs
 
   transmission:
     image: lscr.io/linuxserver/transmission:latest
@@ -128,6 +150,9 @@ services:
       restart_policy:
         condition: on-failure
         max_attempts: 3
+      placement:
+        constraints:
+        - node.labels.POWER == true
       labels:
       - "traefik.enable=true"
       - "traefik.http.routers.transmission.rule=Host(`transmission.bhasher.com`)"
@@ -138,6 +163,8 @@ services:
     networks:
     - internal
     - external
+    depends_on:
+    - system_nfs
     
   jackett:
     image: lscr.io/linuxserver/jackett:latest
@@ -155,6 +182,9 @@ services:
       restart_policy:
         condition: on-failure
         max_attempts: 3
+      placement:
+        constraints:
+        - node.labels.POWER == true
       labels:
       - "traefik.enable=true"
       - "traefik.http.routers.jackett.rule=Host(`jackett.bhasher.com`)"
@@ -165,6 +195,9 @@ services:
     networks:
     - internal
     - external
+    depends_on:
+    - system_traefik
+    - system_nfs
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
@@ -175,6 +208,15 @@ services:
       - TZ=Europe/Paris
     networks:
     - internal
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+      placement:
+        constraints:
+        - node.labels.POWER == true
 
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
@@ -190,6 +232,9 @@ services:
       restart_policy:
         condition: on-failure
         max_attempts: 3
+      placement:
+        constraints:
+        - node.labels.POWER == true
       labels:
       - "traefik.enable=true"
       - "traefik.http.routers.bazarr.rule=Host(`bazarr.bhasher.com`)"
@@ -200,6 +245,9 @@ services:
     networks:
     - external
     - internal
+    depends_on:
+    - system_traefik
+    - system_nfs
  
 
 

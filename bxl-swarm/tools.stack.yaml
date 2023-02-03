@@ -1,0 +1,72 @@
+version: '3.7'
+services:
+  kanboard:
+    image: kanboard/kanboard:latest
+    environment:
+    - DB_DRIVER=postgres
+    - DB_USERNAME=postgres
+    - DB_PASSWORD=DS7BVNZr0qZdGwc63wjHmZry5P0gUVhR
+    - DB_HOSTNAME=storage_postgres
+    - DB_NAME=kanboard
+    networks:
+    - external
+    - storage
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        max_attempts: 3
+      labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kanboard.rule=Host(`kanboard.bxl.bhasher.com`)"
+      - "traefik.http.routers.kanboard.entrypoints=internalsecure"
+      - "traefik.http.services.kanboard.loadbalancer.server.port=80"
+      - "traefik.http.routers.kanboard.tls=true"
+      - "traefik.http.routers.kanboard.tls.certresolver=http"
+      placement:
+        constraints:
+        - node.labels.POWER == true
+    depends_on:
+    - system_traefik
+    - storage_postgres
+
+  dashy:
+    image: lissy93/dashy:latest
+    volumes:
+    - /mnt/nfs/dashy/config.yml:/app/public/conf.yml
+    environment:
+    - NODE_ENV=production
+    networks:
+    - external
+    healthcheck:
+      test: ['CMD', 'node', '/app/services/healthcheck']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        max_attempts: 3
+      labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashy.rule=Host(`dashboard.bhasher.com`)"
+      - "traefik.http.routers.dashy.entrypoints=internalsecure"
+      - "traefik.http.services.dashy.loadbalancer.server.port=80"
+      - "traefik.http.routers.dashy.tls=true"
+      - "traefik.http.routers.dashy.tls.certresolver=http"
+      placement:
+        constraints:
+        - node.labels.POWER == true
+    depends_on:
+    - system_traefik
+    - system_nfs
+
+networks:
+  external:
+    external: true
+  storage:
+    external: true

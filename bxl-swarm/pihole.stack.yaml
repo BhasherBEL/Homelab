@@ -36,6 +36,12 @@ services:
       - "traefik.http.services.pihole.loadbalancer.server.port=80"
       - "traefik.http.routers.pihole.tls=true"
       - "traefik.http.routers.pihole.tls.certresolver=http"
+      placement:
+        constraints:
+        - node.labels.POWER == true
+    depends_on:
+    - system_traefik
+    - system_nfs
 
 networks:
   external:

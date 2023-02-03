@@ -18,6 +18,11 @@ services:
       restart_policy:
         condition: any
         max_attempts: 3
+      placement:
+        constraints:
+        - node.labels.POWER == true
+    depends_on:
+    - system_nfs
 
   redis:
     image: redis:latest
@@ -29,6 +34,9 @@ services:
       restart_policy:
         condition: any
         max_attempts: 3
+      placement:
+        constraints:
+        - node.labels.POWER == true
 
 networks:
   storage:
