@@ -1,0 +1,96 @@
+version: '3.7'
+
+services:
+  prometheus:
+    image:  prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    networks:
+    - monitoring
+    volumes:
+    - /mnt/nfs/prometheus/data:/prometheus
+    - /mnt/nfs/prometheus/config:/etc/prometheus
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        max_attempts: 3
+      placement:
+        constraints:
+        - node.labels.POWER == true
+    depends_on:
+    - system_nfs
+
+  grafana:
+    image:  grafana/grafana:latest
+    networks:
+    - external
+    - monitoring
+    volumes:
+    - /mnt/nfs/grafana:/var/lib/grafana 
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        max_attempts: 3
+      labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.bxl.bhasher.com`)"
+      - "traefik.http.routers.grafana.entrypoints=internalsecure"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      - "traefik.http.routers.grafana.tls=true"
+      - "traefik.http.routers.grafana.tls.certresolver=http"
+      placement:
+        constraints:
+        - node.labels.POWER == true
+    depends_on:
+    - system_nfs
+    - system_traefik
+
+  cadvisor:
+    image: zcube/cadvisor:latest
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    #ports:
+    #  - 8088:8080
+    networks:
+      - monitoring
+    deploy:
+      mode: global
+      restart_policy:
+        condition: any
+        max_attempts: 3
+
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /:/host:ro,rslave
+    command: 
+      - '--path.rootfs=/host'
+      - '--path.procfs=/host/proc' 
+      - '--path.sysfs=/host/sys'
+      - --collector.filesystem.ignored-mount-points
+      - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+    #ports:
+    #  - 9100:9100
+    networks:
+      - monitoring
+    deploy:
+      mode: global
+      restart_policy:
+        condition: any
+        max_attempts: 3
+
+networks:
+  external:
+    external: true
+  monitoring:
+

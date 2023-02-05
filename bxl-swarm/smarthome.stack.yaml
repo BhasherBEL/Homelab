@@ -6,6 +6,7 @@ services:
     - /mnt/nfs/hass:/config
     - /etc/localtime:/etc/localtime:ro
     networks:
+    - smarthome
     - external
     deploy:
       mode: replicated
@@ -36,6 +37,7 @@ services:
     - 1883:1883
     - 9001:9001
     networks:
+    - smarthome
     - external
     deploy:
       mode: replicated
@@ -50,5 +52,6 @@ services:
     - system_nfs
 
 networks:
+  smarthome:
   external:
     external: true
