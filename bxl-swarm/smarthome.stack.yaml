@@ -6,6 +6,7 @@ services:
     - /mnt/nfs/hass:/config
     - /etc/localtime:/etc/localtime:ro
     networks:
+    - storage
     - smarthome
     - external
     deploy:
@@ -27,6 +28,7 @@ services:
     depends_on:
     - system_traefik
     - system_nfs
+    - storage_postgres
 
   mosquitto:
     image: eclipse-mosquitto:latest
@@ -53,5 +55,7 @@ services:
 
 networks:
   smarthome:
+  storage:
+    external: true
   external:
     external: true

@@ -59,9 +59,11 @@ services:
     networks:
     - internal
     - external
+    - storage
     depends_on:
     - system_traefik
     - system_nfs
+    - storage_postgres
 
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
@@ -97,7 +99,7 @@ services:
     - system_nfs
 
   lidarr:
-    image: lscr.io/linuxserver/lidarr:latest
+    image: lscr.io/linuxserver/lidarr:1.1.2-develop  # required for postgres
     environment:
       - PUID=1000
       - PGID=1000
@@ -125,9 +127,11 @@ services:
     networks:
     - internal
     - external
+    - storage
     depends_on:
     - system_traefik
     - system_nfs
+    - storage_postgres
 
   transmission:
     image: lscr.io/linuxserver/transmission:latest
@@ -219,7 +223,7 @@ services:
         - node.labels.POWER == true
 
   bazarr:
-    image: lscr.io/linuxserver/bazarr:latest
+    image: lscr.io/linuxserver/bazarr:1.1.5-development  # required for postgres
     environment:
       - TZ=Europe/Paris
     volumes:
@@ -245,13 +249,17 @@ services:
     networks:
     - external
     - internal
+    - storage
     depends_on:
     - system_traefik
     - system_nfs
+    - storage_postgres
  
 
 
 networks:
   internal:
+  storage:
+    external: true
   external:
     external: true

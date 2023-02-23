@@ -7,7 +7,7 @@ services:
     - POSTGRES_USER=postgres
     - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
     volumes:
-    - /mnt/nfs/postgres:/var/lib/postgresql/data
+    - /mnt/Main/redondant/shared/postgres:/var/lib/postgresql/data
     networks:
     - storage
     secrets:
@@ -20,9 +20,7 @@ services:
         max_attempts: 3
       placement:
         constraints:
-        - node.labels.POWER == true
-    depends_on:
-    - system_nfs
+        - node.labels.STORAGE == true
 
   redis:
     image: redis:latest
