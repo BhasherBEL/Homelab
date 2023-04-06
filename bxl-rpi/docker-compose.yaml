@@ -5,7 +5,7 @@ services:
     container_name: traefik
     image: traefik:v2.9
     command:
-    #- "--api.insecure=true"
+    - "--api.insecure=true"
     - "--providers.docker=true"
     - "--providers.docker.exposedbydefault=false"
     - "--providers.docker.network=external"
@@ -23,7 +23,8 @@ services:
     - "--entrypoints.external.http.redirections.entryPoint.to=externalsecure"
     - "--entrypoints.external.http.redirections.entryPoint.scheme=https"
     - "--entrypoints.external.http.redirections.entryPoint.permanent=true"
-    - "--log.level=DEBUG"
+    #- "--log.level=DEBUG"
+    - "--metrics.prometheus=true"
     environment:
     - TZ=Europe/Paris
     ports:
@@ -35,10 +36,10 @@ services:
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock:ro
     - type: bind
-      source: /home/pi/data/traefik/acme.json
+      source: $DATA/traefik/acme.json
       target: /acme.json
     - type: bind
-      source: /home/pi/data/traefik/rules.toml
+      source: $DATA/traefik/rules.toml
       target: /rules.toml
     restart: always
 
@@ -49,7 +50,7 @@ services:
     ports:
     - "9443:9443"
     volumes:
-    - /home/pi/data/portainer:/data:rw
+    - $DATA/portainer:/data:rw
     - /var/run/docker.sock:/var/run/docker.sock
     labels:
     - "traefik.enable=true"
@@ -68,7 +69,7 @@ services:
     - SYNAPSE_SERVER_NAME=matrix.bhasher.com
     - SYNAPSE_REPORT_STATS=no
     volumes:
-    - /home/pi/data/matrix/synapse:/data:rw
+    - $DATA/matrix/synapse:/data:rw
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.matrix-synapse.rule=Host(`matrix.bhasher.com`)"
@@ -82,7 +83,7 @@ services:
     image: lscr.io/linuxserver/wireguard:latest
     restart: always
     volumes:
-    - /home/pi/data/wireguard:/config
+    - $DATA/wireguard:/config
     - /lib/modules:/lib/modules
     ports:
     - 51821:51820/udp
@@ -99,3 +100,74 @@ services:
     - SYS_MODULE
     sysctls:
     - net.ipv4.conf.all.src_valid_mark=1
+
+  matrix-riot:
+    container_name: matrix-element
+    image: ghcr.io/bubuntux/element-web
+    restart: unless-stopped
+    volumes:
+    - ./config/riot/config.json:/etc/element-web/config.json:ro
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.matrix-riot.rule=Host(`element.bhasher.com`)"
+    - "traefik.http.routers.matrix-riot.tls=true"
+    - "traefik.http.routers.matrix-riot.tls.certresolver=http"
+    - "traefik.http.routers.matrix-riot.entrypoints=internalsecure,externalsecure"
+    - "traefik.http.services.matrix-riot.loadbalancer.server.port=80"
+
+  prom_monitoring:
+    container_name: prom_monitoring
+    image:  prom/prometheus:latest
+    restart: unless-stopped
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.prom.rule=Host(`prometheus.bhasher.com`)"
+    - "traefik.http.routers.prom.entrypoints=internalsecure"
+    - "traefik.http.services.prom.loadbalancer.server.port=9090"
+    - "traefik.http.routers.prom.tls=true"
+    - "traefik.http.routers.prom.tls.certresolver=http"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+       - ./config/monitoring/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
+       - $DATA/monitoring/prometheus:/prometheus
+
+  grafana:
+    container_name: grafana
+    image:  grafana/grafana
+    restart: unless-stopped
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.grafana.rule=Host(`grafana.bhasher.com`)"
+    - "traefik.http.routers.grafana.entrypoints=internalsecure"
+    - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+    - "traefik.http.routers.grafana.tls=true"
+    - "traefik.http.routers.grafana.tls.certresolver=http"
+    volumes:
+    - $DATA/monitoring/grafana:/var/lib/grafana 
+
+  cadvisor:
+    container_name: cadvisor
+    image: gcr.io/cadvisor/cadvisor:v0.47.1
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    restart: always
+
+  node-exporter:
+    container_name: node-exporter
+    image: quay.io/prometheus/node-exporter:latest
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /:/host:ro,rslave
+    command: 
+      - '--path.rootfs=/host'
+      - '--path.procfs=/host/proc' 
+      - '--path.sysfs=/host/sys'
+      - --collector.filesystem.ignored-mount-points
+      - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+    restart: always
