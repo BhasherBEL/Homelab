@@ -143,6 +143,12 @@ services:
     - "traefik.http.services.grafana.loadbalancer.server.port=3000"
     - "traefik.http.routers.grafana.tls=true"
     - "traefik.http.routers.grafana.tls.certresolver=http"
+    environment:
+    - GF_SMTP_ENABLED=true
+    - GF_SMTP_HOST=bdubois.io:465
+    - GF_SMTP_USER=${SMTP_USER}
+    - GF_SMTP_PASSWORD=${SMTP_PASSWORD}
+    - GF_SMTP_FROM_ADDRESS=grafana@bhasher.com
     volumes:
     - $DATA/monitoring/grafana:/var/lib/grafana 
 
@@ -173,6 +179,7 @@ services:
     restart: always
 
   jellyfin:
+    container_name: jellyfin
     image: linuxserver/jellyfin:latest
     volumes:
     - $DATA/mediaserver/jellyfin:/config
@@ -180,6 +187,8 @@ services:
     - /mnt/movies/movies:/data/movies
     - /mnt/movies/musics:/data/musics
     environment:
+    - PUID=1000
+    - PGID=1000
     - TZ=Europe/Paris
     restart: unless-stopped
     labels:
@@ -191,9 +200,12 @@ services:
     - "traefik.http.routers.jellyfin.tls.certresolver=http"
 
   radarr:
+    container_name: radarr
     image: lscr.io/linuxserver/radarr:latest
     environment:
     - TZ=Europe/Paris
+    - PUID=1000
+    - PGID=1000
     volumes:
     - $DATA/mediaserver/radarr:/config
     - /mnt/movies/movies:/movies
@@ -208,6 +220,7 @@ services:
     - "traefik.http.routers.radarr.entrypoints=internalsecure"
 
   sonarr:
+    container_name: sonarr
     image: lscr.io/linuxserver/sonarr:latest
     environment:
     - PUID=1000
@@ -227,6 +240,7 @@ services:
     - "traefik.http.routers.sonarr.entrypoints=internalsecure"
 
   lidarr:
+    container_name: lidarr
     image: lscr.io/linuxserver/lidarr:latest
     environment:
     - PUID=1000
@@ -246,6 +260,7 @@ services:
     - "traefik.http.routers.lidarr.entrypoints=internalsecure"
 
   transmission:
+    container_name: transmission
     image: lscr.io/linuxserver/transmission:latest
     environment:
     - PUID=1000
@@ -268,6 +283,7 @@ services:
     - "traefik.http.routers.transmission.entrypoints=internalsecure"
     
   jackett:
+    container_name: jackett
     image: lscr.io/linuxserver/jackett:latest
     environment:
     - PUID=1000
@@ -287,6 +303,7 @@ services:
     - "traefik.http.routers.jackett.entrypoints=internalsecure"
 
   flaresolverr:
+    container_name: flaresolverr
     image: ghcr.io/flaresolverr/flaresolverr:latest
     environment:
     - LOG_LEVEL=info
@@ -296,9 +313,12 @@ services:
     restart: unless-stopped
 
   bazarr:
+    container_name: bazarr
     image: lscr.io/linuxserver/bazarr
     environment:
     - TZ=Europe/Paris
+    - PUID=1000
+    - PGID=1000
     volumes:
     - $DATA/mediaserver/bazarr:/config
     - /mnt/movies/movies:/movies
@@ -311,4 +331,21 @@ services:
     - "traefik.http.routers.bazarr.tls=true"
     - "traefik.http.routers.bazarr.tls.certresolver=http"
     - "traefik.http.routers.bazarr.entrypoints=internalsecure"
+
+  baikal:
+    container_name: baikal
+    image: ckulka/baikal:nginx
+    restart: on-failure
+    environment:
+    - TZ=Europe/Paris
+    volumes:
+    - $DATA/baikal/config:/var/www/baikal/config
+    - $DATA/baikal/data:/var/www/baikal/Specific
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.baikal.rule=Host(`baikal.bxl.bhasher.com`)"
+    - "traefik.http.services.baikal.loadbalancer.server.port=80"
+    - "traefik.http.routers.baikal.tls=true"
+    - "traefik.http.routers.baikal.tls.certresolver=http"
+    - "traefik.http.routers.baikal.entrypoints=internalsecure,externalsecure"
  
