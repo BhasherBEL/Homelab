@@ -216,6 +216,7 @@ services:
     - "traefik.http.routers.radarr.tls=true"
     - "traefik.http.routers.radarr.tls.certresolver=http"
     - "traefik.http.routers.radarr.entrypoints=internalsecure"
+    - "traefik.http.routers.radarr.middlewares=authelia@docker"
 
   sonarr:
     container_name: sonarr
@@ -236,6 +237,7 @@ services:
     - "traefik.http.routers.sonarr.tls=true"
     - "traefik.http.routers.sonarr.tls.certresolver=http"
     - "traefik.http.routers.sonarr.entrypoints=internalsecure"
+    - "traefik.http.routers.sonarr.middlewares=authelia@docker"
 
   lidarr:
     container_name: lidarr
@@ -256,6 +258,7 @@ services:
     - "traefik.http.routers.lidarr.tls=true"
     - "traefik.http.routers.lidarr.tls.certresolver=http"
     - "traefik.http.routers.lidarr.entrypoints=internalsecure"
+    - "traefik.http.routers.lidarr.middlewares=authelia@docker"
 
   transmission:
     container_name: transmission
@@ -279,6 +282,7 @@ services:
     - "traefik.http.routers.transmission.tls=true"
     - "traefik.http.routers.transmission.tls.certresolver=http"
     - "traefik.http.routers.transmission.entrypoints=internalsecure"
+    - "traefik.http.routers.transmission.middlewares=authelia@docker"
     
   jackett:
     container_name: jackett
@@ -299,6 +303,7 @@ services:
     - "traefik.http.routers.jackett.tls=true"
     - "traefik.http.routers.jackett.tls.certresolver=http"
     - "traefik.http.routers.jackett.entrypoints=internalsecure"
+    - "traefik.http.routers.jackett.middlewares=authelia@docker"
 
   flaresolverr:
     container_name: flaresolverr
@@ -329,6 +334,7 @@ services:
     - "traefik.http.routers.bazarr.tls=true"
     - "traefik.http.routers.bazarr.tls.certresolver=http"
     - "traefik.http.routers.bazarr.entrypoints=internalsecure"
+    - "traefik.http.routers.bazarr.middlewares=authelia@docker"
 
   baikal:
     container_name: baikal
@@ -380,19 +386,19 @@ services:
     - 53:53/udp
     environment:
     - TZ=Europe/Paris
-    - WEBPASSWORD=${PIHOLE_PASSWORD}
+    - WEBPASSWORD=
     - WEBTHEME=default-dark
     - REV_SERVER=false
     - PIHOLE_DNS_=127.0.0.1#5335
     - DNSSEC=true
     - DNSMASQ_LISTENING=all
-    - FTLCONF_REPLY_ADDR4=192.168.1.220
+    - FTLCONF_LOCAL_IPV4=192.168.1.220
     - FTLCONF_RATE_LIMIT=0/0
     - FTL_CMD=debug
     - DNSMASQ_USER=root
     volumes:
-    - $HOME/pihole/config:/etc/pihole
-    - $HOME/pihole/dnsmasq.d:/etc/dnsmasq.d    
+    - $DATA/pihole/config:/etc/pihole
+    - $DATA/pihole/dnsmasq.d:/etc/dnsmasq.d    
     restart: unless-stopped 
     labels:
     - "traefik.enable=true"
@@ -401,3 +407,100 @@ services:
     - "traefik.http.services.pihole.loadbalancer.server.port=80"
     - "traefik.http.routers.pihole.tls=true"
     - "traefik.http.routers.pihole.tls.certresolver=http"
+    - "traefik.http.routers.pihole.middlewares=pihole-strip,authelia@docker"
+    #- "traefik.http.middlewares.pihole-strip.stripprefix.prefixes=/admin"
+    - "traefik.http.middlewares.pihole-strip.addprefix.prefix=/admin"
+
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+    - $DATA/postgres:/var/lib/postgresql/data
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: unless-stopped
+
+  openldap:
+    container_name: openldap
+    image: osixia/openldap:latest
+    restart: unless-stopped
+    environment:
+    - LDAP_ADMIN_USERNAME=admin
+    - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_PASSWORD}
+    - LDAP_READONLY_USER=true
+    - LDAP_READONLY_USER_USERNAME=readonly
+    - LDAP_READONLY_USER_PASSWORD=${LDAP_READONLY_PASSWORD}
+    - LDAP_DOMAIN=bhasher.com
+    - LDAP_ORGANISATION=Bhasher
+    - LDAP_RFC2307BIS_SCHEMA=true
+    - LDAP_TLS=false
+    volumes:
+    - $DATA/openldap/ldap:/var/lib/ldap
+    - $DATA/openldap/slapd.d:/etc/ldap/slapd.d
+
+  ldapusermanager:
+    container_name: ldapusermanager
+    image: wheelybird/ldap-user-manager:latest
+    restart: unless-stopped
+    environment:
+    - LDAP_URI=ldap://openldap
+    - LDAP_BASE_DN=dc=bhasher,dc=com
+    - LDAP_ADMIN_BIND_DN=cn=admin,dc=bhasher,dc=com
+    - LDAP_ADMINS_GROUP=admin
+    - SERVER_HOSTNAME=lum.bhasher.com
+    - NO_HTTPS=true
+    - ORGANISATION_NAME=Bhasher
+    - LDAP_REQUIRE_STARTTLS=false
+    - FORCE_RFC2307BIS=true
+    - SHOW_POSIX_ATTRIBUTES=false
+    - LDAP_ADMIN_BIND_PWD=${LDAP_ADMIN_PASSWORD}
+    - LDAP_USER_OU=users
+    - LDAP_GROUP_OU=groups
+    - LDAP_ACCOUNT_ATTRIBUTE=uid
+    - LDAP_GROUP_ATTRIBUTE=cn
+    - USERNAME_FORMAT={first_name}.{last_name}
+    - ENFORCE_SAFE_SYSTEM_NAMES=false
+    - PASSWORD_HASH=SHA512CRYPT
+    - ACCEPT_WEAK_PASSWORDS=false
+    - LDAP_ACCOUNT_ADDITIONAL_ATTRIBUTES=jpegPhoto^:Profile picture,sshpubkey^+:SSH public key
+    - REMOTE_HTTP_HEADERS_LOGIN=true
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.lum.rule=Host(`lum.bhasher.com`)"
+    - "traefik.http.routers.lum.entrypoints=internalsecure"
+    - "traefik.http.services.lum.loadbalancer.server.port=80"
+    - "traefik.http.routers.lum.tls=true"
+    - "traefik.http.routers.lum.tls.certresolver=http"
+    - "traefik.http.routers.lum.middlewares=authelia@docker"
+
+  authelia:
+    container_name: authelia
+    image: authelia/authelia:latest
+    restart: unless-stopped
+    environment:
+    - TZ=Europe/Paris
+    - AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD=${LDAP_READONLY_PASSWORD}
+    - AUTHELIA_JWT_SECRET=${AUTHELIA_JWT_SECRET}
+    - AUTHELIA_SESSION_SECRET=${AUTHELIA_SESSION_SECRET}
+    - AUTHELIA_STORAGE_ENCRYPTION_KEY=${AUTHELIA_ENCRYPTION_KEY}
+    - AUTHELIA_STORAGE_POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    - AUTHELIA_NOTIFIER_SMTP_PASSWORD=${SMTP_PASSWORD}
+    - AUTHELIA_NOTIFIER_SMTP_USERNAME=${SMTP_USER}
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.authelia.rule=Host(`idp.bhasher.com`)"
+    - "traefik.http.routers.authelia.entrypoints=internalsecure,externalsecure"
+    - "traefik.http.services.authelia.loadbalancer.server.port=9091"
+    - "traefik.http.routers.authelia.tls=true"
+    - "traefik.http.routers.authelia.tls.certresolver=http"
+    - 'traefik.http.middlewares.authelia.forwardAuth.address=http://authelia:9091/api/verify?rd=https%3A%2F%2Fidp.bhasher.com%2F'
+    - 'traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader=true'
+    - 'traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'
+    volumes:
+    - ./config/idp/authelia.configuration.yaml:/config/configuration.yml:ro
