@@ -117,3 +117,15 @@ identity_providers:
       - groups
       - email
       userinfo_signing_algorithm: none
+    - id: matrix_synapse
+      description: Matrix Synapse
+      secret: '$argon2id$v=19$m=65536,t=3,p=4$Z+6HONrjDp54s+MhXuq1cA$bjc5tMGD3gR6AaBYIDx3S2mz/UfPv6a0n1Vf3q2Ifik'
+      public: false
+      authorization_policy: one_factor
+      redirect_uris:
+      - https://matrix.bhasher.com/_synapse/client/oidc/callback
+      scopes:
+      - openid
+      - profile
+      - email
+      userinfo_signing_algorithm: none
