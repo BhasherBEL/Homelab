@@ -111,6 +111,7 @@ identity_providers:
       authorization_policy: one_factor
       redirect_uris:
       - https://grafana.bhasher.com/login/generic_oauth
+      consent_mode: implicit
       scopes:
       - openid
       - profile
@@ -124,8 +125,23 @@ identity_providers:
       authorization_policy: one_factor
       redirect_uris:
       - https://matrix.bhasher.com/_synapse/client/oidc/callback
+      consent_mode: implicit
       scopes:
       - openid
       - profile
+      - email
+      userinfo_signing_algorithm: none
+    - id: portainer
+      description: Portainer
+      secret: '$argon2id$v=19$m=65536,t=3,p=4$7bqhx/sMH6Hes4ggVwpEPg$uue9QyGkROpAihkGpbDV6YjKCJlZVXj1JBkJfyLj2MI'
+      public: false
+      authorization_policy: two_factor
+      redirect_uris:
+      - https://portainer.bxl.bhasher.com
+      consent_mode: implicit
+      scopes:
+      - openid
+      - profile
+      - groups
       - email
       userinfo_signing_algorithm: none
