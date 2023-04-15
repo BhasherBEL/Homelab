@@ -46,15 +46,15 @@ access_control:
     subject:
     - "group:admin"
   - domain: 'radarr.bhasher.com'
-    policy: two_factor
+    policy: one_factor
     subject:
     - "group:mediaserver"
   - domain: 'sonarr.bhasher.com'
-    policy: two_factor
+    policy: one_factor
     subject:
     - "group:mediaserver"
   - domain: 'jellyfin.bhasher.com'
-    policy: two_factor
+    policy: one_factor
     subject:
     - "group:mediaserver"
 
@@ -99,3 +99,21 @@ password_policy:
     require_lowercase: false
     require_number: false
     require_special: false
+
+identity_providers:
+  oidc:
+    enforce_pkce: public_clients_only
+    clients:
+    - id: grafana
+      description: Grafana
+      secret: '$argon2id$v=19$m=65536,t=3,p=4$dQfNyInvlh1Lgw3JXi7G6A$M/WaNpHJkAyaQcXIMsOTl0+gBWGPPVBoCm7NpEQfTpI'
+      public: false
+      authorization_policy: one_factor
+      redirect_uris:
+      - https://grafana.bhasher.com/login/generic_oauth
+      scopes:
+      - openid
+      - profile
+      - groups
+      - email
+      userinfo_signing_algorithm: none

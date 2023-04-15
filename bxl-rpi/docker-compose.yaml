@@ -142,11 +142,32 @@ services:
     - "traefik.http.routers.grafana.tls=true"
     - "traefik.http.routers.grafana.tls.certresolver=http"
     environment:
+    - GF_SERVER_ROOT_URL=https://grafana.bhasher.com
     - GF_SMTP_ENABLED=true
     - GF_SMTP_HOST=bdubois.io:465
     - GF_SMTP_USER=${SMTP_USER}
     - GF_SMTP_PASSWORD=${SMTP_PASSWORD}
     - GF_SMTP_FROM_ADDRESS=grafana@bhasher.com
+    - GF_AUTH_LOGIN_DISABLE_LOGIN_FORM=true
+    - GF_AUTH_DISABLE_SIGNOUT_MENU=true
+    - GF_AUTH_OAUTH_AUTO_LOGIN=true
+    - GF_AUTH_GENERIC_OAUTH_ENABLED=true
+    - GF_AUTH_GENERIC_OAUTH_ICON=signin
+    - GF_AUTH_GENERIC_OAUTH_NAME=Authelia
+    - GF_AUTH_GENERIC_OAUTH_CLIENT_ID=grafana
+    - GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET=${GRAFANA_OAUTH}
+    - GF_AUTH_GENERIC_OAUTH_SCOPES=openid profile email groups
+    - GF_AUTH_GENERIC_OAUTH_EMPTY_SCOPES=false
+    - GF_AUTH_GENERIC_OAUTH_AUTH_URL=https://idp.bhasher.com/api/oidc/authorization
+    - GF_AUTH_GENERIC_OAUTH_TOKEN_URL=https://idp.bhasher.com/api/oidc/token
+    - GF_AUTH_GENERIC_OAUTH_API_URL=https://idp.bhasher.com/api/oidc/userinfo
+    - GF_AUTH_GENERIC_OAUTH_LOGIN_ATTRIBUTE_PATH=preferred_username
+    - GF_AUTH_GENERIC_OAUTH_GROUPS_ATTRIBUTE_PATH=groups
+    - GF_AUTH_GENERIC_OAUTH_NAME_ATTRIBUTE_PATH=name
+    - GF_AUTH_GENERIC_OAUTH_USE_PKCE=false
+    - GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH=contains(roles[*], 'admin') && 'Admin' || 'Viewer'
+    - GF_AUTH_GENERIC_OAUTH_GROUPS_PATH=groups
+    - GF_AUTH_GENERIC_OAUTH_ALLOWED_GROUPS=admin
     volumes:
     - $DATA/monitoring/grafana:/var/lib/grafana 
 
@@ -492,6 +513,8 @@ services:
     - AUTHELIA_STORAGE_POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     - AUTHELIA_NOTIFIER_SMTP_PASSWORD=${SMTP_PASSWORD}
     - AUTHELIA_NOTIFIER_SMTP_USERNAME=${SMTP_USER}
+    - AUTHELIA_IDENTITY_PROVIDERS_OIDC_ISSUER_PRIVATE_KEY_FILE=/secrets/oidc_certificate.pem
+    - AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET=${AUTHELIA_OIDC_HMAC}
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.authelia.rule=Host(`idp.bhasher.com`)"
@@ -504,3 +527,4 @@ services:
     - 'traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'
     volumes:
     - ./config/idp/authelia.configuration.yaml:/config/configuration.yml:ro
+    - $DATA/authelia:/secrets:ro
