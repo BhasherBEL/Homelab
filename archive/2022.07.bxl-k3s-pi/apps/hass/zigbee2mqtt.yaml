@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: zigbee2mqtt-pvc
+  namespace: hass
+spec:
+  storageClassName: longhorn-static
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zigbee2mqtt
+  namespace: hass
+data:
+  configuration.yaml: |
+    homeassistant: true
+    permit_join: true
+    mqtt:
+      base_topic: zigbee2mqtt
+      server: mqtt://mosquitto.hass.svc.cluster.local
+    serial:
+      port: /dev/ttyACM0
+    devices:
+      '0x54ef441000367592':
+        friendly_name: WallSwitchOffice
+      '0x00158d00068b2c39':
+        friendly_name: MovementSensorDeskOffice
+      '0x00158d00067ca592':
+        friendly_name: MovementSensorShelfOffice
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zigbee2mqtt
+  namespace: hass
+  labels:
+    app: zigbee2mqtt
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: zigbee2mqtt
+  template:
+    metadata:
+      labels:
+        app: zigbee2mqtt
+    spec:
+      nodeSelector:
+        zigbee: "true"
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: zigbee2mqtt-pvc
+      - name: config
+        configMap:
+          name: zigbee2mqtt
+      - name: udev
+        hostPath:
+          path: /run/udev
+      - name: ttyacm
+        hostPath:
+          path: /dev/ttyACM0
+      containers:
+      - name: zigbee2mqtt
+        image: koenkk/zigbee2mqtt:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: TZ
+          value: Europe/Paris
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: data
+          mountPath: "/app/data"
+          readOnly: false
+        - name: config
+          mountPath: /app/configuration.yaml
+          subPath: configuration.yaml
+          readOnly: true
+        - name: udev
+          mountPath: /run/udev
+          readOnly: true
+        - name: ttyacm
+          mountPath: /dev/ttyACM0

@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: permis-config
+  namespace: crons
+data:
+  requirements.txt: |
+    requests==2.27.1
+  permis.py: |
+    import requests
+    from datetime import date
+    import os
+
+    token = os.getenv('TELEGRAM_TOKEN')
+    chat_id = os.getenv('TELEGRAM_ID')
+
+    assert token is not None, "Telegram token must be set"
+    assert chat_id is not None, "Telegram chat ID must be set"
+
+    base = 'https://rendezvous.permisconduire.be/api/frontend/v4/offers/'
+
+    str_to_date = lambda x: date(*[int(el) for el in x.split('-')])
+
+    afterDate = date(year=2022, month=6, day=10).strftime('%Y-%m-%d')
+    dates_url = base + f'_calendar?afterDate={afterDate}&size=42&sites=W3wn7&types=rQj2a'
+    rep = requests.get(dates_url).json()
+    dates = {el for el in {str_to_date(day['day']) for day in rep['days'] if day['hasOffer']} if el <= date(2022, 7, 20)}
+
+    if dates:
+      text = 'There are places for :\n - ' + '\n - '.join([el.strftime('%d/%m/%Y') for el in dates])
+
+      url = f'https://api.telegram.org/bot{token}/sendMessage?chat_id={chat_id}&text={text}'
+
+      print(date.today().strftime('%Y-%m-%d'), requests.get(url).status_code)
+    else:
+      print(date.today().strftime('%Y-%m-%d'), "No places")
+
+---
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: permis
+  namespace: crons
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  schedule: "*/10 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  suspend: true
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+          - name: app
+            configMap:
+              name: permis-config
+          containers:
+          - name: permis
+            image: python:3-slim-buster
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/sh
+            - -c
+            - pip install --no-cache-dir -r /app/requirements.txt;python /app/permis.py
+            volumeMounts:
+            - name: app
+              mountPath: /app
+              readOnly: true
+            envFrom:
+            - secretRef:
+                name: telegram-k-creds
+          restartPolicy: OnFailure

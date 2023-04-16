@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nextcloud
+  namespace: cloud
+data:
+  POSTGRES_HOST: postgres.storage.svc.cluster.local
+  POSTGRES_DB: nextcloud
+  POSTGRES_USER: nextcloud
+  NEXTCLOUD_ADMIN_USER: admin
+  NEXTCLOUD_TRUSTED_DOMAINS: nextcloud.bhasher.com
+  NEXTCLOUD_INIT_LOCK: "true"
+  REDIS_HOST: redis.storage.svc.cluster.local
+  SMTP_HOST: smtp.bhasher.com
+  SMTP_SECURE: ssl
+  SMTP_PORT: "465"
+  SMTP_NAME: no-reply@bhasher.com
+  MAIL_FROM_ADDRESS: "Nextcloud <no-reply@bhasher.com>"
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nextcloud-configs-file
+  namespace: cloud
+data:
+  sso.config.php: |
+    <?php
+    $CONFIG = array(
+      'oidc_login_proxy_ldap' => true,
+      'oidc_login_provider_url' => 'https://idp.bhasher.com',
+      'oidc_login_client_id' => 'nextcloud',
+      'oidc_login_client_secret' => (string) getenv('SSO_CLIENT_SECRET'),
+      'oidc_login_auto_redirect' => true,
+      'oidc_login_button_text' => 'Authelia',
+      'oidc_login_scope' => 'openid profile',
+      'oidc_login_tls_verify' => false,
+      'overwriteprotocol' => 'https',
+      'oidc_login_attributes' => array (
+        'ldap_uid' => 'preferred_username',
+      ),
+      'oidc_login_password_authentication' => true,
+    );
+  
+  custom.config.php: |
+    <?
+    $CONFIG = array(
+        'trashbin_retention_obligation' => 'auto, 7',
+    );

@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  namespace: devops
+  name: external-endpoints
+spec:
+  project: k3pi
+
+  source:
+    repoURL: https://git.bhasher.com/Bhasher/K3Pi.git
+    targetRevision: HEAD
+    path: services/apps/external-endpoints/
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: external-endpoints
+
+  syncPolicy:
+    automated:
+      prune: true

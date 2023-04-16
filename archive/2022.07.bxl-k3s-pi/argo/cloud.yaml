@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  namespace: devops
+  name: cloud
+spec:
+  project: k3pi
+
+  source:
+    repoURL: https://git.bhasher.com/Bhasher/K3Pi.git
+    targetRevision: HEAD
+    path: services/apps/cloud/
+    directory:
+      recurse: true
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cloud
+    
+  syncPolicy:
+    automated:
+      prune: true

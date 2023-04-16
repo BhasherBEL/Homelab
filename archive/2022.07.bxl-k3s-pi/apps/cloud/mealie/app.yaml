@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mealie
+  namespace: cloud
+  labels:
+    app: mealie
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 0
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: mealie
+  template:
+    metadata:
+      labels:
+        app: mealie
+    spec:
+      containers:
+      - name: mealie
+        image: hkotel/mealie:latest
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: mealie
+        - secretRef:
+            name: mealie
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mealie
+  namespace: cloud
+spec:
+  type: ClusterIP
+  selector:
+    app: mealie
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mealie
+  namespace: cloud
+  annotations:
+    cert-manager.io/cluster-issuer: "bhasherca-k3s-issuer"
+    cert-manager.io/common-name: "cook.bhasher.com"
+    nginx.ingress.kubernetes.io/auth-response-headers: Remote-User,Remote-Name,Remote-Groups,Remote-Email
+    nginx.ingress.kubernetes.io/auth-signin: https://idp.bhasher.com
+    nginx.ingress.kubernetes.io/auth-snippet: proxy_set_header X-Forwarded-Method request_method;
+    nginx.ingress.kubernetes.io/auth-url: https://idp.bhasher.com/api/verify
+    nginx.ingress.kubernetes.io/configuration-snippet: proxy_set_header X-Forwarded-Method request_method;
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - cook.bhasher.com
+    secretName: mealie-tls
+  rules:
+  - host: cook.bhasher.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: mealie
+            port:
+              number: 80

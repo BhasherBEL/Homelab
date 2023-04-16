@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ldapusermanager
+  namespace: idp
+data:
+  LDAP_URI: "ldap://openldap.idp.svc.cluster.local"
+  LDAP_BASE_DN: "dc=bhasher,dc=com"
+  LDAP_ADMIN_BIND_DN: "cn=admin,dc=bhasher,dc=com"
+  LDAP_ADMINS_GROUP: "admin"
+  SERVER_HOSTNAME: "accounts.bhasher.com"
+  SERVER_PORT: "80"
+  NO_HTTPS: "true"
+  ORGANISATION_NAME: "Bhasher's Accounts"
+  SITE_NAME: "Account Manager"
+  SHOW_POSIX_ATTRIBUTE: "true"
+  LDAP_USER_OU: "users"
+  LDAP_GROUP_OU: "groups"
+  LDAP_REQUIRE_STARTTLS: "false"
+  LDAP_IGNORE_CERT_ERRORS: "true"
+  LDAP_ACCOUNT_ATTRIBUTE: "uid"
+  LDAP_GROUP_ATTRIBUTE: "cn"
+  DEFAULT_USER_GROUP: "default"
+  ENFORCE_SAFE_SYSTEM_NAMES: "false"
+  USERNAME_FORMAT: "{first_name}.{last_name}"
+  PASSWORD_HASH: "SHA512CRYPT"
+  ACCEPT_WEAK_PASSWORDS: "false"
+  # LDAP_GROUP_MEMBERSHIP_USES_UID: "true"
+  LDAP_ACCOUNT_ADDITIONAL_ATTRIBUTES: "jpegPhoto^:Profile picture,sshpubkey^+:SSH public key"
+  REMOTE_HTTP_HEADERS_LOGIN: "true"
+  # FORCE_RFC2307BIS: "true"

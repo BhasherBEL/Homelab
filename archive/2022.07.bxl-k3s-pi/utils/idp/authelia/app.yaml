@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authelia
+  namespace: idp
+  labels:
+    app: authelia
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: authelia
+  template:
+    metadata:
+      labels:
+        app: authelia
+    spec:
+      containers:
+      - name: authelia
+        image: authelia/authelia:latest
+        args: ["--config", "/config/configuration.yml,/config/oidc.yml"]
+        ports:
+        - name: http
+          containerPort: 9091
+        volumeMounts:
+        - name: authelia-config
+          mountPath: /config/configuration.yml
+          subPath: configuration.yml
+        - name: authelia-oidc
+          mountPath: /config/oidc.yml
+          subPath: oidc.yml
+        envFrom:
+        - secretRef:
+            name: authelia
+      volumes:
+      - name: authelia-config
+        configMap:
+          name: authelia-config
+      - name: authelia-oidc
+        secret:
+          secretName: authelia-oidc
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: authelia
+  namespace: idp
+  labels:
+    app: authelia
+spec:
+  ports:
+  - name: http
+    port: 9091
+    targetPort: 9091
+  selector:
+    app: authelia
+  type: ClusterIP
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: authelia
+  namespace: idp
+  annotations:
+    cert-manager.io/cluster-issuer: "bhasherca-k3s-issuer"
+    cert-manager.io/common-name: "idp.bhasher.com"
+spec:
+  ingressClassName: "nginx-external"
+  tls:
+  - hosts:
+    - idp.bhasher.com
+    secretName: authelia-tls
+  rules:
+  - host: idp.bhasher.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: authelia
+            port:
+              number: 9091

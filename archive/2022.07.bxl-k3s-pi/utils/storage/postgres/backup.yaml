@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup
+  namespace: storage
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  schedule: "23 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: postgres-backup
+            image: docker.bhasher.com/postgres-borg:latest
+            imagePullPolicy: Always
+            envFrom:
+            - secretRef:
+                name: postgres-backup
+            volumeMounts:
+            - name: postgres-backup-ssh
+              mountPath: /ssh
+              readOnly: true
+          volumes:
+          - name: postgres-backup-ssh
+            secret:
+              secretName: postgres-backup-ssh
+          restartPolicy: Never

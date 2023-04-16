@@ -1,0 +1,134 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gitea
+  namespace: git
+spec:
+  storageClassName: longhorn-static
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitea
+  namespace: git
+  labels:
+    app: gitea
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: gitea
+  template:
+    metadata:
+      labels:
+        app: gitea
+    spec:
+      volumes:
+      - name: gitea-data
+        persistentVolumeClaim:
+          claimName: gitea
+      - name: gitea-certs
+        secret:
+          secretName: gitea-certs
+      - name: gitea-config
+        configMap:
+          name: gitea-config
+      - name: ca
+        configMap:
+          name: ca
+      containers:
+      - name: gitea
+        image: gitea/gitea:latest
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - secretRef:
+            name: gitea-tokens
+        volumeMounts:
+        - name: gitea-data
+          mountPath: /data
+          readOnly: false
+        - name: ca
+          mountPath: /etc/ssl/certs/bhasherCA.pem
+          subPath: bhasherCA.pem
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 10
+        startupProbe:
+          httpGet:
+            path: /
+            port: 3000
+          failureThreshold: 30
+          periodSeconds: 10
+      initContainers:
+      - name: init-config
+        image: busybox:latest
+        command: ['sh', '-c', 'mkdir -p /data/gitea/conf && cp /tmp/config/app.ini /data/gitea/conf/app.ini']
+        volumeMounts:
+        - name: gitea-data
+          mountPath: /data
+          readOnly: false
+        - name: gitea-config
+          mountPath: "/tmp/config"
+          readOnly: true
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitea
+  namespace: git
+spec:
+  type: ClusterIP
+  selector:
+    app: gitea
+  ports:
+  - name: https
+    port: 3000
+    protocol: TCP
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gitea
+  namespace: git
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    cert-manager.io/cluster-issuer: "bhasherca-k3s-issuer"
+    cert-manager.io/common-name: "git.bhasher.com"
+spec:
+  ingressClassName: nginx-external
+  tls:
+  - hosts:
+    - git.bhasher.com
+    secretName: gitea-tls
+  rules:
+  - host: git.bhasher.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: gitea
+            port:
+              number: 3000

@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  namespace: devops
+  name: portal
+spec:
+  project: k3pi
+
+  source:
+    repoURL: https://git.bhasher.com/Bhasher/K3Pi.git
+    targetRevision: HEAD
+    path: services/apps/portal/
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: portal
+  syncPolicy:
+    automated:
+      prune: true

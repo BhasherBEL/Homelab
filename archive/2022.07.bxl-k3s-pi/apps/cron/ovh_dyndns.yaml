@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ovh-dyndns-config
+  namespace: crons
+data:
+  update_ovh.sh: |
+    #/bin/sh
+
+    #
+    # CONFIG
+    #
+
+    # HOST=${}
+    # LOGIN=${}
+    # PASSWORD=${}
+    CURRENT_DATE=`date +'%d/%m/%Y %H:%M:%S'`
+
+    #
+    # GET IP(s)
+    #
+
+    CURRENT_IP=`{
+    cat <<EOF ; sleep 1;
+    GET / HTTP/1.0
+    Host: www.ifconfig.io
+    User-Agent: curl
+    Referer: http://ifconfig.io
+
+    EOF
+    } | nc -vvv www.ifconfig.io 80 | tail -1`
+
+    #
+    # DO THE WORK
+    #
+    if [ -z $CURRENT_IP ]
+    then
+      echo "No IP retrieved"
+    else
+      echo "$DYNDNS_LOGIN:$DYNDNS_PASSWORD"
+      echo "https://www.ovh.com/nic/update?system=dyndns&hostname=$DYNDNS_HOST&myip=$CURRENT_IP"
+      curl --user "$DYNDNS_LOGIN:$DYNDNS_PASSWORD" "https://www.ovh.com/nic/update?system=dyndns&hostname=$DYNDNS_HOST&myip=$CURRENT_IP"
+      echo "$CURRENT_DATE"": IP updated to" "$CURRENT_IP"
+    fi
+---
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ovh-dyndns
+  namespace: crons
+spec:
+  schedule: "0 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+          - name: data
+            configMap:
+              name: ovh-dyndns-config
+          containers:
+          - name: ovh-dyndns
+            image: alpine:latest
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/sh
+            - -c
+            - apk --no-cache add curl;/bin/sh /data/update_ovh.sh
+            envFrom:
+            - secretRef:
+                name: ovh-dyndns-creds
+            volumeMounts:
+            - name: data
+              mountPath: /data
+              readOnly: true
+          restartPolicy: OnFailure

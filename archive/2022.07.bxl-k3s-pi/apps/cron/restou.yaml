@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: restou-config
+  namespace: crons
+data:
+  requirements.txt: |
+    requests==2.27.1
+    beautifulsoup4==4.10.0
+  restou.py: |
+    import requests
+    from bs4 import BeautifulSoup as bs
+    from datetime import datetime
+    import os
+
+    soup = bs(requests.get('https://uclouvain.be/fr/decouvrir/resto-u/le-galilee-self.html').text, features='html.parser')
+
+    contents = soup.find('div', {'class': 'bigcontenu'}).findAll('div', {'class': 'menus'})
+
+    result = ['Menu du jour:']
+
+    for item in contents[datetime.now().weekday()].findAll('div'):
+        try:
+            title = item.find('p', {'class': 'titre2'}).text.strip()
+            content = item.find('p', {'class': 'texte1'}).text.strip()
+        except:
+            continue
+        if title and content and content != '0':
+            result.append(f' - {title}: {content}')
+
+    token = os.getenv('TELEGRAM_TOKEN')
+    chat_id = os.getenv('TELEGRAM_ID')
+
+    assert token is not None, "Telegram token must be set"
+    assert chat_id is not None, "Telegram chat ID must be set"
+
+    text = '\n'.join(result)
+    url = f'https://api.telegram.org/bot{token}/sendMessage?chat_id={chat_id}&text={text}'
+
+    print(url)
+
+    requests.get(url)
+
+---
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: restou
+  namespace: crons
+spec:
+  schedule: "30 11 * * 2,4"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+          - name: data
+            configMap:
+              name: restou-config
+          containers:
+          - name: restou
+            image: python:3-slim-buster
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/sh
+            - -c
+            - pip install --no-cache-dir -r /data/requirements.txt;python /data/restou.py
+            envFrom:
+            - secretRef:
+                name: telegram-creds
+            volumeMounts:
+            - name: data
+              mountPath: /data
+              readOnly: true
+          restartPolicy: OnFailure

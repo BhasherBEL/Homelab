@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: unibet-pvc
+  namespace: crons
+spec:
+  storageClassName: longhorn-static
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: unibet-config
+  namespace: crons
+data:
+  requirements.txt: |
+    requests==2.27.1
+  unibet.py: |
+    #!/usr/bin/env python
+    # coding: utf-8
+
+    import requests
+    from datetime import datetime
+    import os
+    import json
+
+    def analyze_event(data):
+        return {
+            'time': data['event']['start'],
+            'homeTeam': data['event']['homeName'],
+            'awayTeam': data['event']['awayName'],
+            'odds': {d['criterion']['englishLabel']: {o['englishLabel'] + (' ' + str(o['line']) if 'line' in o else ''): o['odds']/1000 for o in d['outcomes']} for d in data['betOffers']}
+        }
+
+    competitions = [
+        'england/premier_league',
+        'belgium/jupiler_pro_league',
+        'france/ligue_1'
+    ]
+
+    for comp in competitions:
+        content = requests.get(f'https://fr-sports.unibet.be/sportsbook-feeds/views/filter/football/{comp}/matches').json()
+        res = []
+        for a in content['layout']['sections']:
+            try:
+                for b in a['widgets']:
+                    try:
+                        for c in b['matches']['events']:
+                            try:
+                                res.append(analyze_event(c))
+                            except:
+                                pass
+                    except:
+                        pass
+            except:
+                pass
+        os.makedirs(f'/data/records/{comp.replace("/","-")}', exist_ok=True)
+        with open(f'/data/records/{comp.replace("/","-")}/{datetime.now()}.rec', 'w') as file:
+            json.dump(res, file)
+
+---
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: unibet
+  namespace: crons
+spec:
+  schedule: "30 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+          - name: app
+            configMap:
+              name: unibet-config
+          - name: data
+            persistentVolumeClaim:
+              claimName: unibet-pvc
+          containers:
+          - name: unibet
+            image: python:3-slim-buster
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/sh
+            - -c
+            - pip install --no-cache-dir -r /app/requirements.txt;python /app/unibet.py
+            volumeMounts:
+            - name: app
+              mountPath: /app
+              readOnly: true
+            - name: data
+              mountPath: /data
+              readOnly: false
+          restartPolicy: OnFailure

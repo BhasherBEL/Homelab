@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  namespace: devops
+  name: monitoring
+spec:
+  project: k3pi
+
+  source:
+    repoURL: https://git.bhasher.com/Bhasher/K3Pi.git
+    targetRevision: HEAD
+    path: services/utils/monitoring/
+    directory:
+      recurse: true
+      exclude: "custom-ressources/*"
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+
+  syncPolicy:
+    automated:
+      prune: true

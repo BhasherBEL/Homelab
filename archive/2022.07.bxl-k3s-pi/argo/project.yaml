@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: k3pi
+  namespace: devops
+spec:
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  destinations:
+    - name: '*'
+      namespace: '*'
+      server: 'https://kubernetes.default.svc'
+  sourceRepos:
+    - https://git.bhasher.com/Bhasher/K3Pi

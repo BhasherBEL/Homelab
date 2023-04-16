@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  namespace: devops
+  name: argo
+spec:
+  project: k3pi
+
+  source:
+    repoURL: https://git.bhasher.com/Bhasher/K3Pi.git
+    targetRevision: HEAD
+    path: services/argo/
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: devops
+    
+  syncPolicy:
+    automated:
+      prune: true

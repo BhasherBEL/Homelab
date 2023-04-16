@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: timesheet-config
+  namespace: timesheet
+data:
+  TS_DB_PATH: "/data/timesheet.db"
+  TS_HOST: "0.0.0.0"
+  TS_PORT: "8080"

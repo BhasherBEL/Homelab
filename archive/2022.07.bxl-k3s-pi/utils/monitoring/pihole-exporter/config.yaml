@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pihole-exporter
+  namespace: monitoring
+data:
+  PIHOLE_PROTOCOL: http
+  PIHOLE_HOSTNAME: pihole-ui-svc.dns.svc.cluster.local
+  PIHOLE_PORT: "80"

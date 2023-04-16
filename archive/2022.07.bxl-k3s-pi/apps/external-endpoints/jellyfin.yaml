@@ -1,0 +1,51 @@
+kind: Service
+apiVersion: v1
+metadata:
+ name: jellyfin
+ namespace: external-endpoints
+spec:
+ type: ClusterIP
+ ports:
+ - port: 8096
+   targetPort: 8096
+
+---
+
+kind: Endpoints
+apiVersion: v1
+metadata:
+ name: jellyfin
+ namespace: external-endpoints
+subsets:
+ - addresses:
+     - ip: 192.168.1.201
+   ports:
+     - port: 8096
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jellyfin
+  namespace: external-endpoints
+  annotations:
+    cert-manager.io/cluster-issuer: "bhasherca-k3s-issuer"
+    cert-manager.io/common-name: "jellyfin.bhasher.com"
+spec:
+  ingressClassName: "nginx-external"
+  tls:
+  - hosts:
+    - jellyfin.bhasher.com
+    secretName: jellyfin-tls
+  rules:
+  - host: jellyfin.bhasher.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: jellyfin
+            port:
+              number: 8096

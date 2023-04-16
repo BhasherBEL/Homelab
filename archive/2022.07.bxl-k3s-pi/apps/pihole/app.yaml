@@ -1,0 +1,232 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dns
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pihole-pvc
+  namespace: dns
+spec:
+  storageClassName: longhorn-static
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dnsmasq-pvc
+  namespace: dns
+spec:
+  storageClassName: longhorn-static
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pihole
+  namespace: dns
+  labels:
+    app: pihole
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: pihole
+  template:
+    metadata:
+      labels:
+        app: pihole
+        name: pihole
+    spec:
+      affinity:
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - pihole
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      containers:
+      - name: pihole
+        image: cbcrowe/pihole-unbound:latest
+        imagePullPolicy: IfNotPresent
+        envFrom:
+          - configMapRef:
+              name: pihole-configmap
+          - secretRef:
+              name: pihole-secret
+        ports:
+        - name: svc-53-udp
+          containerPort: 53
+          protocol: UDP
+        - name: svc-53-tcp
+          containerPort: 53
+          protocol: TCP  
+        - name: svc-ui
+          containerPort: 80
+          protocol: TCP
+        # livenessProbe:
+        #   httpGet:
+        #     port: svc-ui
+        #   initialDelaySeconds: 15
+        #   periodSeconds: 10
+        # readinessProbe:
+        #   httpGet:
+        #     port: svc-ui
+        #   initialDelaySeconds: 15
+        #   periodSeconds: 10
+        # startupProbe:
+        #   httpGet:
+        #     port: svc-ui
+        #   failureThreshold: 12
+        #   periodSeconds: 10
+        resources:
+          limits:
+            memory: "300Mi"
+            cpu: "250m"
+          requests:
+            memory: "50Mi"
+            cpu: "100m"
+        volumeMounts:
+        - name: pihole-etc
+          mountPath: "/etc/pihole"
+        - name: dnsmasq-etc
+          mountPath: "/etc/dnsmasq.d"
+        - name: unbound-conf
+          mountPath: "/etc/unbound/unbound.conf.d/pi-hole.conf"
+          subPath: "pi-hole.conf"
+          readOnly: true
+      volumes:
+      - name: pihole-etc
+        persistentVolumeClaim:
+          claimName: pihole-pvc
+      - name: dnsmasq-etc
+        persistentVolumeClaim:
+          claimName: dnsmasq-pvc
+      - name: unbound-conf
+        configMap:
+          name: unbound-conf
+
+---
+
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pihole-pdb
+  namespace: dns
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: pihole
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pihole-ui-svc
+  namespace: dns
+spec:
+  selector:
+    app: pihole
+  type: ClusterIP
+  ports:
+  - port: 80
+    protocol: TCP
+    name: pihole-ui
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pihole-tcp-svc
+  namespace: dns
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: 192.168.1.211
+    metallb.universe.tf/allow-shared-ip: "pihole-192.168.1.211"
+spec:
+  selector:
+    app: pihole
+  type: LoadBalancer
+  externalTrafficPolicy: Cluster
+  ports:
+  - port: 53
+    targetPort: 53
+    protocol: TCP
+    name: pihole-dns-tcp
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pihole-udp-svc
+  namespace: dns
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: 192.168.1.211
+    metallb.universe.tf/allow-shared-ip: "pihole-192.168.1.211"
+spec:
+  selector:
+    app: pihole
+  type: LoadBalancer
+  externalTrafficPolicy: Cluster
+  ports:
+  - port: 53
+    targetPort: 53
+    protocol: UDP
+    name: pihole-dns-udp
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pihole
+  namespace: dns
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "bhasherca-k3s-issuer"
+    cert-manager.io/common-name: "pihole.bhasher.com"
+    nginx.ingress.kubernetes.io/app-root: /admin
+    nginx.ingress.kubernetes.io/auth-response-headers: Remote-User,Remote-Name,Remote-Groups,Remote-Email
+    nginx.ingress.kubernetes.io/auth-signin: https://idp.bhasher.com
+    nginx.ingress.kubernetes.io/auth-snippet: proxy_set_header X-Forwarded-Method $request_method;
+    nginx.ingress.kubernetes.io/auth-url: https://idp.bhasher.com/api/verify
+    nginx.ingress.kubernetes.io/configuration-snippet: proxy_set_header X-Forwarded-Method $request_method;
+spec:
+  tls:
+  - hosts:
+    - pihole.bhasher.com
+    secretName: pihole-tls
+  rules:
+  - host: pihole.bhasher.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: pihole-ui-svc
+            port:
+              number: 80

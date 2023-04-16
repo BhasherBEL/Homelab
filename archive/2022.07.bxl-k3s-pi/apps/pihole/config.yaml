@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pihole-configmap
+  namespace: dns
+data:
+  TZ: "Europe/Paris"
+  WEBTHEME: "default-dark"
+  REV_SERVER: "false"
+  PIHOLE_DNS_: "127.0.0.1#5335"
+  DNSSEC: "true"
+  DNSMASQ_LISTENING: "single"
+  FTLCONF_REPLY_ADDR4: "192.168.1.211"
+  FTLCONF_RATE_LIMIT: "0/0"
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: unbound-conf
+  namespace: dns
+data:
+  pi-hole.conf: |
+    remote-control:
+      control-enable: yes
+      control-interface: 127.0.0.1
+      control-port: 8953
+    
+    server:
+        # Conectivity
+        interface: 127.0.0.1  # Only for pi-hole
+        port: 5335
+        do-ip4: yes
+        do-udp: yes
+        do-tcp: yes
+        do-ip6: no
+        prefer-ip6: no
+
+        # Security
+        harden-glue: yes
+        harden-dnssec-stripped: yes
+        harden-referral-path: yes
+        use-caps-for-id: no
+        unwanted-reply-threshold: 10000000
+
+        # Performances
+        edns-buffer-size: 1232
+        prefetch: yes
+        prefetch-key: yes
+        num-threads: 1
+        so-rcvbuf: 1m
+        max-udp-size: 3072
+        cache-min-ttl: 3600
+        cache-max-ttl: 86400
+        msg-cache-slabs: 8
+        rrset-cache-slabs: 8
+        infra-cache-slabs: 8
+        key-cache-slabs: 8
+        rrset-cache-size: 256m
+        msg-cache-size: 128m
+        so-rcvbuf: 1m
+
+        # Privacy
+        hide-identity: yes
+        hide-version: yes
+        private-address: 192.168.0.0/16
+        private-address: 169.254.0.0/16
+        private-address: 172.16.0.0/12
+        private-address: 10.0.0.0/8
+        private-address: fd00::/8
+        private-address: fe80::/10
+
+        # Stats
+        verbosity: 0
+        statistics-interval: 0
+        extended-statistics: yes
+        statistics-cumulative: yes

@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: prometheus
+    app.kubernetes.io/instance: k8s
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: 2.34.0
+  name: prometheus-k8s
+  namespace: monitoring
+spec:
+  ports:
+  - name: web
+    port: 9090
+    targetPort: web
+  - name: reloader-web
+    port: 8080
+    targetPort: reloader-web
+  selector:
+    app.kubernetes.io/component: prometheus
+    app.kubernetes.io/instance: k8s
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: kube-prometheus
+  sessionAffinity: ClientIP
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: prometheus
+  namespace: monitoring
+  annotations:
+    cert-manager.io/cluster-issuer: "bhasherca-k3s-issuer"
+    cert-manager.io/common-name: "prometheus.bhasher.com"
+    nginx.ingress.kubernetes.io/auth-signin: https://idp.bhasher.com
+    nginx.ingress.kubernetes.io/auth-response-headers: Remote-User,Remote-Groups
+    nginx.ingress.kubernetes.io/auth-snippet: proxy_set_header X-Forwarded-Method $request_method;
+    nginx.ingress.kubernetes.io/auth-url: https://idp.bhasher.com/api/verify
+    nginx.ingress.kubernetes.io/configuration-snippet: proxy_set_header X-Forwarded-Method $request_method;
+spec:
+  ingressClassName: "nginx"
+  tls:
+  - hosts:
+    - prometheus.bhasher.com
+    secretName: prometheus-tls
+  rules:
+  - host: prometheus.bhasher.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: prometheus-k8s
+            port:
+              number: 9090

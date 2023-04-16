@@ -1,0 +1,29 @@
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   namespace: devops
+#   name: jupyterhub
+# spec:
+#   project: k3pi
+
+#   source:
+#     #chart: jupyterhub
+#     repoURL: https://git.bhasher.com/Bhasher/K3Pi.git
+#     path: services/apps/jupyterhub
+#     # repoURL: https://jupyterhub.github.io/helm-chart  # /index.yaml
+#     targetRevision: 1.2.0
+#     helm:
+#       valueFiles:
+#       - values.yaml
+#     #  releaseName: jupyterhub
+#     # repoURL: https://git.bhasher.com/Bhasher/K3Pi.git
+#     #targetRevision: HEAD
+#     # path: services/apps/jupyterhub/
+
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: jupyterhub
+
+#   syncPolicy:
+#     automated:
+#       prune: true

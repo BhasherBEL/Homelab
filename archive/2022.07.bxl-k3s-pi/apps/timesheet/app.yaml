@@ -1,0 +1,111 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: timesheet
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: timesheet-pvc
+  namespace: timesheet
+spec:
+  storageClassName: longhorn-static
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: timesheet
+  namespace: timesheet
+  labels:
+    app: timesheet
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: timesheet
+  template:
+    metadata:
+      labels:
+        app: timesheet
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: node0
+      volumes:
+      - name: timesheet-data
+        persistentVolumeClaim:
+          claimName: timesheet-pvc
+      - name: timesheet-config
+        configMap:
+          name: timesheet-config
+      containers:
+      - name: timesheet
+        image: 192.168.1.201:8443/timesheet:latest
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: timesheet-config
+        volumeMounts:
+        - name: timesheet-data
+          mountPath: /data
+          readOnly: false
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: timesheet
+  namespace: timesheet
+spec:
+  type: ClusterIP
+  selector:
+    app: timesheet
+  ports:
+  - name: https
+    port: 8080
+    protocol: TCP
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: timesheet
+  namespace: timesheet
+  annotations:
+    cert-manager.io/cluster-issuer: "bhasherca-k3s-issuer"
+    cert-manager.io/common-name: "timesheet.bhasher.com"
+    nginx.ingress.kubernetes.io/auth-response-headers: Remote-User,Remote-Name,Remote-Groups,Remote-Email
+    nginx.ingress.kubernetes.io/auth-signin: https://idp.bhasher.com
+    nginx.ingress.kubernetes.io/auth-snippet: proxy_set_header X-Forwarded-Method $request_method;
+    nginx.ingress.kubernetes.io/auth-url: https://idp.bhasher.com/api/verify
+    nginx.ingress.kubernetes.io/configuration-snippet: proxy_set_header X-Forwarded-Method $request_method;
+spec:
+  ingressClassName: "nginx"
+  tls:
+  - hosts:
+    - timesheet.bhasher.com
+    secretName: timesheet-tls
+  rules:
+  - host: timesheet.bhasher.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: timesheet
+            port:
+              number: 8080

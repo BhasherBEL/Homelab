@@ -1,0 +1,128 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cloud
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextcloud
+  namespace: cloud
+spec:
+  storageClassName: longhorn-static
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 25Gi
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextcloud
+  namespace: cloud
+  labels:
+    app: nextcloud
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: nextcloud
+  template:
+    metadata:
+      labels:
+        app: nextcloud
+    spec:
+      affinity:
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - nextcloud
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      containers:
+      - name: nextcloud
+        image: nextcloud:latest
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: nextcloud
+        - secretRef:
+            name: nextcloud
+        volumeMounts:
+        - name: nextcloud
+          mountPath: /var/www/html
+          readOnly: false
+        - name: configs-file
+          mountPath: /var/www/html/config/sso.config.php
+          subPath: sso.config.php
+          readOnly: true
+        - name: configs-file
+          mountPath: /var/www/html/config/custom.config.php
+          subPath: custom.config.php
+          readOnly: true
+      volumes:
+      - name: nextcloud
+        persistentVolumeClaim:
+          claimName: nextcloud
+      - name: configs-file
+        configMap:
+          name: nextcloud-configs-file
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextcloud
+  namespace: cloud
+spec:
+  type: ClusterIP
+  selector:
+    app: nextcloud
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nextcloud
+  namespace: cloud
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 5G
+    nginx.ingress.kubernetes.io/client-body-buffer-size: 250M;
+    cert-manager.io/cluster-issuer: "bhasherca-k3s-issuer"
+    cert-manager.io/common-name: "nextcloud.bhasher.com"
+spec:
+  ingressClassName: nginx-external
+  tls:
+  - hosts:
+    - nextcloud.bhasher.com
+    secretName: nextcloud-tls
+  rules:
+  - host: nextcloud.bhasher.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nextcloud
+            port:
+              number: 80

@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/component: grafana
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: 8.4.6
+  name: grafana-config
+  namespace: monitoring
+stringData:
+  grafana.ini: |
+    [date_formats]
+    default_timezone = UTC
+
+    [server]
+    protocol = http
+    root_url = https://monitoring.bhasher.com
+    enable_gzip = true
+
+    [database]
+    type = postgres
+    host = postgres.storage.svc.cluster.local:5432
+    name = grafana
+    user = grafana
+    ssl_mode = disable
+
+    [remote_cache]
+    type = redis
+    connstr = redis.storage.svc.cluster.local:6379
+
+    [analytics]
+    reporting_enabled = false
+    check_for_updates = false
+    enable_feedback_links = false
+
+    [security]
+    disable_initial_admin_creation = true
+    cookie_secure = true
+    cookie_samesite = strict
+    allow_embedding = false
+    x_xss_protection = true
+
+    [users]
+    allow_sign_up = false
+    allow_org_create = false
+    default_theme = dark
+
+    [auth]
+    oauth_auto_login = true
+
+    [auth.generic_oauth]
+    enabled = true
+    name = authelia
+    icon = signin
+    client_id = grafana
+    scopes = openid profile groups email
+    empty_scopes = false
+    auth_url = https://idp.bhasher.com/api/oidc/authorization
+    token_url = https://idp.bhasher.com/api/oidc/token
+    api_url = https://idp.bhasher.com/api/oidc/userinfo
+    tls_skip_verify_insecure = true
+    use_pkce = true
+    login_attribute_path = preferred_username
+    groups_attribute_path = groups
+    role_attribute_path = contains(groups[*], 'admin') && 'Admin'
+    name_attribute_path = name
+type: Opaque

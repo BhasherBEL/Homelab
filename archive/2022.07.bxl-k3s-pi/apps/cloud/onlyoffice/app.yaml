@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: onlyoffice
+  namespace: cloud
+  labels:
+    app: onlyoffice
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: onlyoffice
+  template:
+    metadata:
+      labels:
+        app: onlyoffice
+    spec:
+      affinity:
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - onlyoffice
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      containers:
+      - name: onlyoffice
+        image: onlyoffice/documentserver:latest-arm64
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: onlyoffice
+        - secretRef:
+            name: onlyoffice
+        ports:
+        - name: http
+          containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          failureThreshold: 3
+          periodSeconds: 10
+        startupProbe:
+          httpGet:
+            path: /
+            port: http
+          failureThreshold: 30
+          periodSeconds: 10
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: onlyoffice
+  namespace: cloud
+spec:
+  type: ClusterIP
+  selector:
+    app: onlyoffice
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: onlyoffice
+  namespace: cloud
+  annotations:
+    cert-manager.io/cluster-issuer: "bhasherca-k3s-issuer"
+    cert-manager.io/common-name: "onlyoffice.bhasher.com"
+spec:
+  ingressClassName: nginx-external
+  tls:
+  - hosts:
+    - onlyoffice.bhasher.com
+    secretName: onlyoffice-tls
+  rules:
+  - host: onlyoffice.bhasher.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: onlyoffice
+            port:
+              number: 80

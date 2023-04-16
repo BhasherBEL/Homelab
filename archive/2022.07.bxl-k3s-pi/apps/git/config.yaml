@@ -1,0 +1,275 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitea-config
+  namespace: git
+data:
+  app.ini: |
+    APP_NAME = Gitea Bhasher
+    RUN_MODE = prod
+    RUN_USER = git
+
+    [repository]
+    ROOT                        = /data/git/repositories
+    SCRIPT_TYPE                 = bash
+    DETECT_CHARSETS_ORDER       = defaults
+    FORCE_PRIVATE               = false
+    DEFAULT_PRIVATE             = public
+    DEFAULT_PUSH_CREATE_PRIVATE = false
+    MAX_CREATION_LIMIT          = -1
+    PREFERED_LICENSES           = MIT License
+    DISABLE_HTTP_GIT            = false
+    ENABLE_PUSH_CREATE_USER     = false
+    ENABLE_PUSH_CREATE_ORG      = false
+    DEFAULT_BRANCH              = master
+
+    [repository.local]
+    LOCAL_COPY_PATH = /data/gitea/tmp/local-repo
+
+    [repository.upload]
+    TEMP_PATH     = /data/gitea/uploads
+    FILE_MAX_SIZE = 25
+    MAX_FILES     = 100
+
+    [repository.signing]
+    SIGNING_KEY         = default
+    INITIAL_COMMIT      = always
+    DEFAULT_TRUST_MODEL = collaborator
+    WIKI                = parentsigned
+    CRUD_ACTIONS        = pubkey,parentsigned
+    MERGES              = pubkey,basesigned,comitssigned
+
+    [ui]
+    EXPLORE_PAGING_NUM      = 20
+    ISSUE_PAGING_NUM        = 20
+    MEMBERS_PAGING_NUM      = 20
+    FEED_PAGING_NUM         = 20
+    GRAPH_MAX_COMMIT_NUM    = 100
+    DEFAULT_THEME           = arc-green
+    SHOW_USER_EMAIL         = true
+    MAX_DISPLAY_FILE_SIZE   = 8388608
+    DEFAULT_SHOW_FULL_NAME  = true
+
+    [ui.meta]
+    AUTHOR      = Bhasher's git
+    DESCRIPTION = Custom git server based on gitea
+    KEYWORDS    = gitea,git,bhasher,self-hosted
+
+    [ui.csv]
+    MAX_FILE_SIZE = 8388608
+
+    [markdown]
+    ENABLE_HARD_LINE_BREAK_IN_COMMENTS  = true
+    ENABLE_HARD_LINE_BREAK_IN_DOCUMENTS = true
+    CUSTOM_URL_SCHEMES                  = git
+
+    [server]
+    APP_DATA_PATH           = /data/gitea
+    PROTOCOL                = http
+    DOMAIN                  = git.bhasher.com
+    HTTP_ADDR               = 0.0.0.0
+    HTTP_PORT               = 3000
+    UNIX_SOCKET_PERMISSION  = 660
+    ROOT_URL                = https://git.bhasher.com/
+    LOCAL_ROOT_URL          = http://127.0.0.1:3000/
+    DISABLE_SSH             = true
+    LFS_START_SERVER        = false
+    APP_DATA_PATH           = /data/gitea
+    OFFLINE_MODE            = false
+    LANDING_PAGE            = explore
+
+    [database]
+    DB_TYPE  = postgres
+    HOST     = postgres.storage.svc.cluster.local
+    NAME     = gitea
+    USER     = gitea
+    SCHEMA   = public
+    SSL_MODE = disable
+    LOG_SQL  = false
+
+    [indexer]
+    ISSUE_INDEXER_TYPE    = bleve
+    ISSUE_INDEXER_PATH    = /data/gitea/indexers/issues.bleve
+    REPO_INDEXER_ENABLED  = true
+    REPO_INDEXER_TYPE     = bleve
+    REPO_INDEXER_PATH     = /data/gitea/indexers/repos.bleve
+    MAX_FILE_SIZE         = 524288
+
+    [admin]
+    DEFAULT_EMAIL_NOTIFICATIONS   = enabled
+    DISABLE_REGULAR_ORG_CREATION  = false
+
+    [security]
+    INSTALL_LOCK                        = true
+    LOGIN_REMEMBER_DAYS                 = 7
+    REVERSE_PROXY_LIMIT                 = 1
+    DISABLE_GIT_HOOKS                   = true
+    DISABLE_WEBHOOKS                    = false
+    INTERNAL_TOKEN                      = azerty
+    REVERSE_PROXY_AUTHENTICATION_USER   = Remote-User
+    REVERSE_PROXY_AUTHENTICATION_EMAIL  = Remote-Email
+    REVERSE_PROXY_TRUSTED_PROXIES       = ingress-nginx-controller.ingress-nginx.svc.cluster.local
+
+    [openid]
+    ENABLE_OPENID_SIGNIN = false
+    ENABLE_OPENID_SIGNUP = false
+
+    [service]
+    DISABLE_REGISTRATION                          = true
+    REQUIRE_SIGNIN_VIEW                           = false
+    REGISTER_EMAIL_CONFIRM                        = false
+    ENABLE_NOTIFY_MAIL                            = true
+    ENABLE_BASIC_AUTHENTICATION                   = false
+    ENABLE_REVERSE_PROXY_AUTHENTICATION           = false  # true
+    ENABLE_REVERSE_PROXY_AUTO_REGISTRATION        = false
+    ENABLE_CAPTCHA                                = false
+    DEFAULT_KEEP_EMAIL_PRIVATE                    = false
+    DEFAULT_ALLOW_CREATE_ORGANIZATION             = true
+    DEFAULT_USER_IS_RESTRICTED                    = false
+    DEFAULT_ENABLE_DEPENDENCIES                   = true
+    ALLOW_CROSS_REPOSITORY_DEPENDENCIES           = true
+    ENABLE_USER_HEATMAP                           = true
+    DEFAULT_ENABLE_TIMETRACKING                   = true
+    DEFAULT_ALLOW_ONLY_CONTRIBUTORS_TO_TRACK_TIME = true
+    SHOW_REGISTRATION_BUTTON                      = false
+    SHOW_MILESTONES_DASHBOARD_PAGE                = true
+    AUTO_WATCH_NEW_REPOS                          = true
+    DEFAULT_USER_VISIBILITY                       = public
+    ALLOWED_USER_VISIBILITY_MODES                 = public,limited
+    DEFAULT_ORG_VISIBILITY                        = public
+    DEFAULT_ORG_MEMBER_VISIBLE                    = true
+    ALLOW_ONLY_EXTERNAL_REGISTRATION              = true
+    NO_REPLY_ADDRESS                              = noreply.git.bhasher.com
+    VALID_SITE_URL_SCHEMES                        = https
+
+    [service.explore]
+    REQUIRE_SIGNIN_VIEW                           = false
+    DISABLE_USERS_PAGE                            = false
+
+    [webhook]
+    DELIVER_TIMEOUT   = 5
+    ALLOWED_HOST_LIST = *
+    SKIP_TLS_VERIFY   = false
+    
+    [mailer]
+    ENABLED             = true
+    FROM                = "Bhasher's gitea" <no-reply@bhasher.com>
+    MAILER_TYPE         = smtp
+    HOST                = bdubois.io:465
+    IS_TLS_ENABLED      = true
+    USER                = no-reply@bhasher.com
+    SEND_AS_PLAIN_TEXT  = false
+    SKIP_VERIFY         = true
+    SUBJECT_PREFIX      = [Gitea]
+
+    [cache]
+    ENABLED   = true
+    ADAPTER   = memory
+    ITEM_TTL  = 1h
+    
+    [cache.last_commit]
+    ENABLED       = true
+    ITEM_TTL      = 24h
+    COMMITS_COUNT = 100
+
+    [session]
+    PROVIDER          = memory
+    COOKIE_SECURE     = true
+    COOKIE_NAME       = sessid
+    SESSION_LIFE_TIME = 43200
+    SAME_SITE         = strict
+
+    [picture]
+    DISABLE_GRAVATAR                = false
+    GRAVATAR_SOURCE                 = gravatar
+    ENABLE_FEDERATED_AVATAR         = true
+    #AVATAR_STORAGE_TYPE             = default
+    AVATAR_UPLOAD_PATH              = /data/gitea/avatars
+    AVATAR_MAX_WIDTH                = 2048
+    AVATAR_MAX_HEIGHT               = 1536
+    AVATAR_MAX_FILE_SIZE            = 1048576
+    AVATAR_RENDERED_SIZE_FACTOR     = 5
+    #REPOSITORY_AVATAR_STORAGE_TYPE  = default
+    REPOSITORY_AVATAR_UPLOAD_PATH   = /data/gitea/repo-avatars
+    REPOSITORY_AVATAR_FALLBACK      = random
+    DISABLE_GRAVATAR                = false
+    ENABLE_FEDERATED_AVATAR         = true
+    REPO_INDEXER_EXCLUDE_VENDORED   = true
+
+    [attachment]
+    ENABLE        = true
+    ALLOWED_TYPES = .docx,.gif,.gz,.jpeg,.jpg,.mp4,.log,.pdf,.png,.pptx,.txt,.xlsx
+    MAX_SIZE      = 2
+    MAX_FILES     = 5
+    STORAGE_TYPE  = local
+    PATH          = /data/gitea/attachments
+
+    [log]
+    MODE      = console
+    LEVEL     = Warn
+    ROUTER    = console
+    ROOT_PATH = /data/gitea/log
+
+    [git]
+    PATH                          = 
+    DISABLE_DIFF_HIGHLIGHT        = false
+    MAX_GIT_DIFF_LINES            = 1000
+    MAX_GIT_DIFF_LINE_CHARACTERS  = 1000
+    MAX_GIT_DIFF_FILES            = 100
+    PULL_REQUEST_PUSH_MESSAGE     = true
+    VERBOSE_PUSH                  = true
+    VERBOSE_PUSH_DELAY            = 5
+    LARGE_OBJECT_THRESHOLD        = 1048576
+    DISABLE_PARTIAL_CLONE         = false
+
+    [git.timeout]
+    DEFAULT = 60
+    MIGRATE = 60
+    MIRROR  = 60
+    CLONE   = 60
+    PULL    = 60
+    GC      = 60
+
+    [metrics]
+    ENABLED = false
+
+    [api]
+    ENABLE_SWAGGER              = false
+    MAX_RESPONSE_ITEMS          = 50
+    DEFAULT_PAGING_NUM          = 20
+    DEFAULT_GIT_TREES_PER_PAGE  = 100
+    DEFAULT_MAX_BLOB_SIZE       = 1048576
+
+    [oauth2]
+    ENABLE                        = false
+
+    [i18n]
+    LANGS = en-US,de-DE,fr-FR,nl-NL,es-ES,it-IT,pt-PT
+    NAMES = English,Deutsch,Français,Nederlands,Español,Italiano,Portguês
+
+    [markup]
+    ENABLED = false
+
+    [time]
+    DEFAULT_UI_LOCATION = Europe/Paris
+
+    [migrations]
+    ALLOW_LOCALNETWORKS = true
+    SKIP_TLS_VERIFY     = true
+
+    [federation]
+    ENABLED = false
+
+    [packages]
+    ENABLED = true
+
+    [mirror]
+    ENABLED           = true
+    DISABLE_NEW_PULL  = false
+    DISABLE_NEW_PUSH  = false
+    DEFAULT_INTERVAL  = 1h
+    MIN_INTERVAL      = 15m
+
+    [other]
+    SHOW_FOOTER_TEMPLATE_LOAD_TIME  = false
+    SHOW_FOOTER_VERSION             = false

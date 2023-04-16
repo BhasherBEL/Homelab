@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mk-exporter
+  namespace: monitoring
+  labels:
+    app: mk-exporter
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: mk-exporter
+  template:
+    metadata:
+      labels:
+        app: mk-exporter
+    spec:
+      containers:
+      - name: mk-exporter
+        image: hatamiarash7/mikrotik-exporter:latest
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: CONFIG_FILE
+            value: /config.yml
+        volumeMounts:
+        - name: config
+          mountPath: /config.yml
+          subPath: config.yml
+          readOnly: true
+      volumes:
+      - name: config
+        secret:
+          secretName: mk-exporter
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mk-exporter
+  namespace: monitoring
+  labels:
+    app: mk-exporter
+spec:
+  type: ClusterIP
+  selector:
+    app: mk-exporter
+  ports:
+  - name: metrics
+    port: 9436
+    protocol: TCP
+
+---
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: mk-exporter
+  namespace: monitoring
+  labels:
+    app: mk-exporter
+spec:
+  endpoints:
+  - interval: 15s
+    port: metrics
+  selector:
+    matchLabels:
+      app: mk-exporter

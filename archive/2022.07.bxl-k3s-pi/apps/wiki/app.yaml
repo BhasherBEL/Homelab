@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: wiki
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wikijs
+  namespace: wiki
+  labels:
+    app: wikijs
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: wikijs
+  template:
+    metadata:
+      labels:
+        app: wikijs
+    spec:
+      volumes:
+      - name: ca
+        configMap:
+          name: ca
+      containers:
+      - name: wikijs
+        image: ghcr.io/requarks/wiki:latest
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: wikijs
+        - secretRef:
+            name: wikijs
+        volumeMounts: 
+        - name: ca
+          mountPath: /certs
+          readOnly: true
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          failureThreshold: 2
+          periodSeconds: 10
+        startupProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          failureThreshold: 24
+          periodSeconds: 5
+    
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: wikijs
+  namespace: wiki
+spec:
+  type: ClusterIP
+  selector:
+    app: wikijs
+  ports:
+  - name: http
+    port: 3000
+    protocol: TCP
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wikijs
+  namespace: wiki
+  annotations:
+    cert-manager.io/cluster-issuer: "bhasherca-k3s-issuer"
+    cert-manager.io/common-name: "wiki.bhasher.com"
+spec:
+  ingressClassName: nginx-external
+  tls:
+  - hosts:
+    - wiki.bhasher.com
+    secretName: wikijs-tls
+  rules:
+  - host: wiki.bhasher.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: wikijs
+            port:
+              number: 3000

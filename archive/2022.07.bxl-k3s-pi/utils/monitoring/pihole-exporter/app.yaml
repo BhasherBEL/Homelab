@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pihole-exporter
+  namespace: monitoring
+  labels:
+    app: pihole-exporter
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: pihole-exporter
+  template:
+    metadata:
+      labels:
+        app: pihole-exporter
+    spec:
+      containers:
+      - name: pihole-exporter
+        image: docker.bhasher.com/pihole-exporter:latest
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: pihole-exporter
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pihole-exporter
+  namespace: monitoring
+  labels:
+    app: pihole-exporter
+spec:
+  type: ClusterIP
+  selector:
+    app: pihole-exporter
+  ports:
+  - name: metrics
+    port: 9617
+    protocol: TCP
+
+---
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: pihole-exporter
+  namespace: monitoring
+  labels:
+    app: pihole-exporter
+spec:
+  endpoints:
+  - interval: 15s
+    port: metrics
+    # metricRelabelings:
+    # - action: labeldrop
+    #   regex: (instance|drop)
+    #   sourceLabels:
+    #   - __name__
+  selector:
+    matchLabels:
+      app: pihole-exporter

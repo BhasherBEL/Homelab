@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: metallb-system
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config
+  namespace: metallb-system
+data:
+  config: |
+    address-pools:
+    - name: manual-pool
+      protocol: layer2
+      auto-assign: false
+      addresses:
+      - 192.168.1.210-192.168.1.214
+    - name: auto-pool
+      protocol: layer2
+      addresses:
+      - 192.168.1.215-192.168.1.219

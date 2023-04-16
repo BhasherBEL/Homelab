@@ -1,0 +1,158 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authelia-config
+  namespace: idp
+data:
+  configuration.yml: |
+    default_redirection_url: https://portal.bhasher.com
+    theme: dark
+
+    server:
+      host: 0.0.0.0
+      port: 9091
+
+    log:
+      level: debug
+    
+    totp:
+      disable: false
+      issuer: idp.bhasher.com
+      algorithm: sha256
+      digits: 6
+      period: 30
+      skew: 1
+      secret_size: 32
+
+    authentication_backend:
+      disable_reset_password: false
+      refresh_interval: 5m
+      ldap:
+        implementation: custom
+        url: ldap://openldap.idp.svc.cluster.local
+        timeout: 5s
+        start_tls: false
+        base_dn: DC=bhasher,DC=com
+        username_attribute: uid
+        additional_users_dn: ou=users
+        users_filter: (&({username_attribute}={input})(objectClass=inetOrgPerson))
+        additional_groups_dn: ou=groups
+        groups_filter: (&(uniqueMember={dn})(objectClass=groupOfUniqueNames))
+        group_name_attribute: cn
+        mail_attribute: mail
+        display_name_attribute: cn
+        permit_referrals: false
+    
+    access_control:
+      default_policy: deny
+      rules:
+      - domain: '*.bhasher.com'
+        policy: two_factor
+        subject:
+        - "group:admin"
+      - domain: 'git.bhasher.com'
+        policy: two_factor
+        subject:
+        - "group:contributor"
+      - domain: 'wiki.bhasher.com'
+        policy: two_factor
+        subject:
+        - "group:contributor"
+      - domain: 'radarr.bhasher.com'
+        policy: two_factor
+        subject:
+        - "group:mediaserver"
+      - domain: 'nextcloud.bhasher.com'
+        policy: two_factor
+        subject:
+        - "group:home"
+    
+    session:
+      name: auth_session
+      domain: bhasher.com
+      same_site: lax
+      expiration: 1d
+      inactivity: 3h
+      remember_me_duration: 1w
+      redis:
+        host: redis.storage.svc.cluster.local
+        port: 6379
+
+    regulation:
+      max_retries: 3
+      find_time: 1m
+      ban_time: 5m
+
+    storage:
+      # local:
+      #   path: /data/db.sqlite3
+      postgres:
+        host: postgres.storage.svc.cluster.local
+        port: 5432
+        database: authelia
+        schema: public
+        username: authelia
+
+    notifier:
+      smtp:
+        username: no-reply@bhasher.com
+        host: bdubois.io
+        port: 587
+        sender: no-reply@bhasher.com
+        tls:
+          skip_verify: true
+
+    password_policy:
+      standard:
+        enabled: true
+        min_length: 8
+        max_length: 0
+        require_uppercase: false
+        require_lowercase: false
+        require_number: false
+        require_special: false
+
+    identity_providers:
+      oidc:
+        issuer_private_key: |
+          -----BEGIN RSA PRIVATE KEY-----
+          MIIEowIBAAKCAQEAwz+97ZILHP+8Hxu2XsK17QZEyOiGQ45SRl6/UbjhiN5Cc5di
+          UQ3I8LaHwvxrsbbBaqLQsYVISye8xdeVvKEa/Pk/VYVGRgOQ+DFHPthOYwGa9bZa
+          INtvOKy85OiqFY8mamRiTkCDo4unxVf35mI6Z01+a5WycvG2mC1VY3v0VC2/PyJt
+          uRusqk9946DbP7IJ83WS8GuVEGsKna8pjr1DW2kC+qUZtA8pM0mH8EK1o2wDKPOb
+          X/4J+/A9kbx2Gnt8gxq3NtErcUHsSKwQtQfik38ehfFfOxq+xINjn5W90gUvx2q5
+          zI3gk2cJFTxiKqRtYfTETnepvKqkzTMlBCVAMwIDAQABAoIBAHlpfMBrbW+18xRh
+          FjGs4JYorMNGHJ+Ls8vAhTXbQpvqoeXhQCjo6ogM6TUt5AYZgALAhgeturvJVRCt
+          s5YdlHu0vlZ+zqkg9JfxhL0mou/cArFCmJ8P9QSIHdo2d/V6E8ha7ep9IZ6kbEpC
+          HoxrjqfIP5HE/7eMaSAOKKf5X4Cr701/3r/0rD+BsYZPC0eklRO2W1x801n0+ks0
+          oVI1/fNkM+F8It7GK/AC1KGThLL8DzBP9cwYaqnABktNKCh+/2z4+50G9z8Bcc3F
+          4FUYubidahZ0DD0KniFGcENfDhLPpy3HsQU6Sp5IgZBaM+jbbp5Grv3Wh7kqDEOQ
+          tmdjEGECgYEA7ZLpHm8h2C9nMFwMzCR18VQgAzLlhCxBJn7wOF5EUOJWNRCo1To1
+          G9qNMUKb1pcnwYGc2s488YfiUkufxZKCjdRSmVwul4D5ufb4zGu/4ulzfrx6DnjJ
+          8BBAtYPiP5RD+m9keB1OI6BHYOMtLi4Vv+XjkasTbtYRWcPdQABC+DECgYEA0mR1
+          ye9T4KcrQoFP14I0vFkVLe2gzVa3Kn5MSM7iMMXcTV3G2GSQCtufpVRbGvw0qgDy
+          cdIvT24dIhYaqF33IuJdZgzSlM4/3KQbMPhVlLpaGpiP1CqUuxsTlrjzOZUkTZBE
+          BrfkBO9VwaGX35WqnatFyXJ3TEWPt4/1s9DfiaMCgYEA4sg6gDLVu+iEOEWmcbjc
+          XWJQrL0JGwKjrnu+FBDoZc2pPT6J7AGEcPJPlZZf7Jid+rofYT8+LdHo2WYXPiJ9
+          PaZQstSsJTOZL0vydDDnG1R+S5zfZrEnE2JwYtViRA7kVUvAPGi9DoURngs+NbcI
+          TAbHFWaZRlRSe73clhup0gECgYBK9Pm2MSssDcLu1c1RVZVeSUqva0rv/WYSoJ6j
+          DfouMEAV3EQ80k8zXx3YtF4lFhfZPa8i+CRc4zlD7KYguCGVbxqhgg4AcB72iA0b
+          /E3ZSC9T7GjJyUXmB3aKK2iUaltduvlRf3CghXiDHQRT5ym7NMsPQ1XXea0DVCnQ
+          n6kUiwKBgDAMfny68ymQVskEv/NCTbRkpz6O1DA997QyjPV/QyfSpt1znPuNvgkE
+          SQu0C/b47Nm2ZGAHVryWLo8bBS8+ECEV74GM/kHoDWpWzEeoxynW+dBZoP9sbKzZ
+          LCWjPegQEkVdtp83Thfqb/MfeUj8GHf8MegIGoJd50f19tggd4a3
+          -----END RSA PRIVATE KEY-----
+        access_token_lifespan: 3h
+        authorize_code_lifespan: 1m
+        id_token_lifespan: 1h
+        refresh_token_lifespan: 90m
+        enable_client_debug_messages: false
+        cors:
+          endpoints:
+          - authorization
+          - token
+          - revocation
+          - introspection
+          allowed_origins:
+          - https://git.bhasher.com
+          allowed_origins_from_client_redirect_uris: false

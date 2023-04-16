@@ -1,0 +1,112 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: openldap
+  namespace: idp
+spec:
+  storageClassName: longhorn-static
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: openldap-conf
+  namespace: idp
+spec:
+  storageClassName: longhorn-static
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Mi
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openldap
+  namespace: idp
+  labels:
+    app: openldap
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  selector:
+    matchLabels:
+      app: openldap
+  replicas: 1
+  revisionHistoryLimit: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: openldap
+    spec:
+      containers:
+        - name: openldap
+          image: osixia/openldap:latest
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - name: openldap-certs
+            mountPath: /container/service/slapd/assets/certs
+          - name: openldap-data
+            mountPath: /var/lib/ldap
+          - name: openldap-conf
+            mountPath: /etc/ldap/slapd.d
+          envFrom:
+          - secretRef:
+              name: openldap-credentials
+          ports:
+            - containerPort: 389
+              name: openldap
+            - containerPort: 636
+              name: openldapssl
+      volumes:
+      - name: openldap-certs
+        emptyDir: {}
+        # secret:
+        #   secretName: openldap-certs
+      - name: openldap-data
+        persistentVolumeClaim:
+          claimName: openldap
+      - name: openldap-conf
+        persistentVolumeClaim:
+          claimName: openldap-conf
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: openldap
+  namespace: idp
+spec:
+  type: LoadBalancer
+  selector:
+    app: openldap
+  ports:
+  - name: ldap
+    port: 389
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: openldap-tls
+  namespace: idp
+spec:
+  type: ClusterIP
+  selector:
+    app: openldap
+  ports:
+  - name: ldap-tls
+    port: 636
