@@ -1,0 +1,101 @@
+services:
+  prom_monitoring:
+    container_name: prom_monitoring
+    image:  prom/prometheus:latest
+    restart: unless-stopped
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.prom.rule=Host(`prometheus.bhasher.com`)"
+    - "traefik.http.routers.prom.entrypoints=internalsecure"
+    - "traefik.http.services.prom.loadbalancer.server.port=9090"
+    - "traefik.http.routers.prom.tls=true"
+    - "traefik.http.routers.prom.tls.certresolver=http"
+    - "traefik.http.routers.prom.middlewares=authelia@docker"
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
+    volumes:
+    - $CONFIG/monitoring/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
+    - $DATA/monitoring/prometheus:/prometheus
+    networks:
+    - monitoring
+    - external
+
+  grafana:
+    container_name: grafana
+    image:  grafana/grafana
+    restart: unless-stopped
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.grafana.rule=Host(`grafana.bhasher.com`)"
+    - "traefik.http.routers.grafana.entrypoints=internalsecure"
+    - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+    - "traefik.http.routers.grafana.tls=true"
+    - "traefik.http.routers.grafana.tls.certresolver=http"
+    environment:
+    - GF_SERVER_ROOT_URL=https://grafana.bhasher.com
+    - GF_SMTP_ENABLED=true
+    - GF_SMTP_HOST=bdubois.io:465
+    - GF_SMTP_USER=${SMTP_USER}
+    - GF_SMTP_PASSWORD=${SMTP_PASSWORD}
+    - GF_SMTP_FROM_ADDRESS=grafana@bhasher.com
+    - GF_AUTH_LOGIN_DISABLE_LOGIN_FORM=true
+    - GF_AUTH_DISABLE_SIGNOUT_MENU=true
+    - GF_AUTH_OAUTH_AUTO_LOGIN=true
+    - GF_AUTH_GENERIC_OAUTH_ENABLED=true
+    - GF_AUTH_GENERIC_OAUTH_ICON=signin
+    - GF_AUTH_GENERIC_OAUTH_NAME=Authelia
+    - GF_AUTH_GENERIC_OAUTH_CLIENT_ID=grafana
+    - GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET=${GRAFANA_OAUTH}
+    - GF_AUTH_GENERIC_OAUTH_SCOPES=openid profile email groups
+    - GF_AUTH_GENERIC_OAUTH_EMPTY_SCOPES=false
+    - GF_AUTH_GENERIC_OAUTH_AUTH_URL=https://idp.bhasher.com/api/oidc/authorization
+    - GF_AUTH_GENERIC_OAUTH_TOKEN_URL=https://idp.bhasher.com/api/oidc/token
+    - GF_AUTH_GENERIC_OAUTH_API_URL=https://idp.bhasher.com/api/oidc/userinfo
+    - GF_AUTH_GENERIC_OAUTH_LOGIN_ATTRIBUTE_PATH=preferred_username
+    - GF_AUTH_GENERIC_OAUTH_GROUPS_ATTRIBUTE_PATH=groups
+    - GF_AUTH_GENERIC_OAUTH_NAME_ATTRIBUTE_PATH=name
+    - GF_AUTH_GENERIC_OAUTH_USE_PKCE=false
+    - GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH=contains(roles[*], 'admin') && 'Admin' || 'Viewer'
+    - GF_AUTH_GENERIC_OAUTH_GROUPS_PATH=groups
+    - GF_AUTH_GENERIC_OAUTH_ALLOWED_GROUPS=admin
+    volumes:
+    - $DATA/monitoring/grafana:/var/lib/grafana
+    networks:
+    - external
+    - monitoring
+
+  cadvisor:
+    container_name: cadvisor
+    image: gcr.io/cadvisor/cadvisor:v0.47.1
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    restart: always
+    networks:
+    - monitoring
+
+  node-exporter:
+    container_name: node-exporter
+    image: quay.io/prometheus/node-exporter:latest
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /:/host:ro,rslave
+    command:
+      - '--path.rootfs=/host'
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - --collector.filesystem.ignored-mount-points
+      - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+    restart: always
+    networks:
+    - monitoring
+
+
+networks:
+  monitoring:
+  external:
+    external: true

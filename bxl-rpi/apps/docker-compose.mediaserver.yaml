@@ -1,0 +1,188 @@
+services:
+  jellyfin:
+    container_name: jellyfin
+    image: linuxserver/jellyfin:latest
+    volumes:
+    - $DATA/mediaserver/jellyfin:/config
+    - /mnt/movies/series:/data/tvshows
+    - /mnt/movies/movies:/data/movies
+    - /mnt/movies/musics:/data/musics
+    environment:
+    - PUID=1000
+    - PGID=1000
+    - TZ=Europe/Paris
+    restart: unless-stopped
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.bhasher.com`)"
+    - "traefik.http.routers.jellyfin.entrypoints=internalsecure,externalsecure"
+    - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
+    - "traefik.http.routers.jellyfin.tls=true"
+    - "traefik.http.routers.jellyfin.tls.certresolver=http"
+    networks:
+    - external
+
+  radarr:
+    container_name: radarr
+    image: lscr.io/linuxserver/radarr:latest
+    environment:
+    - TZ=Europe/Paris
+    - PUID=1000
+    - PGID=1000
+    volumes:
+    - $DATA/mediaserver/radarr:/config
+    - /mnt/movies/movies:/movies
+    - /mnt/movies/tmp:/downloads
+    restart: unless-stopped
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.radarr.rule=Host(`radarr.bhasher.com`)"
+    - "traefik.http.services.radarr.loadbalancer.server.port=7878"
+    - "traefik.http.routers.radarr.tls=true"
+    - "traefik.http.routers.radarr.tls.certresolver=http"
+    - "traefik.http.routers.radarr.entrypoints=internalsecure"
+    - "traefik.http.routers.radarr.middlewares=authelia@docker"
+    networks:
+    - mediaserver
+    - external
+
+  sonarr:
+    container_name: sonarr
+    image: lscr.io/linuxserver/sonarr:latest
+    environment:
+    - PUID=1000
+    - PGID=1000
+    - TZ=Europe/Paris
+    volumes:
+    - $DATA/mediaserver/sonarr:/config
+    - /mnt/movies/series:/tv
+    - /mnt/movies/tmp:/downloads
+    restart: unless-stopped
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.sonarr.rule=Host(`sonarr.bhasher.com`)"
+    - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
+    - "traefik.http.routers.sonarr.tls=true"
+    - "traefik.http.routers.sonarr.tls.certresolver=http"
+    - "traefik.http.routers.sonarr.entrypoints=internalsecure"
+    - "traefik.http.routers.sonarr.middlewares=authelia@docker"
+    networks:
+    - mediaserver
+    - external
+
+  lidarr:
+    container_name: lidarr
+    image: lscr.io/linuxserver/lidarr:latest
+    environment:
+    - PUID=1000
+    - PGID=1000
+    - TZ=Europe/Paris
+    volumes:
+    - $DATA/mediaserver/lidarr:/config
+    - /mnt/movies/musics:/music
+    - /mnt/movies/tmp:/downloads
+    restart: unless-stopped
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.lidarr.rule=Host(`lidarr.bhasher.com`)"
+    - "traefik.http.services.lidarr.loadbalancer.server.port=8686"
+    - "traefik.http.routers.lidarr.tls=true"
+    - "traefik.http.routers.lidarr.tls.certresolver=http"
+    - "traefik.http.routers.lidarr.entrypoints=internalsecure"
+    - "traefik.http.routers.lidarr.middlewares=authelia@docker"
+    networks:
+    - mediaserver
+    - external
+
+  transmission:
+    container_name: transmission
+    image: lscr.io/linuxserver/transmission:latest
+    environment:
+    - PUID=1000
+    - PGID=1000
+    - TZ=Europe/Paris
+    volumes:
+    - $DATA/mediaserver/transmission:/config
+    - /mnt/movies/tmp:/downloads
+    - /mnt/movies/torrents:/watch
+    ports:
+    - 51413:51413/tcp
+    - 51413:51413/udp
+    restart: unless-stopped
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.transmission.rule=Host(`transmission.bhasher.com`)"
+    - "traefik.http.services.transmission.loadbalancer.server.port=9091"
+    - "traefik.http.routers.transmission.tls=true"
+    - "traefik.http.routers.transmission.tls.certresolver=http"
+    - "traefik.http.routers.transmission.entrypoints=internalsecure"
+    - "traefik.http.routers.transmission.middlewares=authelia@docker"
+    networks:
+    - mediaserver
+    - external
+
+  jackett:
+    container_name: jackett
+    image: lscr.io/linuxserver/jackett:latest
+    environment:
+    - PUID=1000
+    - PGID=1000
+    - TZ=Europe/Paris
+    - AUTO_UPDATE=true
+    volumes:
+    - $DATA/mediaserver/jackett:/config
+    - /mnt/movies/torrents:/downloads
+    restart: unless-stopped
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.jackett.rule=Host(`jackett.bhasher.com`)"
+    - "traefik.http.services.jackett.loadbalancer.server.port=9117"
+    - "traefik.http.routers.jackett.tls=true"
+    - "traefik.http.routers.jackett.tls.certresolver=http"
+    - "traefik.http.routers.jackett.entrypoints=internalsecure"
+    - "traefik.http.routers.jackett.middlewares=authelia@docker"
+    networks:
+    - mediaserver
+    - external
+
+  flaresolverr:
+    container_name: flaresolverr
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    environment:
+    - LOG_LEVEL=info
+    - LOG_HTML=false
+    - CAPTCHA_SOLVER=none
+    - TZ=Europe/Paris
+    restart: unless-stopped
+    networks:
+    - mediaserver
+
+  bazarr:
+    container_name: bazarr
+    image: lscr.io/linuxserver/bazarr
+    environment:
+    - TZ=Europe/Paris
+    - PUID=1000
+    - PGID=1000
+    volumes:
+    - $DATA/mediaserver/bazarr:/config
+    - /mnt/movies/movies:/movies
+    - /mnt/movies/series:/tv
+    restart: unless-stopped
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.bazarr.rule=Host(`bazarr.bhasher.com`)"
+    - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
+    - "traefik.http.routers.bazarr.tls=true"
+    - "traefik.http.routers.bazarr.tls.certresolver=http"
+    - "traefik.http.routers.bazarr.entrypoints=internalsecure"
+    - "traefik.http.routers.bazarr.middlewares=authelia@docker"
+    networks:
+    - mediaserver
+    - external
+
+networks:
+  mediaserver:
+  external:
+    external: true
+

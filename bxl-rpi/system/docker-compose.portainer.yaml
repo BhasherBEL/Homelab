@@ -1,0 +1,23 @@
+services:
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:latest
+    ports:
+    - "9443:9443"
+    volumes:
+    - $DATA/portainer:/data:rw
+    - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.portainer.rule=Host(`portainer.bxl.bhasher.com`)"
+    - "traefik.http.routers.portainer.entrypoints=externalsecure,internalsecure"
+    - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+    - "traefik.http.routers.portainer.tls=true"
+    - "traefik.http.routers.portainer.tls.certresolver=http"
+    restart: unless-stopped
+    networks:
+    - external
+
+networks:
+  external:
+    external: true
