@@ -1,6 +1,6 @@
 services:
-  prom_monitoring:
-    container_name: prom_monitoring
+  prometheus:
+    container_name: prometheus
     image:  prom/prometheus:latest
     restart: unless-stopped
     labels:
@@ -68,10 +68,10 @@ services:
     container_name: cadvisor
     image: gcr.io/cadvisor/cadvisor:v0.47.1
     volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
+    - /:/rootfs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
     restart: always
     networks:
     - monitoring
@@ -80,20 +80,19 @@ services:
     container_name: node-exporter
     image: quay.io/prometheus/node-exporter:latest
     volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-      - /:/host:ro,rslave
+    - /proc:/host/proc:ro
+    - /sys:/host/sys:ro
+    - /:/rootfs:ro
+    - /:/host:ro,rslave
     command:
-      - '--path.rootfs=/host'
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
-      - --collector.filesystem.ignored-mount-points
-      - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+    - '--path.rootfs=/host'
+    - '--path.procfs=/host/proc'
+    - '--path.sysfs=/host/sys'
+    - --collector.filesystem.ignored-mount-points
+    - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
     restart: always
     networks:
     - monitoring
-
 
 networks:
   monitoring:

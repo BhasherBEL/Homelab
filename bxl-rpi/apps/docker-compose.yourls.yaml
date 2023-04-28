@@ -1,0 +1,47 @@
+services:
+  shlink:
+    container_name: shlink
+    image: shlinkio/shlink:latest
+    environment:
+    - DEFAULT_DOMAIN=s.bhasher.com
+    - IS_HTTPS_ENABLED=true
+    #- GEOLITE_LICENSE_KEY=${GEOLITE_LICENSE_KEY}
+    - DB_DRIVER=postgres
+    - DB_NAME=shlink
+    - DB_USER=postgres
+    - DB_PASSWORD=${POSTGRES_PASSWORD}
+    - DB_HOST=postgres
+    - DB_PORT=5432
+    #- REDIS_SERVERS=redis
+    - DEFAULT_QR_CODE_MARGIN=20
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.shlink.rule=Host(`s.bhasher.com`)"
+    - "traefik.http.services.shlink.loadbalancer.server.port=8080"
+    - "traefik.http.routers.shlink.tls=true"
+    - "traefik.http.routers.shlink.tls.certresolver=http"
+    - "traefik.http.routers.shlink.entrypoints=internalsecure,externalsecure"
+    networks:
+    - external
+    - storage
+
+  shlink_ui:
+    container_name: shlink_ui
+    image: shlinkio/shlink-web-client
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.shlinkui.rule=Host(`shlink.bhasher.com`)"
+    - "traefik.http.services.shlinkui.loadbalancer.server.port=80"
+    - "traefik.http.routers.shlinkui.tls=true"
+    - "traefik.http.routers.shlinkui.tls.certresolver=http"
+    - "traefik.http.routers.shlinkui.entrypoints=internalsecure,externalsecure"
+    volumes:
+    - $DATA/shlink/servers.json:/usr/share/nginx/html/servers.json
+    networks:
+    - external
+
+networks:
+  external:
+    external: true
+  storage:
+    external: true

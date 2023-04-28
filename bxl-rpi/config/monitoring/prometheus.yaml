@@ -34,3 +34,7 @@ scrape_configs:
     static_configs:
           - targets: ['traefik:8080']
 
+  - job_name: 'authelia'
+    scrape_interval: 15s
+    static_configs:
+          - targets: ['authelia:9959']

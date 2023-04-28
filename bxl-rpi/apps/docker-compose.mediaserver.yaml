@@ -20,6 +20,7 @@ services:
     - "traefik.http.routers.jellyfin.tls=true"
     - "traefik.http.routers.jellyfin.tls.certresolver=http"
     networks:
+    - auth
     - external
 
   radarr:
