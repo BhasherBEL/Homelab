@@ -18,6 +18,18 @@ services:
     networks:
     - storage
 
+  mariadb:
+    container_name: mariadb
+    image: mariadb:latest
+    restart: on-failure
+    environment:
+    - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT}
+    volumes:
+    - $DATA/mariadb:/var/lib/mysql:rw
+    networks:
+    - storage
+
+
 networks:
   storage:
     name: storage
