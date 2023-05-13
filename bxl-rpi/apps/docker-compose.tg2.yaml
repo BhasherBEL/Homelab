@@ -1,0 +1,4 @@
+services:
+  tg2:
+    container_name: tg2
+    image: tg2:latest

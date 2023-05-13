@@ -1,0 +1,39 @@
+services:
+  hass:
+    container_name: hass
+    image: ghcr.io/home-assistant/home-assistant:stable
+    volumes:
+    - $DATA/hass:/config
+    - /etc/localtime:/etc/localtime:ro
+    networks:
+    - smarthome
+    - external
+    restart: on-failure
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.hass.rule=Host(`hass.bhasher.com`)"
+    - "traefik.http.routers.hass.entrypoints=internalsecure"
+    - "traefik.http.services.hass.loadbalancer.server.port=8123"
+    - "traefik.http.routers.hass.tls=true"
+    - "traefik.http.routers.hass.tls.certresolver=http"
+
+  mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto:latest
+    volumes:
+    - $CONFIG/smarthome/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    - $DATA/mosquitto/data:/mosquitto/data
+    - $DATA/mosquitto/passwordfile:/mosquitto/passwordfile
+    ports:
+    - 1883:1883
+    - 9001:9001
+    networks:
+    - smarthome
+    - external
+    restart: on-failure
+
+networks:
+  smarthome:
+  external:
+    external: true
+
