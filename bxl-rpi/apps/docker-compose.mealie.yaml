@@ -1,0 +1,30 @@
+  services:
+    mealie:
+      container_name: mealie
+      image: hkotel/mealie:latest
+      restart: always
+      environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      - RECIPE_PUBLIC=true
+      - RECIPE_SHOW_NUTRITION=true
+      - RECIPE_SHOW_ASSETS=true
+      - RECIPE_LANDSCAPE_VIEW=true
+      - RECIPE_DISABLE_COMMENTS=true
+      - RECIPE_DISABLE_AMOUNT=false
+      labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mealie.rule=Host(`mealie.bhasher.com`)"
+      - "traefik.http.services.mealie.loadbalancer.server.port=80"
+      - "traefik.http.routers.mealie.tls=true"
+      - "traefik.http.routers.mealie.tls.certresolver=http"
+      - "traefik.http.routers.mealie.entrypoints=websecure"
+      volumes:
+      - $DATA/mealie/:/app/data
+      networks:
+      - external
+
+networks:
+  external:
+    external: true
