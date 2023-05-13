@@ -34,7 +34,8 @@ services:
     - "traefik.http.services.shlinkui.loadbalancer.server.port=80"
     - "traefik.http.routers.shlinkui.tls=true"
     - "traefik.http.routers.shlinkui.tls.certresolver=http"
-    - "traefik.http.routers.shlinkui.entrypoints=internalsecure,externalsecure"
+    - "traefik.http.routers.shlinkui.entrypoints=internalsecure"
+    - "traefik.http.routers.shlinkui.middlewares=authelia@docker"
     volumes:
     - $DATA/shlink/servers.json:/usr/share/nginx/html/servers.json
     networks:
