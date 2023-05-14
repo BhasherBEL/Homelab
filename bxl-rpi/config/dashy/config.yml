@@ -1,0 +1,212 @@
+pageInfo:
+  title: Homelab
+  description: Welcome to bhasher's homelab dashboard!
+  navLinks:
+    - title: GitHub
+      path: https://github.com/BhasherBEL
+appConfig:
+  theme: one-dark
+  layout: auto
+  iconSize: small
+  language: en
+  statusCheck: true
+  colCount: 8
+sections:
+  - name: Public services
+    icon: fa-server
+    displayData:
+      sortBy: most-used
+      rows: 1
+      cols: 3
+      collapsed: false
+      hideForGuests: false
+    items:
+      - title: Jellyfin
+        icon: hl-jellyfin
+        url: https://jellyfin.bhasher.com
+        statusCheckUrl: http://jellyfin:8096
+        id: 0_1507_jellyfin
+      - title: Autheli
+        icon: hl-authelia
+        url: https://idp.bhasher.com
+        statusCheckUrl: http://authelia:9091
+        id: 1_1507_autheli
+      - title: Mealie
+        icon: hl-mealie
+        url: https://mealie.bhasher.com
+        statusCheckUrl: http://mealie
+        id: 2_1507_mealie
+      - title: Baikal
+        icon: hl-baikal
+        url: https://baikal.bxl.bhasher.com
+        statusCheckUrl: http://baikal
+        id: 3_1507_baikal
+      - title: Element web
+        icon: hl-element
+        url: https://element.bhasher.com
+        statusCheckUrl: http://matrix-riot
+        id: 4_1507_elementweb
+      - title: Shlink
+        icon: hl-shlink
+        url: https://shlink.bhasher.com
+        statusCheckUrl: https://shlink_ui
+        id: 5_1507_shlink
+  - name: Private services
+    displayData:
+      sortBy: most-used
+      rows: 1
+      cols: 3
+      collapsed: false
+      hideForGuests: false
+    items:
+      - title: Bazarr
+        icon: hl-bazarr
+        url: https://bazarr.bhasher.com
+        statusCheckUrl: http://bazarr:6767
+        id: 0_1631_bazarr
+      - title: Radarr
+        icon: hl-radarr
+        url: https://radarr.bhasher.com
+        statusCheckUrl: http://radarr:7878
+        id: 1_1631_radarr
+      - title: Sonarr
+        icon: hl-sonarr
+        url: https://sonarr.bhasher.com
+        statusCheckUrl: http://sonarr:8989
+        id: 2_1631_sonarr
+      - title: Lidarr
+        icon: hl-lidarr
+        url: https://lidarr.bhasher.com
+        statusCheckUrl: http://lidarr:8686
+        id: 3_1631_lidarr
+      - title: Transmission
+        icon: hl-transmission
+        url: https://transmission.bhasher.com
+        statusCheckUrl: http://transmission:9091
+        id: 4_1631_transmission
+      - title: Jackett
+        icon: hl-jackett
+        url: https://jacket.bhasher.com
+        statusCheckUrl: http://jackett:9117
+        id: 5_1631_jackett
+      - title: Grafana
+        icon: hl-grafana
+        url: https://grafana.bhasher.com
+        statusCheckUrl: http://grafana:3000
+        id: 6_1631_grafana
+      - title: Portainer
+        icon: hl-portainer
+        url: https://portainer.bxl.bhasher.com
+        statusCheckUrl: http://portainer:9000
+        id: 7_1631_portainer
+      - title: InvoiceNinja
+        icon: hl-invoiceninja
+        url: https://invoice.bhasher.com
+        statusCheckUrl: http://invoicenginx
+        id: 8_1631_invoiceninja
+      - title: Dashboard
+        icon: hl-dashy
+        url: https://hub.bhasher.com
+        statusCheckUrl: http://dashy
+        id: 9_1631_dashboard
+      - title: Syncthing
+        icon: hl-syncthing
+        url: https://syncthing.bhasher.com
+        statusCheckUrl: http://syncthing:8384
+        id: 10_1631_syncthing
+      - title: Portainer (VPS)
+        icon: hl-portainer
+        url: https://portainer.vps.bhasher.com
+        id: 11_1631_portainervps
+      - title: Portainer (LLN)
+        icon: hl-portainer
+        url: https://portainer.lln.bhasher.com
+        id: 12_1631_portainerlln
+  - name: System services
+    displayData:
+      sortBy: most-used
+      rows: 1
+      cols: 2
+      collapsed: false
+      hideForGuests: false
+    items:
+      - title: Prometeus
+        icon: hl-prometheus
+        url: https://prometheus.bhasher.com
+        statusCheckUrl: http://prometheus:9090
+        id: 0_1545_prometeus
+      - title: Traefik
+        icon: hl-traefik
+        url: https://traefik.bhasher.com
+        statusCheckUrl: http://traefik:8080
+        id: 1_1545_traefik
+      - title: User manager
+        icon: hl-phpldapadmin
+        url: https://lum.bhasher.com
+        statusCheckUrl: http://ldapusermanager
+        id: 2_1545_usermanager
+      - title: Mikrotik router
+        icon: hl-mikrotik
+        url: http://192.168.1.1:8080/
+        id: 3_1545_mikrotikrouter
+  - name: Real life survey
+    widgets:
+      - type: clock
+        options:
+          timezone: Europe/Brussels
+          format: fr-FR
+          hideDate: false
+        id: 0_1554_clock
+      - type: public-holidays
+        options:
+          country: BE
+          holidayType: all
+          monthsToShow: 12
+        id: 1_1554_publicholidays
+      - type: github-profile-stats
+        options:
+          username: BhasherBEL
+          hideLanguagesCard: true
+        id: 2_1554_githubprofilestats
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 2
+      collapsed: false
+      hideForGuests: false
+  - name: Online survey
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 2
+      collapsed: false
+      hideForGuests: false
+    widgets:
+      - type: public-ip
+        id: 0_1331_publicip
+      - type: crypto-watch-list
+        options:
+          currency: USD
+          sortBy: marketCap
+          assets:
+            - bitcoin
+            - ethereum
+        id: 1_1331_cryptowatchlist
+  - name: Monitoring
+    widgets:
+      - type: pi-hole-stats
+        options:
+          hostname: http://pihole
+          apiKey: ''
+        id: 0_1062_piholestats
+  - name: Random
+    widgets:
+      - type: joke
+        options:
+          language: en
+          category: all
+        id: 0_609_joke
+      - type: xkcd-comic
+        options:
+          comic: random
+        id: 1_609_xkcdcomic

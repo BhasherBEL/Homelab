@@ -23,6 +23,7 @@ services:
     - "--entrypoints.external.http.redirections.entryPoint.permanent=true"
     #- "--log.level=DEBUG"
     - "--metrics.prometheus=true"
+    - "--api.dashboard=true"
     environment:
     - TZ=Europe/Paris
     ports:
@@ -40,6 +41,14 @@ services:
       source: $DATA/traefik/rules.toml
       target: /rules.toml
     restart: always
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.traefik.rule=Host(`traefik.bhasher.com`)"
+    - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+    - "traefik.http.routers.traefik.tls=true"
+    - "traefik.http.routers.traefik.tls.certresolver=http"
+    - "traefik.http.routers.traefik.entrypoints=internalsecure"
+    - "traefik.http.routers.traefik.middlewares=authelia@docker"
     networks:
     - external
 
