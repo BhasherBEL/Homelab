@@ -24,6 +24,7 @@ services:
     - $CONFIG/smarthome/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
     - $DATA/mosquitto/data:/mosquitto/data
     - $DATA/mosquitto/passwordfile:/mosquitto/passwordfile
+    - /etc/localtime:/etc/localtime:ro
     ports:
     - 1883:1883
     - 9001:9001
@@ -31,6 +32,19 @@ services:
     - smarthome
     - external
     restart: on-failure
+
+  zigbee2mqtt:
+    container_name: zigbee2mqtt
+    restart: unless-stopped
+    image: koenkk/zigbee2mqtt:latest
+    volumes:
+    - $DATA/zigbee2mqtt:/app/data
+    - /run/udev:/run/udev:ro
+    - /etc/localtime:/etc/localtime:ro
+    devices:
+    - /dev/ttyACM0:/dev/ttyACM0
+    networks:
+    - smarthome
 
 networks:
   smarthome:
