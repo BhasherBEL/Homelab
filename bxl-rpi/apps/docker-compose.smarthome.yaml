@@ -46,6 +46,25 @@ services:
     networks:
     - smarthome
 
+  nodered:
+    container_name: nodered
+    restart: on-failure
+    image: nodered/node-red:latest
+    volumes:
+    - $DATA/nodered:/data
+    networks:
+    - smarthome
+    - external
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.nodered.rule=Host(`nodered.bhasher.com`)"
+    - "traefik.http.routers.nodered.entrypoints=internalsecure"
+    - "traefik.http.services.nodered.loadbalancer.server.port=1880"
+    - "traefik.http.routers.nodered.tls=true"
+    - "traefik.http.routers.nodered.tls.certresolver=http"
+    - "traefik.http.routers.nodered.middlewares=authelia@docker"
+
+
 networks:
   smarthome:
   external:

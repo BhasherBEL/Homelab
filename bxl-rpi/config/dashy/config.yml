@@ -26,11 +26,11 @@ sections:
         url: https://jellyfin.bhasher.com
         statusCheckUrl: http://jellyfin:8096
         id: 0_1507_jellyfin
-      - title: Autheli
+      - title: Authelia
         icon: hl-authelia
         url: https://idp.bhasher.com
         statusCheckUrl: http://authelia:9091
-        id: 1_1507_autheli
+        id: 1_1507_authelia
       - title: Mealie
         icon: hl-mealie
         url: https://mealie.bhasher.com
@@ -122,6 +122,16 @@ sections:
         icon: hl-portainer
         url: https://portainer.lln.bhasher.com
         id: 12_1631_portainerlln
+      - title: Home assistant
+        icon: hl-home-assistant
+        url: https://hass.bhasher.com
+        statusCheckUrl: http://hass:8123
+        id: 13_1631_homeassistant
+      - title: Node-red
+        icon: hl-node-red
+        url: https://nodered.bhasher.com
+        statusCheckUrl: http://nodered:1880
+        id: 14_1631_nodered
   - name: System services
     displayData:
       sortBy: most-used
@@ -199,6 +209,12 @@ sections:
           hostname: http://pihole
           apiKey: ''
         id: 0_1062_piholestats
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 2
+      collapsed: false
+      hideForGuests: false
   - name: Random
     widgets:
       - type: joke
@@ -210,3 +226,9 @@ sections:
         options:
           comic: random
         id: 1_609_xkcdcomic
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 2
+      collapsed: false
+      hideForGuests: false

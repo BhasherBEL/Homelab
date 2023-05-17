@@ -3,6 +3,7 @@ services:
     container_name: prometheus
     image:  prom/prometheus:latest
     restart: unless-stopped
+    user: root
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.prom.rule=Host(`prometheus.bhasher.com`)"
@@ -66,15 +67,25 @@ services:
 
   cadvisor:
     container_name: cadvisor
-    image: gcr.io/cadvisor/cadvisor:v0.47.1
+    image: gcr.io/cadvisor/cadvisor:v0.47.0 #v0.47.1
     volumes:
     - /:/rootfs:ro
     - /var/run:/var/run:rw
     - /sys:/sys:ro
     - /var/lib/docker/:/var/lib/docker:ro
     restart: always
+    command:
+    - "--housekeeping_interval=30s"
+    - "--docker_only=true"
+    - "--disable_metrics=percpu,sched,tcp,udp,disk,diskIO,hugetlb,referenced_memory,cpu_topology,resctrl"
     networks:
     - monitoring
+    healthcheck:
+      test: wget --quiet --tries=1 --spider http://localhost:8080/healthz || exit 1
+      interval: 15s
+      timeout: 15s
+      retries: 5
+      start_period: 30s
 
   node-exporter:
     container_name: node-exporter
