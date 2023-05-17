@@ -107,5 +107,6 @@ services:
 
 networks:
   monitoring:
+    name: monitoring
   external:
     external: true

@@ -52,6 +52,7 @@ services:
     image: nodered/node-red:latest
     volumes:
     - $DATA/nodered:/data
+    - /etc/localtime:/etc/localtime:ro
     networks:
     - smarthome
     - external
