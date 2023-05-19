@@ -173,11 +173,6 @@ sections:
           holidayType: all
           monthsToShow: 12
         id: 1_1554_publicholidays
-      - type: github-profile-stats
-        options:
-          username: BhasherBEL
-          hideLanguagesCard: true
-        id: 2_1554_githubprofilestats
     displayData:
       sortBy: default
       rows: 1
@@ -194,6 +189,11 @@ sections:
     widgets:
       - type: public-ip
         id: 0_1331_publicip
+      - type: github-profile-stats
+        options:
+          username: BhasherBEL
+          hideLanguagesCard: true
+        id: 2_1554_githubprofilestats
       - type: crypto-watch-list
         options:
           currency: USD
@@ -206,7 +206,7 @@ sections:
     widgets:
       - type: pi-hole-stats
         options:
-          hostname: http://pihole
+          hostname: http://pihole/admin/api.php
           apiKey: ''
         id: 0_1062_piholestats
     displayData:

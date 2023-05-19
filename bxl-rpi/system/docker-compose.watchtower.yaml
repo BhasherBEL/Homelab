@@ -24,6 +24,8 @@ services:
     - "--notification-email-server-password=${SMTP_PASSWORD}"
     networks:
     - monitoring
+    labels:
+    - "com.centurylinklabs.watchtower.enable=false"
 
 networks:
   monitoring:

@@ -13,13 +13,13 @@ services:
     networks:
     - invoice
     - external
-    labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.invoice.rule=Host(`invoice.bhasher.com`)"
-    - "traefik.http.services.invoice.loadbalancer.server.port=80"
-    - "traefik.http.routers.invoice.tls=true"
-    - "traefik.http.routers.invoice.tls.certresolver=http"
-    - "traefik.http.routers.invoice.entrypoints=internalsecure"
+    #labels:
+    #- "traefik.enable=true"
+    #- "traefik.http.routers.invoice.rule=Host(`invoice.bhasher.com`)"
+    #- "traefik.http.services.invoice.loadbalancer.server.port=80"
+    #- "traefik.http.routers.invoice.tls=true"
+    #- "traefik.http.routers.invoice.tls.certresolver=http"
+    #- "traefik.http.routers.invoice.entrypoints=internalsecure"
 
   invoiceninja:
     image: invoiceninja/invoiceninja:5
@@ -44,6 +44,31 @@ services:
     - $DATA/invoiceninja/storage:/var/www/app/storage:rw
     networks:
     - invoice
+    - storage
+
+  invoiceplane:
+    container_name: invoiceplane
+    image: mhzawadi/invoiceplane:latest
+    volumes:
+    - $DATA/invoiceplane/uploads:/var/www/html/uploads
+    - $DATA/invoiceplane/ipconfig.php:/var/www/html/ipconfig.php
+    - /etc/localtime:/etc/localtime:ro
+    environment:
+    - IP_URL=https://invoice.bhasher.com
+    #- MYSQL_HOST=mariadb
+    #- MYSQL_USER=root
+    #- MYSQL_PASSWORD=${MARIADB_ROOT}
+    #- MYSQL_DB=InvoicePlane
+    #- DISABLE_SETUP=false
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.invoice.rule=Host(`invoice.bhasher.com`)"
+    - "traefik.http.services.invoice.loadbalancer.server.port=80"
+    - "traefik.http.routers.invoice.tls=true"
+    - "traefik.http.routers.invoice.tls.certresolver=http"
+    - "traefik.http.routers.invoice.entrypoints=internalsecure"
+    networks:
+    - external
     - storage
 
 networks:
