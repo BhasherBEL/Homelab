@@ -122,26 +122,48 @@ services:
     - mediaserver
     - external
 
-  jackett:
-    container_name: jackett
-    image: lscr.io/linuxserver/jackett:latest
+#  jackett:
+#    container_name: jackett
+#    image: lscr.io/linuxserver/jackett:latest
+#    environment:
+#    - PUID=1000
+#    - PGID=1000
+#    - TZ=Europe/Paris
+#    - AUTO_UPDATE=true
+#    volumes:
+#    - $DATA/mediaserver/jackett:/config
+#    - /mnt/movies/torrents:/downloads
+#    restart: unless-stopped
+#    labels:
+#    - "traefik.enable=true"
+#    - "traefik.http.routers.jackett.rule=Host(`jackett.bhasher.com`)"
+#    - "traefik.http.services.jackett.loadbalancer.server.port=9117"
+#    - "traefik.http.routers.jackett.tls=true"
+#    - "traefik.http.routers.jackett.tls.certresolver=http"
+#    - "traefik.http.routers.jackett.entrypoints=internalsecure"
+#    - "traefik.http.routers.jackett.middlewares=authelia@docker"
+#    networks:
+#    - mediaserver
+#    - external
+
+  prowlarr:
+    container_name: prowlarr
+    image: lscr.io/linuxserver/prowlarr:latest
     environment:
     - PUID=1000
     - PGID=1000
     - TZ=Europe/Paris
-    - AUTO_UPDATE=true
     volumes:
-    - $DATA/mediaserver/jackett:/config
-    - /mnt/movies/torrents:/downloads
+    - $DATA/mediaserver/prowlarr:/config
     restart: unless-stopped
     labels:
     - "traefik.enable=true"
-    - "traefik.http.routers.jackett.rule=Host(`jackett.bhasher.com`)"
-    - "traefik.http.services.jackett.loadbalancer.server.port=9117"
-    - "traefik.http.routers.jackett.tls=true"
-    - "traefik.http.routers.jackett.tls.certresolver=http"
-    - "traefik.http.routers.jackett.entrypoints=internalsecure"
-    - "traefik.http.routers.jackett.middlewares=authelia@docker"
+    - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.bhasher.com`)"
+    - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
+    - "traefik.http.routers.prowlarr.tls=true"
+    - "traefik.http.routers.prowlarr.tls.certresolver=http"
+    - "traefik.http.routers.prowlarr.entrypoints=internalsecure"
+    - "traefik.http.routers.prowlarr.middlewares=authelia@docker"
     networks:
     - mediaserver
     - external
