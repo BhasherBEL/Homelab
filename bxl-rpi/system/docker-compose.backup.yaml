@@ -14,12 +14,6 @@ services:
     - COMPRESSION=lz4
     - PRUNE=1
     restart: "no"
+    profiles:
+    - dnr
 
-  cron:
-    container_name: cron-scheduling
-    image: alpine:latest
-    volumes:
-      - ./config/cron:/etc/cron.d:ro
-      - /etc/localtime:/etc/localtime:ro
-    command: crond -f
-    restart: unless-stopped
