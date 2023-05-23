@@ -171,7 +171,8 @@ sections:
         options:
           country: BE
           holidayType: all
-          monthsToShow: 12
+          monthsToShow: 4
+          lang: fr
         id: 1_1554_publicholidays
     displayData:
       sortBy: default
@@ -193,7 +194,7 @@ sections:
         options:
           username: BhasherBEL
           hideLanguagesCard: true
-        id: 2_1554_githubprofilestats
+        id: 1_1331_githubprofilestats
       - type: crypto-watch-list
         options:
           currency: USD
@@ -201,20 +202,7 @@ sections:
           assets:
             - bitcoin
             - ethereum
-        id: 1_1331_cryptowatchlist
-  - name: Monitoring
-    widgets:
-      - type: pi-hole-stats
-        options:
-          hostname: http://pihole/admin/api.php
-          apiKey: ''
-        id: 0_1062_piholestats
-    displayData:
-      sortBy: default
-      rows: 1
-      cols: 2
-      collapsed: false
-      hideForGuests: false
+        id: 2_1331_cryptowatchlist
   - name: Random
     widgets:
       - type: joke
@@ -229,6 +217,6 @@ sections:
     displayData:
       sortBy: default
       rows: 1
-      cols: 2
+      cols: 4
       collapsed: false
       hideForGuests: false

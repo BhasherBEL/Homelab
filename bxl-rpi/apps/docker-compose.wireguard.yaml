@@ -12,7 +12,7 @@ services:
     - TZ=Europe/Paris
     - SERVERURL=vpn.bhasher.com
     - SERVERPORT=51821
-    - PEERS=5
+    - PEERS=10
     - PEERDNS=auto
     - INTERNAL_SUBNET=10.13.14.0
     - ALLOWEDIPS=0.0.0.0/0

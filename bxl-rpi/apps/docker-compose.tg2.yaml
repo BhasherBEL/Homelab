@@ -2,3 +2,12 @@ services:
   tg2:
     container_name: tg2
     image: tg2:latest
+    environment:
+    - TGTG_EMAIL=tgtg.trash@bhasher.com
+    - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+    - TELEGRAM_ID=${TELEGRAM_ID}
+    volumes:
+    - $DATA/tg2:/data
+    labels:
+    - "com.centurylinklabs.watchtower.enable=false"
+
