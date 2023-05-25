@@ -1,0 +1,31 @@
+services:
+  planka:
+    container_name: planka
+    image: ghcr.io/plankanban/planka:latest
+    restart: unless-stopped
+    volumes:
+    - $DATA/planka/user-avatars:/app/public/user-avatars:rw
+    - $DATA/planka/project-background-images:/app/public/project-background-images:rw
+    - $DATA/planka/attachments:/app/private/attachments:rw
+    environment:
+    - BASE_URL=https://planka.bhasher.com
+    - TRUST_PROXY=1
+    - DATABASE_URL=${PLANKA_DATABASE_URL}
+    - SECRET_KEY=${PLANKA_SECRET_KEY}
+    networks:
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.planka.rule=Host(`planka.bhasher.com`)"
+    - "traefik.http.services.planka.loadbalancer.server.port=1337"
+    - "traefik.http.routers.planka.tls=true"
+    - "traefik.http.routers.planka.tls.certresolver=http"
+    - "traefik.http.routers.planka.entrypoints=internalsecure"
+    networks:
+    - storage
+    - external
+
+networks:
+  storage:
+    external: true
+  external:
+    external: true

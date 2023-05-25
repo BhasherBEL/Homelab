@@ -84,11 +84,11 @@ sections:
         url: https://transmission.bhasher.com
         statusCheckUrl: http://transmission:9091
         id: 4_1631_transmission
-      - title: Jackett
-        icon: hl-jackett
-        url: https://jacket.bhasher.com
-        statusCheckUrl: http://jackett:9117
-        id: 5_1631_jackett
+      - title: Prowlarr
+        icon: hl-prowlarr
+        url: https://prowlarr.bhasher.com
+        statusCheckUrl: http://prowlarr:9696
+        id: 5_1631_prowlarr
       - title: Grafana
         icon: hl-grafana
         url: https://grafana.bhasher.com
