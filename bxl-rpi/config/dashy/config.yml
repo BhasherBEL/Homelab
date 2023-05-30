@@ -132,6 +132,11 @@ sections:
         url: https://nodered.bhasher.com
         statusCheckUrl: http://nodered:1880
         id: 14_1631_nodered
+      - title: Planka
+        icon: hl-planka
+        url: https://planka.bhasher.com
+        statusCheckUrl: http://planka:1337
+        id: 15_1631_planka
   - name: System services
     displayData:
       sortBy: most-used

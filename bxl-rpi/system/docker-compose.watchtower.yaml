@@ -7,7 +7,7 @@ services:
     - /etc/localtime:/etc/localtime:ro
     command:
     - "--cleanup"
-    - "--schedule=0 0 3 * * *"
+    - "--schedule=0 0 3 * * SAT"
     #- "--label-enable"
     - "--monitor-only"
     - "--http-api-metrics=true"
