@@ -1,0 +1,167 @@
+default_redirection_url: https://hub.bhasher.com
+theme: dark
+
+server:
+  host: 0.0.0.0
+  port: 9091
+
+log:
+  level: info
+
+totp:
+  disable: false
+  issuer: idp.bhasher.com
+  algorithm: sha256
+  digits: 6
+  period: 30
+  skew: 1
+  secret_size: 32
+
+ntp:
+  disable_startup_check: true
+
+authentication_backend:
+  password_reset:
+    disable: false
+  refresh_interval: 5m
+  ldap:
+    user: cn=readonly,dc=bhasher,dc=com
+    implementation: custom
+    url: ldap://openldap
+    timeout: 5s
+    start_tls: false
+    base_dn: DC=bhasher,DC=com
+    username_attribute: uid
+    additional_users_dn: ou=users
+    users_filter: (&({username_attribute}={input})(objectClass=inetOrgPerson))
+    additional_groups_dn: ou=groups
+    groups_filter: (&(uniqueMember={dn})(objectClass=groupOfUniqueNames))
+    group_name_attribute: cn
+    mail_attribute: mail
+    display_name_attribute: cn
+    permit_referrals: false
+
+access_control:
+  default_policy: deny
+  rules:
+  - domain: 'radarr.bhasher.com'
+    policy: one_factor
+    subject:
+    - "group:mediaserver"
+  - domain: 'sonarr.bhasher.com'
+    policy: one_factor
+    subject:
+    - "group:mediaserver"
+  - domain: 'jellyfin.bhasher.com'
+    policy: one_factor
+    subject:
+    - "group:mediaserver"
+  - domain: 'lum.bhasher.com'
+    policy: two_factor
+    subject:
+    - "group:admin"
+  - domain: '*.bhasher.com'
+    policy: one_factor
+    subject:
+    - "group:admin"
+
+session:
+  name: auth_session
+  domain: bhasher.com
+  same_site: lax
+  expiration: 1d
+  inactivity: 3h
+  remember_me_duration: 1w
+  redis:
+    host: redis
+    port: 6379
+
+regulation:
+  max_retries: 3
+  find_time: 1m
+  ban_time: 5m
+
+storage:
+  # local:
+  #   path: /data/db.sqlite3
+  postgres:
+    host: postgres
+    port: 5432
+    database: authelia
+    schema: public
+    username: postgres
+
+notifier:
+  smtp:
+    host: bdubois.io
+    port: 587
+    sender: no-reply@bhasher.com
+
+password_policy:
+  standard:
+    enabled: true
+    min_length: 8
+    max_length: 0
+    require_uppercase: false
+    require_lowercase: false
+    require_number: false
+    require_special: false
+
+telemetry:
+  metrics:
+    enabled: true
+    address: "tcp://0.0.0.0:9959"
+    buffers:
+      read: 4096
+      write: 4096
+    timeouts:
+      read: 6s
+      write: 6s
+      idle: 30s
+
+
+identity_providers:
+  oidc:
+    enforce_pkce: public_clients_only
+    clients:
+    - id: grafana
+      description: Grafana
+      secret: '$argon2id$v=19$m=65536,t=3,p=4$dQfNyInvlh1Lgw3JXi7G6A$M/WaNpHJkAyaQcXIMsOTl0+gBWGPPVBoCm7NpEQfTpI'
+      public: false
+      authorization_policy: one_factor
+      redirect_uris:
+      - https://grafana.bhasher.com/login/generic_oauth
+      consent_mode: implicit
+      scopes:
+      - openid
+      - profile
+      - groups
+      - email
+      userinfo_signing_algorithm: none
+    - id: matrix_synapse
+      description: Matrix Synapse
+      secret: '$argon2id$v=19$m=65536,t=3,p=4$Z+6HONrjDp54s+MhXuq1cA$bjc5tMGD3gR6AaBYIDx3S2mz/UfPv6a0n1Vf3q2Ifik'
+      public: false
+      authorization_policy: one_factor
+      redirect_uris:
+      - https://matrix.bhasher.com/_synapse/client/oidc/callback
+      consent_mode: implicit
+      scopes:
+      - openid
+      - profile
+      - email
+      userinfo_signing_algorithm: none
+    - id: portainer
+      description: Portainer
+      secret: '$argon2id$v=19$m=65536,t=3,p=4$7bqhx/sMH6Hes4ggVwpEPg$uue9QyGkROpAihkGpbDV6YjKCJlZVXj1JBkJfyLj2MI'
+      public: false
+      authorization_policy: two_factor
+      redirect_uris:
+      - https://portainer.bxl.bhasher.com
+      consent_mode: implicit
+      scopes:
+      - openid
+      - profile
+      - groups
+      - email
+      userinfo_signing_algorithm: none

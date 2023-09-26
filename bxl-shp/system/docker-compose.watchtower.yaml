@@ -1,0 +1,32 @@
+services:
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - /etc/localtime:/etc/localtime:ro
+    command:
+    - "--cleanup"
+    - "--schedule=0 0 3 * * SAT"
+    - "--label-enable"
+    #- "--monitor-only"
+    - "--http-api-metrics=true"
+    - "--http-api-token=watchtower"
+    #- "--run-once=true"
+    # emails notification
+    - "--notifications=email"
+    - "--notifications-level=trace"
+    - "--notification-email-from=watchtower.noreply@bhasher.com"
+    - "--notification-email-to=watchtower.homelab@bhasher.com"
+    - "--notification-email-server=bdubois.io"
+    - "--notification-email-server-port=465"
+    - "--notification-email-server-user=${SMTP_USER}"
+    - "--notification-email-server-password=${SMTP_PASSWORD}"
+    networks:
+    - monitoring
+    labels:
+    - "com.centurylinklabs.watchtower.enable=false"
+
+networks:
+  monitoring:
+    external: true

@@ -1,0 +1,29 @@
+services:
+  dashy:
+    container_name: dashy
+    image: dashy
+    environment:
+    - NODE_ENV=production
+    restart: unless-stopped
+    volumes:
+    - $CONFIG/dashy/config.yml:/app/public/conf.yml
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.dashy.rule=Host(`hub.bhasher.com`)"
+    - "traefik.http.routers.dashy.entrypoints=internalsecure"
+    - "traefik.http.services.dashy.loadbalancer.server.port=80"
+    - "traefik.http.routers.dashy.tls=true"
+    - "traefik.http.routers.dashy.tls.certresolver=http"
+    - "traefik.http.routers.dashy.middlewares=authelia@docker"
+    - "com.centurylinklabs.watchtower.enable=false"
+    healthcheck:
+      test: ['CMD', 'node', '/app/services/healthcheck']
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+    networks:
+    - external
+
+networks:
+  external:
+    external: true

@@ -1,0 +1,14 @@
+[Unit]
+Description=Start Borg Backup Container
+After=docker.service
+ConditionPathExists=/mnt/borg
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/docker start borg
+User=pi
+Group=pi
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

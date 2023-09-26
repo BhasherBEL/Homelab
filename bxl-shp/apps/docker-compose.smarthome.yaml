@@ -1,0 +1,73 @@
+services:
+  hass:
+    container_name: hass
+    image: ghcr.io/home-assistant/home-assistant:stable
+    volumes:
+    - $DATA/hass:/config
+    - /etc/localtime:/etc/localtime:ro
+    networks:
+    - smarthome
+    - external
+    restart: on-failure
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.hass.rule=Host(`hass.bhasher.com`)"
+    - "traefik.http.routers.hass.entrypoints=internalsecure"
+    - "traefik.http.services.hass.loadbalancer.server.port=8123"
+    - "traefik.http.routers.hass.tls=true"
+    - "traefik.http.routers.hass.tls.certresolver=http"
+
+  mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto:latest
+    volumes:
+    - $CONFIG/smarthome/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    - $DATA/mosquitto/data:/mosquitto/data
+    - $DATA/mosquitto/passwordfile:/mosquitto/passwordfile
+    - /etc/localtime:/etc/localtime:ro
+    ports:
+    - 1883:1883
+    - 9001:9001
+    networks:
+    - smarthome
+    - external
+    restart: on-failure
+
+  zigbee2mqtt:
+    container_name: zigbee2mqtt
+    restart: unless-stopped
+    image: koenkk/zigbee2mqtt:latest
+    volumes:
+    - $DATA/zigbee2mqtt:/app/data
+    - /run/udev:/run/udev:ro
+    - /etc/localtime:/etc/localtime:ro
+    devices:
+    - /dev/ttyACM0:/dev/ttyACM0
+    networks:
+    - smarthome
+
+  nodered:
+    container_name: nodered
+    restart: on-failure
+    image: nodered/node-red:latest
+    volumes:
+    - $DATA/nodered:/data
+    - /etc/localtime:/etc/localtime:ro
+    networks:
+    - smarthome
+    - external
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.nodered.rule=Host(`nodered.bhasher.com`)"
+    - "traefik.http.routers.nodered.entrypoints=internalsecure"
+    - "traefik.http.services.nodered.loadbalancer.server.port=1880"
+    - "traefik.http.routers.nodered.tls=true"
+    - "traefik.http.routers.nodered.tls.certresolver=http"
+    - "traefik.http.routers.nodered.middlewares=authelia@docker"
+
+
+networks:
+  smarthome:
+  external:
+    external: true
+

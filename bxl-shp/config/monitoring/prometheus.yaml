@@ -1,0 +1,40 @@
+global:
+  scrape_interval:     60s # By default, scrape targets every 15 seconds.
+
+  # Attach these labels to any time series or alerts when communicating with
+  # external systems (federation, remote storage, Alertmanager).
+  external_labels:
+    monitor: 'monitor'
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: "Docker Job"
+    static_configs:
+      - targets: ["host.docker.internal:9323"] 
+
+  - job_name: 'cadvisor'
+    static_configs:
+          - targets: ['cadvisor:8080']
+
+  - job_name: 'node-exporter'
+    static_configs:
+          - targets: ['node-exporter:9100']
+
+  - job_name: 'treafik'
+    static_configs:
+          - targets: ['traefik:8080']
+
+  - job_name: 'authelia'
+    static_configs:
+          - targets: ['authelia:9959']
+
+  - job_name: 'mikrotik'
+    static_configs:
+          - targets: ['mikrotik:9436']
+

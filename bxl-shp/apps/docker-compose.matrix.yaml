@@ -1,0 +1,39 @@
+services:
+  matrix-synapse:
+    container_name: matrix-synapse
+    image: matrixdotorg/synapse:latest
+    restart: unless-stopped
+    environment:
+    - SYNAPSE_SERVER_NAME=matrix.bhasher.com
+    - SYNAPSE_REPORT_STATS=no
+    volumes:
+    - $DATA/matrix/synapse:/data:rw
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.matrix-synapse.rule=Host(`matrix.bhasher.com`)"
+    - "traefik.http.routers.matrix-synapse.tls=true"
+    - "traefik.http.routers.matrix-synapse.tls.certresolver=http"
+    - "traefik.http.routers.matrix-synapse.entrypoints=internalsecure,externalsecure"
+    - "traefik.http.services.matrix-synapse.loadbalancer.server.port=8008"
+    networks:
+    - external
+
+  matrix-riot:
+    container_name: matrix-element
+    image: ghcr.io/bubuntux/element-web
+    restart: unless-stopped
+    volumes:
+    - $CONFIG/riot/config.json:/etc/element-web/config.json:ro
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.matrix-riot.rule=Host(`element.bhasher.com`)"
+    - "traefik.http.routers.matrix-riot.tls=true"
+    - "traefik.http.routers.matrix-riot.tls.certresolver=http"
+    - "traefik.http.routers.matrix-riot.entrypoints=internalsecure,externalsecure"
+    - "traefik.http.services.matrix-riot.loadbalancer.server.port=80"
+    networks:
+    - external
+
+networks:
+  external:
+    external: true

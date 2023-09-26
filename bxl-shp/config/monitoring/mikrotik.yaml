@@ -1,0 +1,42 @@
+devices:
+  - name: router
+    address: 192.168.1.1
+    username: prometheus
+    password: ck1Jm25pcgW4IbnrHa3VCkxVR5H19fbO
+    features:
+      bgp: true #
+      dhcp: true
+      dhcpv6: true #
+      dhcpl: true
+      dhcp_leases: true
+      routes: true #
+      pools: true #
+      optics: true #
+      wlansta: true
+      wlanif: true
+      ipsec: true #
+      ipsec-peers: true #
+      monitor: true
+      health: true
+      conntrack: true
+      pool: true #
+      resource: true
+
+features:
+  bgp: true #
+  dhcp: true
+  dhcpv6: true #
+  dhcpl: true
+  dhcp_leases: true
+  routes: true #
+  pools: true #
+  optics: true #
+  wlansta: true
+  wlanif: true
+  ipsec: true #
+  ipsec-peers: true #
+  monitor: true
+  health: true
+  conntrack: true
+  pool: true #
+  resource: true
