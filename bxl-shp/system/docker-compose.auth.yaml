@@ -44,7 +44,7 @@ services:
     - PASSWORD_HASH=SHA512CRYPT
     - ACCEPT_WEAK_PASSWORDS=false
     - LDAP_ACCOUNT_ADDITIONAL_ATTRIBUTES=jpegPhoto^:Profile picture,sshpubkey^+:SSH public key
-    #- REMOTE_HTTP_HEADERS_LOGIN=true
+    - REMOTE_HTTP_HEADERS_LOGIN=true
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.lum.rule=Host(`lum.bhasher.com`)"
@@ -52,7 +52,7 @@ services:
     - "traefik.http.services.lum.loadbalancer.server.port=80"
     - "traefik.http.routers.lum.tls=true"
     - "traefik.http.routers.lum.tls.certresolver=http"
-    #- "traefik.http.routers.lum.middlewares=authelia@docker"
+    - "traefik.http.routers.lum.middlewares=authelia@docker"
     networks:
     - auth
     - external

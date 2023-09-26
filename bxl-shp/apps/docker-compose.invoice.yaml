@@ -1,51 +1,4 @@
 services:
-#  invoicenginx:
-#    container_name: invoice_nginx
-#    image: nginx:latest
-#    restart: on-failure
-#    volumes:
-#    - $CONFIG/invoiceninja/in-vhost.conf:/etc/nginx/conf.d/in-vhost.conf:ro
-#    - $DATA/invoiceninja/public:/var/www/app/public:ro
-#    environment:
-#    - TRUSTED_PROXIES='*'
-#    depends_on:
-#      - invoiceninja
-#    networks:
-#    - invoice
-#    - external
-#    #labels:
-#    #- "traefik.enable=true"
-#    #- "traefik.http.routers.invoice.rule=Host(`invoice.bhasher.com`)"
-#    #- "traefik.http.services.invoice.loadbalancer.server.port=80"
-#    #- "traefik.http.routers.invoice.tls=true"
-#    #- "traefik.http.routers.invoice.tls.certresolver=http"
-#    #- "traefik.http.routers.invoice.entrypoints=internalsecure"
-#
-#  invoiceninja:
-#    image: invoiceninja/invoiceninja:5
-#    container_name: invoice_ninja
-#    environment:
-#    - APP_URL=https://invoice.bhasher.com
-#    - APP_KEY=${INVOICENINJA_APIKEY}
-#    - REQUIRE_HTTPS=true
-#    - PHANTOMJS_PDF_GENERATION=false
-#    - PDF_GENERATOR=snappdf
-#    - QUEUE_CONNECTION=database
-#    - DB_HOST=mariadb
-#    - DB_DATABASE=invoiceninja
-#    - DB_USERNAME=root
-#    - DB_PASSWORD=${MARIADB_ROOT}
-#    - IN_USER_EMAIL=invoice@bhasher.com
-#    - IN_PASSWORD=${INVOICENINJA_PASSWORD}
-#    - TRUSTED_PROXIES='*'
-#    restart: unless-stopped
-#    volumes:
-#    - $DATA/invoiceninja/public:/var/www/app/public:rw
-#    - $DATA/invoiceninja/storage:/var/www/app/storage:rw
-#    networks:
-#    - invoice
-#    - storage
-
   invoiceplane:
     container_name: invoiceplane
     image: mhzawadi/invoiceplane:latest
@@ -53,6 +6,7 @@ services:
     - $DATA/invoiceplane/uploads:/var/www/html/uploads
     - $DATA/invoiceplane/ipconfig.php:/var/www/html/ipconfig.php
     - /etc/localtime:/etc/localtime:ro
+    command: sh -c "apk add php7-mbstring php7-iconv php7-json gd && nginx -g 'daemon off;'"
     environment:
     - IP_URL=https://invoice.bhasher.com
     #- MYSQL_HOST=mariadb
@@ -66,7 +20,7 @@ services:
     - "traefik.http.services.invoice.loadbalancer.server.port=80"
     - "traefik.http.routers.invoice.tls=true"
     - "traefik.http.routers.invoice.tls.certresolver=http"
-    - "traefik.http.routers.invoice.entrypoints=internalsecure"
+    - "traefik.http.routers.invoice.entrypoints=internalsecure,externalsecure"
     networks:
     - external
     - storage

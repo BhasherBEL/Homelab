@@ -1,13 +1,19 @@
 services:
   matrix-synapse:
     container_name: matrix-synapse
-    image: matrixdotorg/synapse:latest
+    image: matrixdotorg/synapse:v1.92.3
     restart: unless-stopped
     environment:
-    - SYNAPSE_SERVER_NAME=matrix.bhasher.com
+    - SYNAPSE_SERVER_NAME=bhasher.com
     - SYNAPSE_REPORT_STATS=no
     volumes:
     - $DATA/matrix/synapse:/data:rw
+    healthcheck:
+      test: ["CMD", "curl", "-fSs", "http://localhost:8008/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.matrix-synapse.rule=Host(`matrix.bhasher.com`)"
@@ -33,6 +39,7 @@ services:
     - "traefik.http.services.matrix-riot.loadbalancer.server.port=80"
     networks:
     - external
+
 
 networks:
   external:
