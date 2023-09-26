@@ -60,6 +60,7 @@ services:
     - GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH=contains(roles[*], 'admin') && 'Admin' || 'Viewer'
     - GF_AUTH_GENERIC_OAUTH_GROUPS_PATH=groups
     - GF_AUTH_GENERIC_OAUTH_ALLOWED_GROUPS=admin
+    - GF_AUTH_OAUTH_ALLOW_INSECURE_EMAIL_LOOKUP=true
     volumes:
     - $DATA/monitoring/grafana:/var/lib/grafana
     - /etc/localtime:/etc/localtime:ro
@@ -76,6 +77,9 @@ services:
     - /sys:/sys:ro
     - /var/lib/docker/:/var/lib/docker:ro
     - /etc/localtime:/etc/localtime:ro
+    - /etc/machine-id:/etc/machine-id:ro
+    - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id:ro
+    - /dev/disk/:/dev/disk:ro
     restart: always
     command:
     - "--housekeeping_interval=60s"
@@ -84,6 +88,8 @@ services:
     - "--disable_metrics=percpu,sched,tcp,udp,disk,diskIO,hugetlb,referenced_memory,cpu_topology,resctrl"
     networks:
     - monitoring
+    devices:
+    - /dev/kmsg
     healthcheck:
       test: wget --quiet --tries=1 --spider http://localhost:8080/healthz || exit 1
       interval: 15s

@@ -24,6 +24,9 @@ services:
     #- "--log.level=DEBUG"
     - "--metrics.prometheus=true"
     - "--api.dashboard=true"
+    #- "--experimental.plugins.sablier.moduleName=github.com/acouvreur/sablier"
+    #- "--experimental.plugins.sablier.version=v1.3.0"
+    #- "--providers.file.filename=/etc/traefik/dynamic-config.yml"
     environment:
     - TZ=Europe/Paris
     ports:

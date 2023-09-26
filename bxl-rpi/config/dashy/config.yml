@@ -99,11 +99,11 @@ sections:
         url: https://portainer.bxl.bhasher.com
         statusCheckUrl: http://portainer:9000
         id: 7_1631_portainer
-      - title: InvoiceNinja
+      - title: Invoiceplane
         icon: hl-invoiceninja
         url: https://invoice.bhasher.com
-        statusCheckUrl: http://invoicenginx
-        id: 8_1631_invoiceninja
+        statusCheckUrl: http://invoiceplane
+        id: 8_1631_invoiceplane
       - title: Dashboard
         icon: hl-dashy
         url: https://hub.bhasher.com
