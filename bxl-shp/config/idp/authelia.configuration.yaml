@@ -165,3 +165,17 @@ identity_providers:
       - groups
       - email
       userinfo_signing_algorithm: none
+    - id: jellyfin
+      description: Jellyfn
+      secret: '$argon2id$v=19$m=65536,t=3,p=4$+AqLF91LkfyZJIhjxq3lVQ$m0aSF/XYaWAU1NgRUlwMC3cB0k09Jg+HBBXa8iJWCLk'
+      public: false
+      authorization_policy: one_factor
+      redirect_uris:
+      - https://jellyfin.bhasher.com/sso/OID/redirect/Authelia
+      consent_mode: implicit
+      scopes:
+      - openid
+      - profile
+      - groups
+      - email
+      userinfo_signing_algorithm: none

@@ -204,6 +204,15 @@ services:
     - mediaserver
     - external
 
+  sonarr_youtubedl:
+    image: whatdaybob/sonarr_youtubedl:latest
+    container_name: sonarr_youtubedl
+    volumes:
+    - $DATA/mediaserver/youtubedl:/config
+    - /mnt/movies/series:/sonarr_root
+    networks:
+    - mediaserver
+
 networks:
   mediaserver:
   external:

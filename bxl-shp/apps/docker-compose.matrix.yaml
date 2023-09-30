@@ -23,6 +23,7 @@ services:
     - "traefik.http.services.matrix-synapse.loadbalancer.server.port=8008"
     networks:
     - external
+    - matrix
 
   matrix-riot:
     container_name: matrix-element
@@ -40,7 +41,18 @@ services:
     networks:
     - external
 
+  mautrix-slack:
+    container_name: mautrix-slack
+    image: dock.mau.dev/mautrix/slack:latest
+    restart: unless-stopped
+    volumes:
+    - $DATA/matrix/slack:/data
+    networks:
+    - matrix
+    - storage
+
 
 networks:
+  matrix:
   external:
     external: true
