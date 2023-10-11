@@ -41,15 +41,15 @@ services:
     networks:
     - external
 
-  mautrix-slack:
-    container_name: mautrix-slack
-    image: dock.mau.dev/mautrix/slack:latest
-    restart: unless-stopped
-    volumes:
-    - $DATA/matrix/slack:/data
-    networks:
-    - matrix
-    - storage
+  #mautrix-slack:
+  #  container_name: mautrix-slack
+  #  image: dock.mau.dev/mautrix/slack:latest
+  #  restart: unless-stopped
+  #  volumes:
+  #  - $DATA/matrix/slack:/data
+  #  networks:
+  #  - matrix
+  #  - storage
 
 
 networks:

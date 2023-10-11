@@ -1,0 +1,47 @@
+services:
+  ferdium-server:
+    container_name: ferdium-server
+    image: ferdium/ferdium-server:latest
+    environment:
+    - NODE_ENV=development
+    - APP_URL=ferdium.bhasher.com
+    - DB_CONNECTION=pg
+    - DB_HOST=postgres
+    - DB_PORT=5432
+    - DB_USER=postgres
+    - DB_PASSWORD=$POSTGRES_PASSWORD
+    - DB_DATABASE=ferdium
+    - DB_SSL=false
+    #- MAIL_CONNECTION=smtp
+    #- SMTP_HOST=127.0.0.1
+    #- SMTP_PORT=2525
+    #- MAIL_SSL=false
+    #- MAIL_USERNAME=username
+    #- MAIL_PASSWORD=password
+    #- MAIL_SENDER=noreply@ferdium.org
+    - IS_CREATION_ENABLED=true
+    - IS_DASHBOARD_ENABLED=true
+    - IS_REGISTRATION_ENABLED=true
+    - CONNECT_WITH_FRANZ=false
+    - PUID=1000
+    - PGID=1000
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.ferdium.rule=Host(`ferdium.bhasher.com`)"
+    - "traefik.http.services.ferdium.loadbalancer.server.port=3333"
+    - "traefik.http.routers.ferdium.tls=true"
+    - "traefik.http.routers.ferdium.tls.certresolver=http"
+    - "traefik.http.routers.ferdium.entrypoints=internalsecure"
+    volumes:
+    - $DATA/ferdium/data:/data
+    - $DATA/ferdium/recipes:/app/recipes
+    restart: unless-stopped
+    networks:
+    - storage
+    - external
+
+networks:
+  storage:
+    external: true
+  external:
+    external: true

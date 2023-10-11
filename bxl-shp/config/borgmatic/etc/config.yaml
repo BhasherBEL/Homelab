@@ -1,0 +1,33 @@
+source_directories:
+- /mnt/source
+repositories:
+- path: /mnt/borg-repository
+  label: local
+
+compression: lz4
+archive_name_format: 'backup-{now}'
+
+keep_hourly: 12
+keep_daily: 7
+keep_weekly: 4
+keep_monthly: 6
+
+
+checks:
+- name: repository
+- name: archives
+check_last: 3
+
+
+before_backup:
+- echo "Starting a backup job."
+after_backup:
+- echo "Backup created."
+on_error:
+- echo "Error while creating a backup."
+
+exclude_patterns:
+- '*.pyc'
+- '/*.cache'
+- '*/MediaCover'
+
