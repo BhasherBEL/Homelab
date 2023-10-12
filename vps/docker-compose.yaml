@@ -38,6 +38,8 @@ services:
     container_name: portainer
     image: portainer/portainer-ce:latest
     restart: on-failure
+    ports:
+    - 8000:8000/tcp
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.portainer.rule=Host(`portainer.vps.bhasher.com`)"
@@ -74,7 +76,6 @@ services:
       - /home/debian/containers/mailserver/docker-data/mail-state/:/var/mail-state/:rw
       - /home/debian/containers/mailserver/mail-logs/:/var/log/mail/:rw
       - /home/debian/containers/mailserver/config/:/tmp/docker-mailserver/:rw
-      - /home/debian/containers/stepca/issued/bdubois.io:/certs:ro
       - /etc/localtime:/etc/localtime:ro
       - type: bind
         source: /etc/letsencrypt/acme.json
@@ -109,7 +110,6 @@ services:
       # NETWORKING
       - NETWORK_INTERFACE=eth0
       - PERMIT_DOCKER=none
-      - POSTFIX_INET_PROTOCOLS=ipv4
       - DOVECOT_INET_PROTOCOLS=ipv4
       
       # PERSISTENCE
@@ -188,76 +188,16 @@ services:
     container_name: whoami
     image: docker.io/traefik/whoami:latest
     labels:
-       - "traefik.http.routers.whoami.tls.domains[0].main=bdubois.io"
-       - "traefik.http.routers.whoami.tls.domains[0].sans=*.bdubois.io"
-       #- "traefik.http.routers.whoami.rule=Host(`*.bdubois.io`)"
-       - "traefik.http.routers.whoami.tls=true"
-       - "traefik.http.routers.whoami.tls.certresolver=http"
-    networks:
-    - external
-
-  invoicenginx:
-    container_name: invoice_nginx
-    image: nginx:latest
-    restart: on-failure
-    volumes:
-    - /home/debian/containers/invoiceninja/in-vhost.conf:/etc/nginx/conf.d/in-vhost.conf:ro
-    - /home/debian/containers/invoiceninja/app/public:/var/www/app/public:ro
-    environment:
-    - TRUSTED_PROXIES='*'
-    depends_on:
-      - invoiceninja
-    networks:
-    - invoice
-    - external
-    labels:
     - "traefik.enable=true"
-    - "traefik.http.routers.invoice.rule=Host(`invoice.vps.bhasher.com`)"
-    - "traefik.http.services.invoice.loadbalancer.server.port=80"
-    - "traefik.http.routers.invoice.tls=true"
-    - "traefik.http.routers.invoice.tls.certresolver=http"
-    - "traefik.http.routers.invoice.entrypoints=websecure"
-
-  invoiceninja:
-    image: invoiceninja/invoiceninja:5
-    container_name: invoice_ninja
-    environment:
-    - APP_URL=https://invoice.vps.bhasher.com
-    - APP_KEY=base64:p4rqG3iLEKieXE6D84hVdjkwJK3TDPSDOu5AdH0XEu8=
-    - REQUIRE_HTTPS=true
-    - PHANTOMJS_PDF_GENERATION=false
-    - PDF_GENERATOR=snappdf
-    - QUEUE_CONNECTION=database
-    - DB_HOST=invoicedb
-    - DB_DATABASE=ninja
-    - DB_USERNAME=ninja
-    - DB_PASSWORD=ninja
-    - IN_USER_EMAIL=invoice@bhasher.com
-    - IN_PASSWORD=zDcUZAVQk03aDHJJo4QccSpHXQMxgTEI
-    - TRUSTED_PROXIES='*'
-    restart: on-failure
-    volumes:
-    - /home/debian/containers/invoiceninja/app/public:/var/www/app/public:rw
-    - /home/debian/containers/invoiceninja/app/storage:/var/www/app/storage:rw
-    depends_on:
-    - invoicedb
+    #- "traefik.http.routers.whoami.tls.domains[0].main=bdubois.io"
+    #- "traefik.http.routers.whoami.tls.domains[0].sans=*.bdubois.io"
+    - "traefik.http.routers.whoami.rule=Host(`bdubois.io`, `imap.bdubois.io`, `smtp.bdubois.io`)"
+    #- "traefik.http.services.whoami.loadbalancer.server.port=80"
+    - "traefik.http.routers.whoami.tls=true"
+    - "traefik.http.routers.whoami.tls.certresolver=http"
+    #- "traefik.http.routers.whoami.entrypoints=websecure"
     networks:
-    - invoice
+    - external
 
-  invoicedb:
-    container_name: invoice_db
-    image: mariadb:latest
-    restart: on-failure
-    environment:
-    - MYSQL_ROOT_PASSWORD=ninjaAdm1nPassword
-    - MYSQL_USER=ninja
-    - MYSQL_PASSWORD=ninja
-    - MYSQL_DATABASE=ninja
-    volumes:
-    - /home/debian/containers/invoiceninja/mariadb/data:/var/lib/mysql:rw
-    networks:
-    - invoice
-  
 networks:
   external:
-  invoice:
