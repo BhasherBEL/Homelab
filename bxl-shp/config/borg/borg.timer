@@ -1,9 +1,0 @@
-[Unit]
-Description=Run Borg Backup at 4 a.m. every day
-
-[Timer]
-OnCalendar=*-*-* 04:00:00
-Persistent=true
-
-[Install]
-WantedBy=timers.target

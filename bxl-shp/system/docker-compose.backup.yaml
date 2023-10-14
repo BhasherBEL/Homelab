@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     volumes:
     - $DATA:/mnt/source:ro
-    - $BACKUP:/mnt/borg-repository:rw
+    - $BACKUP/shp:/mnt/borg-repository:rw
     - $CONFIG/borgmatic/etc:/etc/borgmatic.d
     - $DATA/borgmatic/borg:/root/.config/borg
     - $DATA/borgmatic/ssh:/root/.ssh
@@ -18,4 +18,22 @@ services:
     - RUN_ON_STARTUP=true
     networks:
     - storage
+
+  borgmatic-vps:
+    container_name: borgmatic-vps
+    image: ghcr.io/borgmatic-collective/borgmatic:latest
+    restart: unless-stopped
+    volumes:
+    - /mnt/vps:/mnt/source:ro
+    - $BACKUP/vps:/mnt/borg-repository:rw
+    - $CONFIG/borgmatic/etc:/etc/borgmatic.d
+    - $DATA/borgmatic-vps/borg:/root/.config/borg
+    - $DATA/borgmatic-vps/ssh:/root/.ssh
+    - $DATA/borgmatic-vps/cache:/root/.cache/borg
+    - /etc/localtime:/etc/localtime:ro
+    environment:
+    - TZ=Europe/Paris
+    - BORG_PASSPHRASE=none
+    - BACKUP_CRON=0 5 * * *
+    - RUN_ON_STARTUP=true
 

@@ -1,0 +1,35 @@
+services:
+  joplin-server:
+    container_name: joplin
+    image: joplin/server:latest
+    restart: unless-stopped
+    volumes:
+    - /etc/localtime:/etc/localtime:ro
+    - /etc/timezone:/etc/timezone:ro
+    environment:
+    - APP_PORT=22300
+    - APP_BASE_URL=https://joplin.bhasher.com
+    - DB_CLIENT=pg
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    - POSTGRES_DATABASE=joplin
+    - POSTGRES_HOST=postgres
+    - TZ=Europe/Paris
+    ports:
+    - 22300:22300/tcp
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.joplin.rule=Host(`joplin.bhasher.com`)"
+    - "traefik.http.services.joplin.loadbalancer.server.port=22300"
+    - "traefik.http.routers.joplin.tls=true"
+    - "traefik.http.routers.joplin.tls.certresolver=http"
+    - "traefik.http.routers.joplin.entrypoints=internalsecure"
+    networks:
+    - storage
+    - external
+
+networks:
+  storage:
+    external: true
+  external:
+    external: true

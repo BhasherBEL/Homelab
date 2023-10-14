@@ -1,0 +1,34 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:1.26.0-alpine
+    container_name: vaultwarden
+    restart: unless-stopped
+    volumes:
+    - $DATA/vaultwarden:/data
+    environment:
+    - DATABASE_URL=${VAULT_DATABASE_URL}
+    - SIGNUPS_ALLOWED=false
+    - DOMAIN=https://vault.bhasher.com
+    - ADMIN_TOKEN=${VAULT_ADMIN}
+    - SMTP_HOST=bdubois.io
+    - SMTP_FROM=no-reply@bhasher.com
+    - SMTP_PORT=587
+    - SMTP_SECURITY=starttls
+    - SMTP_USERNAME=${SMTP_USER}
+    - SMTP_PASSWORD=${SMTP_PASSWORD}
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.vaultwarden.rule=Host(`vault.bhasher.com`)"
+    - "traefik.http.routers.vaultwarden.entrypoints=internalsecure"
+    - "traefik.http.services.vaultwarden.loadbalancer.server.port=80"
+    - "traefik.http.routers.vaultwarden.tls=true"
+    - "traefik.http.routers.vaultwarden.tls.certresolver=http"
+    networks:
+    - external
+    - storage
+
+networks:
+  external:
+    external: true
+  storage:
+    external: true

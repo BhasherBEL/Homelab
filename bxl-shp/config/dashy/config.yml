@@ -46,11 +46,6 @@ sections:
         url: https://element.bhasher.com
         statusCheckUrl: http://matrix-riot
         id: 4_1507_elementweb
-      - title: Shlink
-        icon: hl-shlink
-        url: https://shlink.bhasher.com
-        statusCheckUrl: https://shlink_ui
-        id: 5_1507_shlink
   - name: Private services
     displayData:
       sortBy: most-used
@@ -118,25 +113,30 @@ sections:
         icon: hl-portainer
         url: https://portainer.vps.bhasher.com
         id: 11_1631_portainervps
-      - title: Portainer (LLN)
-        icon: hl-portainer
-        url: https://portainer.lln.bhasher.com
-        id: 12_1631_portainerlln
       - title: Home assistant
         icon: hl-home-assistant
         url: https://hass.bhasher.com
         statusCheckUrl: http://hass:8123
-        id: 13_1631_homeassistant
+        id: 12_1631_homeassistant
       - title: Node-red
         icon: hl-node-red
         url: https://nodered.bhasher.com
         statusCheckUrl: http://nodered:1880
-        id: 14_1631_nodered
+        id: 13_1631_nodered
       - title: Planka
         icon: hl-planka
         url: https://planka.bhasher.com
         statusCheckUrl: http://planka:1337
-        id: 15_1631_planka
+        id: 14_1631_planka
+      - title: Monica
+        icon: hl-monica
+        url: https://monica.bhasher.com
+        statusCheck: true
+        id: 15_1631_monica
+      - title: Vaultwarden
+        icon: hl-vaultwarden
+        url: https://vault.bhasher.com
+        id: 16_1631_vaultwarden
   - name: System services
     displayData:
       sortBy: most-used
