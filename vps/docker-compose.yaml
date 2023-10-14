@@ -64,13 +64,7 @@ services:
     - 465:465
     - 587:587
     - 993:993
-    labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.sieve.rule=Host(`sieve.bdubois.io`)"
-    - "traefik.http.routers.sieve.entrypoints=websecure"
-    - "traefik.http.services.sieve.loadbalancer.server.port=4190"
-    - "traefik.http.routers.sieve.tls=true"
-    - "traefik.http.routers.sieve.tls.certresolver=http"
+    - 4190:4190
     volumes:
       - /home/debian/containers/mailserver/mail-data/:/var/mail/:rw
       - /home/debian/containers/mailserver/docker-data/mail-state/:/var/mail-state/:rw
@@ -116,23 +110,20 @@ services:
       - ONE_DIR=1
       
       # FILTERING
-      - ENABLE_AMAVIS=0
-      - ENABLE_SPAMASSASSIN=0
+      - ENABLE_AMAVIS=1
+      - ENABLE_SPAMASSASSIN=1
       - ENABLE_CLAMAV=0
       - ENABLE_MANAGESIEVE=1
-      #- ENABLE_AMAVIS=1  # Link between MTA & ClamAV/SpamAssassin
       - ENABLE_DNSBL=0  # DNS-based source rejection
-      #- ENABLE_CLAMAV=1  # Antivirus
       - VIRUSMAILS_DELETE_DELAY=7
       - POSTSCREEN_ACTION=enforce
-      #- ENABLE_SPAMASSASSIN=1  # Antispam
       - SPAMASSASSIN_SPAM_TO_INBOX=1
-      #- ENABLE_SPAMASSASSIN_KAM=1  # Extended rules set
+      - ENABLE_SPAMASSASSIN_KAM=1  # Extended rules set
       - MOVE_SPAM_TO_JUNK=1
-      - SA_TAG=2.0  # Spam info header level
+      - SA_TAG=-1000000.0  # Spam info header level
       - SA_TAG2=6.31  # Spam level
       - SA_KILL=6.31
-      - SA_SPAM_SUBJECT=***SPAM*****
+      - SA_SPAM_SUBJECT=***SPAM (_SCORE_)***
       
       # SECURITY
       - ENABLE_FAIL2BAN=1
