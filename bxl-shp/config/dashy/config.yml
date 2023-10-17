@@ -128,15 +128,10 @@ sections:
         url: https://planka.bhasher.com
         statusCheckUrl: http://planka:1337
         id: 14_1631_planka
-      - title: Monica
-        icon: hl-monica
-        url: https://monica.bhasher.com
-        statusCheck: true
-        id: 15_1631_monica
       - title: Vaultwarden
         icon: hl-vaultwarden
         url: https://vault.bhasher.com
-        id: 16_1631_vaultwarden
+        id: 15_1631_vaultwarden
   - name: System services
     displayData:
       sortBy: most-used
