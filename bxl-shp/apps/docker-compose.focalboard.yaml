@@ -1,0 +1,39 @@
+version: "3"
+
+services:
+  focalboard:
+    container_name: focalboard
+    image: mattermost/focalboard:latest
+    environment:
+    - VIRTUAL_HOST=localhost
+    - VIRTUAL_PORT=8000
+    - VIRTUAL_PROTO=http
+    - FOCALBOARD_SERVERROOT=https://board.bhasher.com
+    - FOCALBOARD_PORT=8000
+    - FOCALBOARD_DBTYPE=postgres
+    - FOCALBOARD_DBCONFIG=postgresql://postgres:${POSTGRES_PASSWORD}@postgres/focalboard?sslmode=disable&connect_timeout=10
+    - FOCALBOARD_POSTGRES_DBCONFIG=dbname=focalboard sslmode=disable
+    - FOCALBOARD_TELEMETRY=false
+    - FOCALBOARD_USESSL=false
+    - FOCALBOARD_AUTHMODE=none
+    - TZ=Europe/Paris
+    volumes:
+    - $DATA/focalboard:/opt/focalboard/data
+    restart: unless-stopped
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.focalboard.rule=Host(`board.bhasher.com`)"
+    - "traefik.http.services.focalboard.loadbalancer.server.port=8000"
+    - "traefik.http.routers.focalboard.tls=true"
+    - "traefik.http.routers.focalboard.tls.certresolver=http"
+    - "traefik.http.routers.focalboard.entrypoints=internalsecure"
+    networks:
+    - external
+    - storage
+
+networks:
+  external:
+    external: true
+  storage:
+    external: true
+
