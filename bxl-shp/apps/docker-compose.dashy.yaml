@@ -24,6 +24,31 @@ services:
     networks:
     - external
 
+  dashy-SD:
+    container_name: dashy-SD
+    image: dashy
+    environment:
+    - NODE_ENV=production
+    restart: unless-stopped
+    volumes:
+    - $CONFIG/dashy/config-sd.yml:/app/public/conf.yml
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.dashy-sd.rule=Host(`hub-sd.bhasher.com`)"
+    - "traefik.http.routers.dashy-sd.entrypoints=internalsecure,externalsecure"
+    - "traefik.http.services.dashy-sd.loadbalancer.server.port=80"
+    - "traefik.http.routers.dashy-sd.tls=true"
+    - "traefik.http.routers.dashy-sd.tls.certresolver=http"
+    - "traefik.http.routers.dashy-sd.middlewares=authelia@docker"
+    - "com.centurylinklabs.watchtower.enable=false"
+    healthcheck:
+      test: ['CMD', 'node', '/app/services/healthcheck']
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+    networks:
+    - external
+
 networks:
   external:
     external: true
