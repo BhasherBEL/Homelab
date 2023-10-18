@@ -2,7 +2,7 @@ services:
   tg2:
     container_name: tg2
     image: tg2:latest
-    restart: on-failure
+    restart: on-failure:10
     environment:
     - TGTG_EMAIL=tgtg.trash@bhasher.com
     - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
