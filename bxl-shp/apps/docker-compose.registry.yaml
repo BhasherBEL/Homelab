@@ -1,0 +1,51 @@
+services:
+  registry-ui:
+    container_name: registry-ui
+    image: joxit/docker-registry-ui:main
+    restart: always
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.registryui.rule=Host(`registry.bhasher.com`)"
+    - "traefik.http.services.registryui.loadbalancer.server.port=80"
+    - "traefik.http.routers.registryui.tls=true"
+    - "traefik.http.routers.registryui.tls.certresolver=http"
+    - "traefik.http.routers.registryui.entrypoints=internalsecure"
+    environment:
+    - REGISTRY_URL=https://registry.bhasher.com
+    - SINGLE_REGISTRY=true
+    - REGISTRY_TITLE=Bhasher Docker Registry
+    - DELETE_IMAGES=true
+    - SHOW_CONTENT_DIGEST=true
+    - NGINX_PROXY_PASS_URL=http://registry:5000
+    - SHOW_CATALOG_NB_TAGS=true
+    - CATALOG_MIN_BRANCHES=1
+    - CATALOG_MAX_BRANCHES=1
+    - TAGLIST_PAGE_SIZE=100
+    - REGISTRY_SECURED=false
+    - CATALOG_ELEMENTS_LIMIT=1000
+    networks:
+    - registry
+    - external
+
+  registry:
+    image: registry:2.8.2
+    restart: always
+    container_name: registry
+    ports:
+    - 5000:5000
+    environment:
+    - REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin=[http://registry.bhasher.com]
+    - REGISTRY_HTTP_HEADERS_Access-Control-Allow-Methods=[HEAD,GET,OPTIONS,DELETE]
+    - REGISTRY_HTTP_HEADERS_Access-Control-Allow-Credentials=[true]
+    - REGISTRY_HTTP_HEADERS_Access-Control-Allow-Headers=[Authorization,Accept,Cache-Control]
+    - REGISTRY_HTTP_HEADERS_Access-Control-Expose-Headers=[Docker-Content-Digest]
+    - REGISTRY_STORAGE_DELETE_ENABLED='true'
+    volumes:
+    - /mnt/homelab/registry:/var/lib/registry
+    networks:
+    - registry
+
+networks:
+  registry:
+  external:
+    external: true
