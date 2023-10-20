@@ -1,0 +1,22 @@
+services: 
+  portfolio:
+    container_name: portfolio
+    image: nginx:latest
+    restart: unless-stopped
+    environment:
+    - TZ=Europe/Paris
+    volumes:
+    - $DATA/portfolio:/usr/share/nginx/html:ro
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.portfolio.rule=Host(`portfolio.bhasher.com`)"
+    - "traefik.http.services.portfolio.loadbalancer.server.port=80"
+    - "traefik.http.routers.portfolio.tls=true"
+    - "traefik.http.routers.portfolio.tls.certresolver=http"
+    - "traefik.http.routers.portfolio.entrypoints=internalsecure"
+    networks:
+    - external
+
+networks:
+  external:
+    external: true
