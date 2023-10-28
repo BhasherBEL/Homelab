@@ -2,6 +2,7 @@ services:
   invoiceplane:
     container_name: invoiceplane
     image: mhzawadi/invoiceplane:latest
+    restart: unless-stopped
     volumes:
     - $DATA/invoiceplane/uploads:/var/www/html/uploads
     - $DATA/invoiceplane/ipconfig.php:/var/www/html/ipconfig.php

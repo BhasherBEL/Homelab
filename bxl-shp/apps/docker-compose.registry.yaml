@@ -2,7 +2,7 @@ services:
   registry-ui:
     container_name: registry-ui
     image: joxit/docker-registry-ui:main
-    restart: always
+    restart: on-failure:5
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.registryui.rule=Host(`registry.bhasher.com`)"
@@ -26,10 +26,12 @@ services:
     networks:
     - registry
     - external
+    depends_on:
+    - registry
 
   registry:
     image: registry:2.8.2
-    restart: always
+    restart: on-failure:5
     container_name: registry
     ports:
     - 5000:5000

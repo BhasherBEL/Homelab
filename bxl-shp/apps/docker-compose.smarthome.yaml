@@ -8,7 +8,7 @@ services:
     networks:
     - smarthome
     - external
-    restart: on-failure
+    restart: unless-stopped
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.hass.rule=Host(`hass.bhasher.com`)"
@@ -16,6 +16,9 @@ services:
     - "traefik.http.services.hass.loadbalancer.server.port=8123"
     - "traefik.http.routers.hass.tls=true"
     - "traefik.http.routers.hass.tls.certresolver=http"
+    depends_on:
+    - authelia
+    - traefik
 
   mosquitto:
     container_name: mosquitto
@@ -31,7 +34,7 @@ services:
     networks:
     - smarthome
     - external
-    restart: on-failure
+    restart: unless-stopped
 
   zigbee2mqtt:
     container_name: zigbee2mqtt
@@ -45,10 +48,12 @@ services:
     - /dev/ttyACM0:/dev/ttyACM0
     networks:
     - smarthome
+    depends_on:
+    - mosquitto
 
   nodered:
     container_name: nodered
-    restart: on-failure
+    restart: on-failure:5
     image: nodered/node-red:latest
     volumes:
     - $DATA/nodered:/data
@@ -64,6 +69,8 @@ services:
     - "traefik.http.routers.nodered.tls=true"
     - "traefik.http.routers.nodered.tls.certresolver=http"
     - "traefik.http.routers.nodered.middlewares=authelia@docker"
+    depends_on:
+    - hass
 
 
 networks:

@@ -21,7 +21,7 @@ services:
   mariadb:
     container_name: mariadb
     image: mariadb:latest
-    restart: on-failure
+    restart: unless-stopped
     environment:
     - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT}
     volumes:

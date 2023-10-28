@@ -61,6 +61,8 @@ services:
     - GF_AUTH_GENERIC_OAUTH_GROUPS_PATH=groups
     - GF_AUTH_GENERIC_OAUTH_ALLOWED_GROUPS=admin
     - GF_AUTH_OAUTH_ALLOW_INSECURE_EMAIL_LOOKUP=true
+    - GF_RENDERING_SERVER_URL=http://grafana-renderer:8081/render
+    - GF_RENDERING_CALLBACK_URL=http://grafana:3000/
     volumes:
     - $DATA/monitoring/grafana:/var/lib/grafana
     - /etc/localtime:/etc/localtime:ro
@@ -131,7 +133,49 @@ services:
     - /etc/localtime:/etc/localtime:ro
     networks:
     - monitoring
-  
+    depends_on:
+    - prometheus
+
+  grafana-renderer:
+    container_name: grafana-renderer
+    image: grafana/grafana-image-renderer:latest
+    restart: unless-stopped
+    networks:
+    - monitoring
+    depends_on:
+    - grafana
+
+  grafana-reporter:
+    container_name: grafana-reporter
+    image: izakmarais/grafana-reporter:latest
+    restart: unless-stopped
+    command: "-ip grafana:3000 -cmd_enable=0 -grid-layout=1"
+    networks:
+    - monitoring
+    - external
+    depends_on:
+    - grafana
+    - grafana-renderer
+
+  grafana-sendreport:
+    container_name: grafana-sendreport
+    image: registry.bhasher.com/send-report:latest
+    restart: unless-stopped
+    environment:
+    - PDF_URL=grafana-reporter:8686/api/v5/report/64nrElFmj?apitoken=${GRAFANA_TOKEN}&var-interval=5m&from=now-7d&to=now
+    - TO_EMAIL=grafana-report.lan@bhasher.com
+    - SMTP_SERVER=bdubois.io
+    - SMTP_PORT=465
+    - SMTP_USER=${SMTP_USER}
+    - SMTP_PASSWORD=${SMTP_PASSWORD}
+    - CRON_SCHEDULE=0 4 * * 0
+    networks:
+    - monitoring
+    volumes:
+    - /etc/localtime:/etc/localtime:ro
+    - /etc/timezone:/etc/timezone:ro
+    depends_on:
+    - grafana-reporter
 
 networks:
   monitoring:
