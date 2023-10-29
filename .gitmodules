@@ -1,0 +1,3 @@
+[submodule "builds/tg2"]
+	path = builds/tg2
+	url = git@github.com:BhasherBEL/tg2.git
