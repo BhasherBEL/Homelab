@@ -163,7 +163,8 @@ services:
     restart: unless-stopped
     environment:
     - PDF_URL=grafana-reporter:8686/api/v5/report/64nrElFmj?apitoken=${GRAFANA_TOKEN}&var-interval=5m&from=now-7d&to=now
-    - TO_EMAIL=grafana-report.lan@bhasher.com
+    - TO_EMAIL=grafana.report@bhasher.com
+    - FROM=Grafana Report <no-reply@bhasher.com>
     - SMTP_SERVER=bdubois.io
     - SMTP_PORT=465
     - SMTP_USER=${SMTP_USER}
