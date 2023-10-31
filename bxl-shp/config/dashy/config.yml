@@ -123,11 +123,10 @@ sections:
         url: https://nodered.bhasher.com
         statusCheckUrl: http://nodered:1880
         id: 13_1631_nodered
-      - title: Planka
-        icon: hl-planka
-        url: https://planka.bhasher.com
-        statusCheckUrl: http://planka:1337
-        id: 14_1631_planka
+      - title: Focalboard
+        icon: hl-mattermost
+        url: https://board.bhasher.com
+        id: 14_1631_focalboard
       - title: Vaultwarden
         icon: hl-vaultwarden
         url: https://vault.bhasher.com

@@ -3,7 +3,7 @@ version: "3"
 services:
   focalboard:
     container_name: focalboard
-    image: mattermost/focalboard:latest
+    image: registry.bhasher.com/focalboard:latest
     environment:
     - VIRTUAL_HOST=localhost
     - VIRTUAL_PORT=8000
