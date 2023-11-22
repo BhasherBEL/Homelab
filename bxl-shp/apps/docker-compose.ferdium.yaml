@@ -31,7 +31,7 @@ services:
     - "traefik.http.services.ferdium.loadbalancer.server.port=3333"
     - "traefik.http.routers.ferdium.tls=true"
     - "traefik.http.routers.ferdium.tls.certresolver=http"
-    - "traefik.http.routers.ferdium.entrypoints=internalsecure"
+    - "traefik.http.routers.ferdium.entrypoints=internalsecure,externalsecure"
     volumes:
     - $DATA/ferdium/data:/data
     - $DATA/ferdium/recipes:/app/recipes

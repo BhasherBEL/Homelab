@@ -1,10 +1,3 @@
-pageInfo:
-  title: Service Desk
-  description: Welcome to service-desk dashboard!
-  navLinks:
-    - title: HomeLab
-      path: https://hub.bhasher.com
-      target: sametab
 appConfig:
   theme: adventure
   layout: auto
@@ -12,6 +5,14 @@ appConfig:
   language: en
   statusCheck: true
   colCount: 4
+pageInfo:
+  title: Service Desk
+  description: Welcome to service-desk dashboard!
+  navLinks:
+    - title: HomeLab
+      path: https://hub.bhasher.com
+      target: sametab
+  footerText: ''
 sections:
   - name: Public services
     icon: fa-server
@@ -27,11 +28,11 @@ sections:
         url: https://uclouvain.be/4040
         statusCheck: false
         id: 0_1507_
-      - title: 8282 - SD
+      - title: 8282 - Services
         description: Catalogue de services / ivanti
         url: https://uclouvain.be/8282
         statusCheck: false
-        id: 1_1507_sd
+        id: 1_1507_services
       - title: Wifi (public)
         icon: ''
         url: https://uclouvain.be/fr/decouvrir/wifi.html
@@ -44,8 +45,14 @@ sections:
         id: 3_1507_wifiintra
       - title: Permanances WiFi
         icon: ''
+        url: >-
+          https://intranet.uclouvain.be/fr/myucl/services-informatiques/wifi-permanence.html
         statusCheck: false
         id: 4_1507_permananceswifi
+      - title: ADE infos
+        url: https://uclouvain.be/fr/facultes/sc/comment-fonctionne-ade.html
+        statusCheck: false
+        id: 5_1507_adeinfos
   - name: Private services
     displayData:
       sortBy: default
@@ -72,3 +79,11 @@ sections:
         url: http://msconsole.siws.ucl.ac.be/
         statusCheck: false
         id: 3_1631_msconsole
+      - title: Password reset
+        url: https://sites.uclouvain.be/sisu/tools/rstpwd/
+        statusCheck: false
+        id: 4_1631_passwordreset
+      - title: Jira
+        url: https://uclouvain.atlassian.net/jira/dashboards/10025
+        statusCheck: false
+        id: 5_1631_jira
