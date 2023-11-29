@@ -1,0 +1,27 @@
+services: 
+  onlyoffice-documentserver:
+    container_name: onlyoffice-documentserver
+    image: onlyoffice/documentserver:latest
+    restart: on-failure:3
+    environment:
+    - JWT_SECRET=${ONLYOFFICE_JWT}
+    - WOPI_ENABLED=true
+    volumes:
+    - $DATA/onlyoffice/DocumentServer/logs:/var/log/onlyoffice 
+    - $DATA/onlyoffice/DocumentServer/data:/var/www/onlyoffice/Data
+    - $DATA/onlyoffice/DocumentServer/lib:/var/lib/onlyoffice
+    - $DATA/onlyoffice/DocumentServer/db:/var/lib/postgresql
+    - $DATA/onlyoffice/DocumentServer/rabbitmq:/var/lib/rabbitmq
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.onlyoffice.rule=Host(`onlyoffice.bhasher.com`)"
+    - "traefik.http.services.onlyoffice.loadbalancer.server.port=80"
+    - "traefik.http.routers.onlyoffice.tls=true"
+    - "traefik.http.routers.onlyoffice.tls.certresolver=http"
+    - "traefik.http.routers.onlyoffice.entrypoints=internalsecure"
+    networks:
+    - external
+
+networks:
+  external:
+    external: true
