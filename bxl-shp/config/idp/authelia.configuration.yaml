@@ -179,3 +179,17 @@ identity_providers:
       - groups
       - email
       userinfo_signing_algorithm: none
+    - id: miniflux
+      description: Miniflux
+      secret: '$argon2id$v=19$m=65536,t=3,p=4$6CLrUJhwSMsOAryD/Fn0JA$1Lw6ECq0SSxDOQhbxM3nuHaXaEbXyVOgndGjAkTmkbc'
+      public: false
+      authorization_policy: one_factor
+      redirect_uris:
+      - https://miniflux.bhasher.com/oauth2/oidc/callback
+      consent_mode: implicit
+      scopes:
+      - openid
+      - profile
+      - groups
+      - email
+      userinfo_signing_algorithm: none
