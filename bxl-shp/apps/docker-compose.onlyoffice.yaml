@@ -53,6 +53,8 @@ services:
     - MYSQL_SERVER_PASS=onlyoffice_pass
     - ELASTICSEARCH_SERVER_HOST=onlyoffice-elasticsearch
     - ELASTICSEARCH_SERVER_HTTPPORT=9200
+    - NGINX_WORKER_PROCESSES=1
+    - NGINX_WORKER_CONNECTIONS=1024
     volumes:
     - $DATA/onlyoffice/CommunityServer/data:/var/www/onlyoffice/Data
     - $DATA/onlyoffice/CommunityServer/log:/var/log/onlyoffice
