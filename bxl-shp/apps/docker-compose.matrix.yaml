@@ -41,6 +41,26 @@ services:
     networks:
     - external
 
+  matrix-maubot:
+    container_name: matrix-maubot
+    image: dock.mau.dev/maubot/maubot:latest
+    restart: unless-stopped
+    environment:
+    - TZ=Europe/Paris
+    volumes:
+    - $DATA/matrix/maubot:/data
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.matrix-maubot.rule=Host(`maubot.bhasher.com`)"
+    - "traefik.http.routers.matrix-maubot.tls=true"
+    - "traefik.http.routers.matrix-maubot.tls.certresolver=http"
+    - "traefik.http.routers.matrix-maubot.entrypoints=internalsecure"
+    - "traefik.http.services.matrix-maubot.loadbalancer.server.port=29316"
+    networks:
+    - external
+    - storage
+    - matrix
+
   #mautrix-slack:
   #  container_name: mautrix-slack
   #  image: dock.mau.dev/mautrix/slack:latest
@@ -55,4 +75,6 @@ services:
 networks:
   matrix:
   external:
+    external: true
+  storage:
     external: true
