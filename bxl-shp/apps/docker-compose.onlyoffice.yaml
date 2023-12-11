@@ -54,7 +54,8 @@ services:
     - ELASTICSEARCH_SERVER_HOST=onlyoffice-elasticsearch
     - ELASTICSEARCH_SERVER_HTTPPORT=9200
     - NGINX_WORKER_PROCESSES=1
-    - NGINX_WORKER_CONNECTIONS=1024
+    - NGINX_WORKER_CONNECTIONS=200
+    - CPU_PROCESSOR_COUNT=200
     volumes:
     - $DATA/onlyoffice/CommunityServer/data:/var/www/onlyoffice/Data
     - $DATA/onlyoffice/CommunityServer/log:/var/log/onlyoffice
@@ -83,7 +84,7 @@ services:
     environment:
     - discovery.type=single-node
     - bootstrap.memory_lock=true
-    - "ES_JAVA_OPTS=-Xms1g -Xmx1g -Dlog4j2.formatMsgNoLookups=true"
+    - "ES_JAVA_OPTS=-Xms250m -Xmx250m -Dlog4j2.formatMsgNoLookups=true"
     - "indices.fielddata.cache.size=30%"
     - "indices.memory.index_buffer_size=30%" 
     - "ingest.geoip.downloader.enabled=false"
