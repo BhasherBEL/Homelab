@@ -1,0 +1,15 @@
+services:
+  iodine:
+    container_name: iodine
+    image: registry.bhasher.com/iodine:latest
+    restart: unless-stopped
+    environment:
+    - IP=10.10.0.1
+    - DOMAIN=dns.bhasher.com
+    - PASSWORD=${IODINE_PASSWORD}
+    cap_add:
+    - NET_ADMIN 
+    volumes:
+    - /dev:/dev:ro
+    ports:
+    - 5353:53/udp
