@@ -131,6 +131,10 @@ sections:
         icon: hl-vaultwarden
         url: https://vault.bhasher.com
         id: 15_1631_vaultwarden
+      - title: MiniFlux
+        icon: hl-miniflux
+        url: https://miniflux.bhasher.com
+        id: 16_1631_miniflux
   - name: System services
     displayData:
       sortBy: most-used
