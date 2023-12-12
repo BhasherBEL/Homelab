@@ -1,0 +1,8 @@
+maubot: 0.1.0
+id: com.bhasher.uclouvainrestou
+version: 0.0.1
+license: MIT
+modules:
+  - main
+main_class:
+  UCLouvainRestoUBot

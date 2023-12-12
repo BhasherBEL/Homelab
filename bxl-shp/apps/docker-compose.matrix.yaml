@@ -49,6 +49,7 @@ services:
     - TZ=Europe/Paris
     volumes:
     - $DATA/matrix/maubot:/data
+    - /home/shp/homelab/builds/maubot-resotU:/plugin:ro
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.matrix-maubot.rule=Host(`maubot.bhasher.com`)"
