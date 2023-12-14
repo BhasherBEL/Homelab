@@ -135,6 +135,10 @@ sections:
         icon: hl-miniflux
         url: https://miniflux.bhasher.com
         id: 16_1631_miniflux
+      - title: Maubot
+        icon: hl-matrix
+        url: https://maubot.bhasher.com/_matrix/maubot/#/
+        id: 17_1631_maubot
   - name: System services
     displayData:
       sortBy: most-used

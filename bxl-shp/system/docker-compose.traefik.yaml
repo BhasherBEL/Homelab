@@ -52,6 +52,7 @@ services:
     - "traefik.http.routers.traefik.tls.certresolver=http"
     - "traefik.http.routers.traefik.entrypoints=internalsecure"
     - "traefik.http.routers.traefik.middlewares=authelia@docker"
+    - "traefik.http.middlewares.httpsupgrade.headers.customrequestheaders.X-Forwarded-Proto=https"
     networks:
     - external
 

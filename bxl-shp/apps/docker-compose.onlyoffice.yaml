@@ -20,6 +20,7 @@ services:
     - "traefik.http.routers.onlyoffice-editor.tls=true"
     - "traefik.http.routers.onlyoffice-editor.tls.certresolver=http"
     - "traefik.http.routers.onlyoffice-editor.entrypoints=internalsecure,externalsecure"
+    - "traefik.http.routers.onlyoffice-editor.middlewares=httpsupgrade"
     networks:
     - external
     - onlyoffice
@@ -53,7 +54,7 @@ services:
     - MYSQL_SERVER_PASS=onlyoffice_pass
     - ELASTICSEARCH_SERVER_HOST=onlyoffice-elasticsearch
     - ELASTICSEARCH_SERVER_HTTPPORT=9200
-    - NGINX_WORKER_PROCESSES=1
+    - NGINX_WORKER_PROCESSES=10
     - NGINX_WORKER_CONNECTIONS=200
     - CPU_PROCESSOR_COUNT=200
     volumes:
