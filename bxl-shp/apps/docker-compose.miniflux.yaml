@@ -15,10 +15,17 @@ services:
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.miniflux.rule=Host(`miniflux.bhasher.com`)"
-    - "traefik.http.services.miniflux.loadbalancer.server.port=8080"
+    - "traefik.http.routers.miniflux.service=miniflux-service"
+    - "traefik.http.services.miniflux-service.loadbalancer.server.port=8080"
     - "traefik.http.routers.miniflux.tls=true"
     - "traefik.http.routers.miniflux.tls.certresolver=http"
     - "traefik.http.routers.miniflux.entrypoints=internalsecure"
+    - "traefik.http.routers.minifluxshare.rule=Host(`miniflux.bhasher.com`) && PathPrefix(`/share`)"
+    - "traefik.http.routers.minifluxshare.service=minifluxshare-service"
+    - "traefik.http.services.minifluxshare-service.loadbalancer.server.port=8080"
+    - "traefik.http.routers.minifluxshare.tls=true"
+    - "traefik.http.routers.minifluxshare.tls.certresolver=http"
+    - "traefik.http.routers.minifluxshare.entrypoints=externalsecure"
     healthcheck:
       test: ["CMD", "/usr/bin/miniflux", "-healthcheck", "auto"]
     networks:
