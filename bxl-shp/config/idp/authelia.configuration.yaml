@@ -193,3 +193,17 @@ identity_providers:
       - groups
       - email
       userinfo_signing_algorithm: none
+    - id: gitea
+      description: Gitea
+      secret: '$argon2id$v=19$m=65536,t=3,p=4$hVcRat4GdQSCfaikh6C7xQ$KydT/DYUVnazMHhhZgYN9+LMaAI9vpX9x53PcYgsrko'
+      public: false
+      authorization_policy: two_factor
+      redirect_uris:
+      - https://git.bhasher.com/user/oauth2/Authelia/callback
+      consent_mode: implicit
+      scopes:
+      - openid
+      - profile
+      - groups
+      - email
+      userinfo_signing_algorithm: none
