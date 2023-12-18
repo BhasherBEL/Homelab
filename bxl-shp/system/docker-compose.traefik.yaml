@@ -24,9 +24,9 @@ services:
     #- "--log.level=DEBUG"
     - "--metrics.prometheus=true"
     - "--api.dashboard=true"
-    #- "--experimental.plugins.sablier.moduleName=github.com/acouvreur/sablier"
-    #- "--experimental.plugins.sablier.version=v1.3.0"
     #- "--providers.file.filename=/etc/traefik/dynamic-config.yml"
+    - "--experimental.plugins.sablier.modulename=github.com/acouvreur/sablier"
+    - "--experimental.plugins.sablier.version=v1.5.0"
     environment:
     - TZ=Europe/Paris
     ports:
@@ -40,9 +40,9 @@ services:
     - type: bind
       source: $DATA/traefik/acme.json
       target: /acme.json
-    - type: bind
-      source: $DATA/traefik/rules.toml
-      target: /rules.toml
+    #- type: bind
+    #  source: $CONFIG/traefik/traefik.yaml
+    #  target: /etc/traefik/traefik.yaml
     restart: always
     labels:
     - "traefik.enable=true"
@@ -53,6 +53,31 @@ services:
     - "traefik.http.routers.traefik.entrypoints=internalsecure"
     - "traefik.http.routers.traefik.middlewares=authelia@docker"
     - "traefik.http.middlewares.httpsupgrade.headers.customrequestheaders.X-Forwarded-Proto=https"
+    networks:
+    - external
+
+  sablier:
+    container_name: sablier
+    image: acouvreur/sablier:latest
+    command:
+    - start
+    - --provider.name=docker
+    volumes:
+    - '/var/run/docker.sock:/var/run/docker.sock'
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.sablier.rule=Host(`sablier.bhasher.com`)"
+    - "traefik.http.services.sablier.loadbalancer.server.port=80"
+    - "traefik.http.routers.sablier.tls=true"
+    - "traefik.http.routers.sablier.tls.certresolver=http"
+    - "traefik.http.routers.sablier.entrypoints=internalsecure"
+    - "traefik.http.middlewares.sablier1h.plugin.sablier.group=default"
+    - "traefik.http.middlewares.sablier1h.plugin.sablier.dynamic.displayName=My Title"
+    - "traefik.http.middlewares.sablier1h.plugin.sablier.dynamic.refreshFrequency=5s"
+    - "traefik.http.middlewares.sablier1h.plugin.sablier.dynamic.showDetails=true"
+    - "traefik.http.middlewares.sablier1h.plugin.sablier.dynamic.theme=hacker-terminal"
+    - "traefik.http.middlewares.sablier1h.plugin.sablier.sablierUrl=http://sablier:10000"
+    - "traefik.http.middlewares.sablier1h.plugin.sablier.sessionDuration=1m"
     networks:
     - external
 
