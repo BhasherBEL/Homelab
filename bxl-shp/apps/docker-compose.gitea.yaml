@@ -14,6 +14,9 @@ services:
     - /etc/localtime:/etc/localtime:ro
     depends_on:
     - postgres
+    - redis
+    ports:
+    - 2222:22/tcp
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.gitea.rule=Host(`git.bhasher.com`)"
