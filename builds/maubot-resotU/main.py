@@ -1,10 +1,32 @@
 from time import time
 import aiohttp
 import asyncio
+from bs4 import BeautifulSoup
 
 from mautrix.types import TextMessageEventContent, MessageType, Format, RelatesTo, RelationType, MediaMessageEventContent
 from maubot import Plugin, MessageEvent
 from maubot.handlers import command
+
+async def extract_picture_url(url, base_url):
+  async with aiohttp.ClientSession() as session:
+    async with session.get(url) as response:
+      if response.status != 200:
+        return "Error: Unable to access the page."
+
+      content = await response.read()
+      soup = BeautifulSoup(content, 'html.parser')
+
+      images = soup.find_all('img')
+
+      for img in images:
+        src = img.get('src')
+        if src and src.startswith(base_url):
+          if src.startswith('//'):
+            return f"https:{src}"
+          else:
+            return src
+
+      return "No image found"
 
 async def download_image(url):
     async with aiohttp.ClientSession() as session:
@@ -33,7 +55,12 @@ class UCLouvainRestoUBot(Plugin):
 
   @command.new("menu", help="Menu")
   async def menu_handler(self, evt: MessageEvent, message: str = "") -> None:
-    data = await download_image("https://cdn.uclouvain.be/groups/cms-editors-resto-u/menu_51063_Restaurants_Universitaires_UCLouvain__Le_Sablon_-_Le_Galilee_-__LPzNYH61112.jpeg")
+    data = await download_image(
+      await extract_picture_url(
+        "https://uclouvain.be/fr/decouvrir/resto-u/le-galilee-self.html",
+        "//cdn.uclouvain.be/groups/cms-editors-resto-u/menu"
+      )
+    )
     url = await self.client.upload_media(data, mime_type="application/json")
 
     content = MediaMessageEventContent(
