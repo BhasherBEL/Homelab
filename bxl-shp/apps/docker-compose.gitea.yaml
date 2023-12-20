@@ -23,7 +23,7 @@ services:
     - "traefik.http.services.gitea.loadbalancer.server.port=3000"
     - "traefik.http.routers.gitea.tls=true"
     - "traefik.http.routers.gitea.tls.certresolver=http"
-    - "traefik.http.routers.gitea.entrypoints=internalsecure"
+    - "traefik.http.routers.gitea.entrypoints=internalsecure,externalsecure"
     networks:
     - external
     - storage
