@@ -46,6 +46,10 @@ sections:
         url: https://element.bhasher.com
         statusCheckUrl: http://matrix-riot
         id: 4_1507_elementweb
+      - title: Gitea
+        icon: hl-gitea
+        url: https://git.bhasher.com
+        id: 5_1507_gitea
   - name: Private services
     displayData:
       sortBy: most-used
@@ -139,6 +143,14 @@ sections:
         icon: hl-matrix
         url: https://maubot.bhasher.com/_matrix/maubot/#/
         id: 17_1631_maubot
+      - title: Mikrotik
+        icon: hl-mikrotik
+        url: https://router.bhasher.com
+        id: 18_1631_mikrotik
+      - title: TrueNAS
+        icon: hl-truenas
+        url: https://truenas.bhasher.com
+        id: 19_1631_truenas
   - name: System services
     displayData:
       sortBy: most-used

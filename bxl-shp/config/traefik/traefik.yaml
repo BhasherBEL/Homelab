@@ -7,8 +7,19 @@ http:
         certresolver: http
       entrypoints: internalsecure
 
+    mikrotik:
+      rule: "Host(`router.bhasher.com`)"
+      service: mikrotik
+      tls: 
+        certresolver: http
+      entrypoints: internalsecure
+
   services:
     truenas:
       loadBalancer:
         servers:
-        - url: http://192.168.1.201/
+        - url: http://192.168.1.201
+    mikrotik:
+      loadBalancer:
+        servers:
+        - url: http://192.168.1.1:8080
