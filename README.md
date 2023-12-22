@@ -38,11 +38,13 @@ Finally, a directory `builds/` contains the custom services.
 | Pro | Invoiceplane | ✅ | L+A* | Invoicing and billing software |
 | Pro | Portfolio | ❌ | P | Personal portfolio |
 | Tools | Joplin | ✅ | L | Note-taking and to-do list application |
-| Tools | Vaultwarden | ✅ | L+A* | Bitwarden password manager |
+| Tools | Vaultwarden | ✅ | P+A* | Bitwarden password manager |
 | Tools | Mealie | ✅ | L+(A*) | Recipe management and meal planning |
 | Tools | Dashy | ✅ | L+A | Dashboard for data visualization and control |
 | Tools | Focalboard | ✅ | L+A* | Projects and tasks management |
 | Tools | Baikal | ✅ | P+A* | CalDAV and CardDAV server |
+| Tools | Seafile | ✅ | L+A | Cloud file storage |
+| Tools | Onlyoffice-editor | ✅ | P+A* | Online realtime office collaboration |
 | Script | tg2 | ✅ | - | Telegram bot for Too Good To Go|
 | VPN | Wireguard | ✅ | P+A* | Secure and easy-to-configure VPN solution |
 | Monitoring | Grafana | ✅ | L+A | Platform for monitoring and observability |
@@ -68,3 +70,12 @@ Finally, a directory `builds/` contains the custom services.
 | Reverse Proxy | wellknown-nginx | ✅ | P | Serve well-known services |
 | Update | Watchtower | ✅ | - | Automatic container image updating |
 
+
+### Accessibility legend
+
+| Symbol | Meaning | Description |
+| ------ | ------- | ----------- |
+| P      | Publicly accessible | The service can be accessed by anyone without restrictions. |
+| L      | Local-only | The service is accessible only within a local network or environment, not publicly. |
+| A      | Authenticated through SSO/LDAP | Access requires authentication via Single Sign-On (SSO) or Lightweight Directory Access Protocol (LDAP). |
+| A*     | Authenticated through another way | Access requires authentication using a method other than SSO/LDAP. |
