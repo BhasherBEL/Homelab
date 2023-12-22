@@ -24,7 +24,7 @@ services:
     #- "--log.level=DEBUG"
     - "--metrics.prometheus=true"
     - "--api.dashboard=true"
-    #- "--providers.file.filename=/etc/traefik/dynamic-config.yml"
+    - "--providers.file.filename=/etc/traefik/dynamic-config.yaml"
     - "--experimental.plugins.sablier.modulename=github.com/acouvreur/sablier"
     - "--experimental.plugins.sablier.version=v1.5.0"
     environment:
@@ -40,9 +40,9 @@ services:
     - type: bind
       source: $DATA/traefik/acme.json
       target: /acme.json
-    #- type: bind
-    #  source: $CONFIG/traefik/traefik.yaml
-    #  target: /etc/traefik/traefik.yaml
+    - type: bind
+      source: $CONFIG/traefik/traefik.yaml
+      target: /etc/traefik/dynamic-config.yaml
     restart: always
     labels:
     - "traefik.enable=true"

@@ -1,0 +1,14 @@
+http:
+  routers:
+    truenas:
+      rule: "Host(`truenas.bhasher.com`)"
+      service: truenas
+      tls: 
+        certresolver: http
+      entrypoints: internalsecure
+
+  services:
+    truenas:
+      loadBalancer:
+        servers:
+        - url: http://192.168.1.201/
