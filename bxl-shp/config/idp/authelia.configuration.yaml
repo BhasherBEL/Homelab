@@ -207,3 +207,17 @@ identity_providers:
       - groups
       - email
       userinfo_signing_algorithm: none
+    - id: seafile
+      description: Seafile
+      secret: '$argon2id$v=19$m=65536,t=3,p=4$vZ7/eiJGrPeuEWwllkN7zw$IhspEFbyQe/rBzchVs8iigsQKbYsXPfBBhR2Loo0afI'
+      public: false
+      authorization_policy: one_factor
+      redirect_uris:
+        - https://file.bhasher.com/oauth/callback/
+      consent_mode: implicit
+      scopes:
+        - openid
+        - profile
+        - email
+      userinfo_signing_algorithm: none
+

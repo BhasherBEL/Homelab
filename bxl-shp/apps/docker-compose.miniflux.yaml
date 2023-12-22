@@ -20,7 +20,7 @@ services:
     - "traefik.http.routers.miniflux.tls=true"
     - "traefik.http.routers.miniflux.tls.certresolver=http"
     - "traefik.http.routers.miniflux.entrypoints=internalsecure"
-    - "traefik.http.routers.minifluxshare.rule=Host(`miniflux.bhasher.com`) && PathPrefix(`/share`)"
+    - "traefik.http.routers.minifluxshare.rule=Host(`miniflux.bhasher.com`) && (PathPrefix(`/share/`) || PathPrefix(`/stylesheets/`) || PathPrefix(`/icon/`))"
     - "traefik.http.routers.minifluxshare.service=minifluxshare-service"
     - "traefik.http.services.minifluxshare-service.loadbalancer.server.port=8080"
     - "traefik.http.routers.minifluxshare.tls=true"
