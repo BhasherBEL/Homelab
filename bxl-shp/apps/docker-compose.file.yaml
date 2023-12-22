@@ -8,11 +8,11 @@ services:
     - WOPI_ENABLED=true
     - JWT_ENABLED=true
     volumes:
-    - $DATA/onlyoffice/DocumentServer/logs:/var/log/onlyoffice 
-    - $DATA/onlyoffice/DocumentServer/data:/var/www/onlyoffice/Data
-    - $DATA/onlyoffice/DocumentServer/lib:/var/lib/onlyoffice
-    - $DATA/onlyoffice/DocumentServer/db:/var/lib/postgresql
-    - $DATA/onlyoffice/DocumentServer/rabbitmq:/var/lib/rabbitmq
+    - $DATA/file/onlyoffice/logs:/var/log/onlyoffice 
+    - $DATA/file/onlyoffice/data:/var/www/onlyoffice/Data
+    - $DATA/file/onlyoffice/lib:/var/lib/onlyoffice
+    - $DATA/file/onlyoffice/db:/var/lib/postgresql
+    - $DATA/file/onlyoffice/rabbitmq:/var/lib/rabbitmq
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.onlyoffice-editor.rule=Host(`onlyoffice-editor.bhasher.com`)"
