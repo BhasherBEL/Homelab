@@ -56,6 +56,7 @@ Finally, a directory `builds/` contains the custom services.
 | Monitoring | Mikrotik Exporter | ✅ | - | Prometheus exporter for MikroTik router metrics |
 | Monitoring | Node Exporter | ✅ | - | Prometheus exporter for system and hardware metrics |
 | Monitoring | Portainer | ✅ | P+A | Container management and orchestration platform |
+| Monitoring | Trakr | ✅ | L+A | Pixel tracker app |
 | Auth | OpenLDAP | ✅ | - | Open-source LDAP directory server |
 | Auth | LDAPUserManager | ✅ | L+A | User and group management for LDAP |
 | Auth | Authelia | ✅ | P+A | Multi-factor authentication and SSO proxy |
