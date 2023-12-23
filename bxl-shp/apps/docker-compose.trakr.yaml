@@ -1,0 +1,26 @@
+services: 
+  trakr:
+    container_name: trakr
+    image: registry.bhasher.com/trakr:dev
+    restart: unless-stopped
+    environment:
+    - TZ=Europe/Paris
+    volumes:
+    - $DATA/trakr:/data
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.trakr.rule=Host(`trakr.bhasher.com`)"
+    - "traefik.http.routers.trakr.service=trakrpublic"
+    - "traefik.http.services.trakr.loadbalancer.server.port=80"
+    - "traefik.http.routers.trakr.tls=true"
+    - "traefik.http.routers.trakr.tls.certresolver=http"
+    - "traefik.http.routers.trakr.entrypoints=internalsecure"
+    - "traefik.http.routers.trakr.middlewares=authelia@docker"
+    - "traefik.http.routers.trakrpublic.rule=Host(`trakr.bhasher.com`) && PathPrefix(`/p/`)"
+    - "traefik.http.routers.trakrpublic.service=trakrpublic"
+    - "traefik.http.services.trakrpublic.loadbalancer.server.port=80"
+    - "traefik.http.routers.trakrpublic.tls=true"
+    - "traefik.http.routers.trakrpublic.tls.certresolver=http"
+    - "traefik.http.routers.trakrpublic.entrypoints=internalsecure,externalsecure"
+    networks:
+    - external

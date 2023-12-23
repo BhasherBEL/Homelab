@@ -4,3 +4,6 @@
 [submodule "builds/focalboard"]
 	path = builds/focalboard
 	url = git@github.com:BhasherBEL/focalboard.git
+[submodule "builds/trakr"]
+	path = builds/trakr
+	url = git.bhasher.com:Bhasher/trakr.git
