@@ -1,0 +1,12 @@
+services:
+  kill-the-newsletter:
+    container_name: kill-the-newsletter
+    image: registry.bhasher.com/kill-the-newsletter:latest
+    ports:
+    - 127.0.0.1:4000:80/tcp
+    environment:
+    - URL=https://kill-the-newsletter.com
+    - SMTP=smtp://localhost
+    - ADMIN_EMAIL=kill-the-newsletter@localhost
+    volumes:
+    - ./data:/data
