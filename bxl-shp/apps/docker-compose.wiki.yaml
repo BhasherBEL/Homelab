@@ -1,0 +1,18 @@
+services:
+  mdbook:
+    container_name: mdbook
+    image: thefarwind/mdbook
+    restart: unless-stopped
+    entrypoint: mdbook serve --hostname 0.0.0.0
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.mdbook.rule=Host(`wiki.bhasher.com`)"
+    - "traefik.http.routers.mdbook.entrypoints=internalsecure"
+    - "traefik.http.services.mdbook.loadbalancer.server.port=3000"
+    - "traefik.http.routers.mdbook.tls=true"
+    - "traefik.http.routers.mdbook.tls.certresolver=http"
+    volumes:
+    - $CONFIG/wiki:/src
+    networks:
+    - external
+
