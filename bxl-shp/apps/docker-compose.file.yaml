@@ -28,6 +28,7 @@ services:
   seafile-storage:
     container_name: seafile-storage
     image: mariadb:10.11
+    restart: unless-stopped
     environment:
     - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT}
     volumes:
@@ -38,6 +39,7 @@ services:
   seafile-memcached:
     container_name: seafile-memcached
     image: memcached:1.6.18
+    restart: unless-stopped
     entrypoint: memcached -m 256
     networks:
     - file
@@ -45,6 +47,7 @@ services:
   seafile:
     container_name: seafile
     image: seafileltd/seafile-mc:latest
+    restart: unless-stopped
     volumes:
     - $DATA/file/data:/shared   
     environment:
@@ -72,5 +75,3 @@ services:
 
 networks:
   file:
-  external:
-    external: true

@@ -21,3 +21,5 @@ services:
     - "traefik.http.routers.kill-the-newsletter.entrypoints=internalsecure"
     networks:
     - external
+    deploy:
+      replicas: 0

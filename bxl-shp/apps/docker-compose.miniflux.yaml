@@ -2,6 +2,7 @@ services:
   miniflux:
     container_name: miniflux
     image: miniflux/miniflux:latest
+    restart: unless-stopped
     environment:
     - BASE_URL=https://miniflux.bhasher.com
     - DATABASE_URL=${MINIFLUX_DATABASE_URL}
