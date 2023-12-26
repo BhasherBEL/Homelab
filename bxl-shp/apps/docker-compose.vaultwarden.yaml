@@ -6,6 +6,7 @@ services:
     volumes:
     - $DATA/vaultwarden:/data
     environment:
+    - TZ=Europe/Paris
     - DATABASE_URL=${VAULT_DATABASE_URL}
     - SIGNUPS_ALLOWED=false
     - DOMAIN=https://vault.bhasher.com

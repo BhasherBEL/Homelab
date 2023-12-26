@@ -11,6 +11,9 @@ services:
     volumes:
     - $DATA/fail2ban:/data
     - $DATA/vaultwarden:/remotelogs/vaultwarden:ro
+    - type: bind
+      source: /home/shp/.ssh/mkrouter
+      target: /ssh-key/mkrouter
     # authelia
     # hass
     # traefik ?
