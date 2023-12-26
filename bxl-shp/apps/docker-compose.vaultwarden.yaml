@@ -16,6 +16,9 @@ services:
     - SMTP_SECURITY=starttls
     - SMTP_USERNAME=${SMTP_USER}
     - SMTP_PASSWORD=${SMTP_PASSWORD}
+    - LOG_LEVEL=error
+    - EXTENDED_LOGGING=true
+    - LOG_FILE=/data/vaultwarden.log
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.vaultwarden.rule=Host(`vault.bhasher.com`)"
