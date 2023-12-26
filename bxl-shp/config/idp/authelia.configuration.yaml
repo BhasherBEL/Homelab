@@ -220,4 +220,18 @@ identity_providers:
         - profile
         - email
       userinfo_signing_algorithm: none
+    - id: wikijs
+      description: WikiJS
+      secret: '$argon2id$v=19$m=65536,t=3,p=4$aAnFAm2XL8rGMOLhMpgL1Q$ZBJ3v0d1guzLj/FVBTJz2v+ZAhy/jZc7B4iNozvx+hU'
+      public: false
+      authorization_policy: one_factor
+      redirect_uris:
+        - https://wiki.bhasher.com/login/4b20571d-a8d7-4384-a95c-589fe7fc7ab6/callback
+      consent_mode: implicit
+      scopes:
+        - openid
+        - profile
+        - email
+        - groups
+      userinfo_signing_algorithm: none
 

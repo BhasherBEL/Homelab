@@ -1,18 +1,25 @@
 services:
-  mdbook:
-    container_name: mdbook
-    image: thefarwind/mdbook
+  wikijs:
+    container_name: wikijs
+    image: ghcr.io/requarks/wiki:2
     restart: unless-stopped
-    entrypoint: mdbook serve --hostname 0.0.0.0
+    depends_on:
+    - postgres
+    environment:
+    - DB_TYPE=postgres
+    - DB_HOST=postgres
+    - DB_PORT=5432
+    - DB_USER=postgres
+    - DB_PASS=${POSTGRES_PASSWORD}
+    - DB_NAME=wikijs
     labels:
     - "traefik.enable=true"
-    - "traefik.http.routers.mdbook.rule=Host(`wiki.bhasher.com`)"
-    - "traefik.http.routers.mdbook.entrypoints=internalsecure"
-    - "traefik.http.services.mdbook.loadbalancer.server.port=3000"
-    - "traefik.http.routers.mdbook.tls=true"
-    - "traefik.http.routers.mdbook.tls.certresolver=http"
-    volumes:
-    - $CONFIG/wiki:/src
+    - "traefik.http.routers.wikijs.rule=Host(`wiki.bhasher.com`)"
+    - "traefik.http.routers.wikijs.entrypoints=internalsecure"
+    - "traefik.http.services.wikijs.loadbalancer.server.port=3000"
+    - "traefik.http.routers.wikijs.tls=true"
+    - "traefik.http.routers.wikijs.tls.certresolver=http"
     networks:
+    - storage
     - external
 
