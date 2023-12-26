@@ -28,6 +28,7 @@ services:
     - gitea
     - external
     - storage
+
   gitea-runner:
     container_name: gitea-runner
     image: gitea/act_runner:latest
@@ -37,6 +38,8 @@ services:
     - GITEA_RUNNER_REGISTRATION_TOKEN=${GITEA_RUNNER_TOKEN}
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+    - gitea
 
 
 networks:
