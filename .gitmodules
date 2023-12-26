@@ -7,3 +7,6 @@
 [submodule "builds/trakr"]
 	path = builds/trakr
 	url = git.bhasher.com:Bhasher/trakr.git
+[submodule "builds/ssh-honeypot"]
+	path = builds/ssh-honeypot
+	url = git.bhasher.com:Bhasher/ssh-honeypot.git

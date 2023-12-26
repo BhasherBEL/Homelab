@@ -1,0 +1,8 @@
+services:
+  ssh-honeypot:
+    container_name: ssh-honeypot
+    image: registry.bhasher.com/ssh-honeypot:latest
+    ports:
+    - 24587:22
+    volumes:
+    - $DATA/honeypots/ssh-honeypot:/app/data:rw
