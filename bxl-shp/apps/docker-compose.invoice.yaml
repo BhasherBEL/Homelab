@@ -4,17 +4,14 @@ services:
     image: mhzawadi/invoiceplane:latest
     restart: unless-stopped
     volumes:
-    - $DATA/invoiceplane/uploads:/var/www/html/uploads
-    - $DATA/invoiceplane/ipconfig.php:/var/www/html/ipconfig.php
     - /etc/localtime:/etc/localtime:ro
-    #command: sh -c "apk add php7-mbstring php7-iconv php7-json gd && nginx -g 'daemon off;'"
+    - $DATA/invoiceplane/uploads:/var/www/html/uploads
+    - type: bind
+      source: $DATA/invoiceplane/ipconfig.php
+      target: /var/www/html/ipconfig.php
     environment:
+    - TZ=Europe/Paris
     - IP_URL=https://invoice.bhasher.com
-    #- MYSQL_HOST=mariadb
-    #- MYSQL_USER=root
-    #- MYSQL_PASSWORD=${MARIADB_ROOT}
-    #- MYSQL_DB=InvoicePlane
-    #- DISABLE_SETUP=false
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.invoice.rule=Host(`invoice.bhasher.com`)"
@@ -22,14 +19,23 @@ services:
     - "traefik.http.routers.invoice.tls=true"
     - "traefik.http.routers.invoice.tls.certresolver=http"
     - "traefik.http.routers.invoice.entrypoints=internalsecure,externalsecure"
-    #- "com.centurylinklabs.watchtower.enable=true"
+    - "com.centurylinklabs.watchtower.enable=true"
     networks:
     - external
-    - storage
+    - invoice
+
+  invoiceplane-db:
+    container_name: invoiceplane-db
+    image: mariadb:10.4.10
+    volumes:
+      - $DATA/invoiceplane/mariadb:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT}
+      - MYSQL_DATABASE=invoiceplane
+      - MYSQL_USER=invoiceplane
+      - MYSQL_PASSWORD=${MARIADB_ROOT}
+    networks:
+    - invoice
 
 networks:
   invoice:
-  external:
-    external: true
-  storage:
-    external: true
