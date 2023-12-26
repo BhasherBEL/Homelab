@@ -3,6 +3,8 @@ services:
     container_name: iodine
     image: registry.bhasher.com/iodine:latest
     restart: unless-stopped
+    labels:
+    - "com.centurylinklabs.watchtower.enable=true"
     environment:
     - IP=10.10.0.1
     - DOMAIN=dns.bhasher.com

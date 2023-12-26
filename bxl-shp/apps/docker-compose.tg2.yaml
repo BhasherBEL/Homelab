@@ -15,5 +15,5 @@ services:
     volumes:
     - $DATA/tg2:/data
     labels:
-    - "com.centurylinklabs.watchtower.enable=false"
+    - "com.centurylinklabs.watchtower.enable=true"
 

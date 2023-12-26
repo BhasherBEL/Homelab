@@ -22,5 +22,6 @@ services:
     - "traefik.http.routers.trakrpublic.tls=true"
     - "traefik.http.routers.trakrpublic.tls.certresolver=http"
     - "traefik.http.routers.trakrpublic.entrypoints=internalsecure,externalsecure"
+    - "com.centurylinklabs.watchtower.enable=true"
     networks:
     - external

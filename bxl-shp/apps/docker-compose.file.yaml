@@ -21,6 +21,7 @@ services:
     - "traefik.http.routers.onlyoffice-editor.tls.certresolver=http"
     - "traefik.http.routers.onlyoffice-editor.entrypoints=internalsecure,externalsecure"
     - "traefik.http.routers.onlyoffice-editor.middlewares=httpsupgrade"
+    - "com.centurylinklabs.watchtower.enable=true"
     networks:
     - external
     - file
@@ -69,6 +70,7 @@ services:
     - "traefik.http.routers.seafile.tls=true"
     - "traefik.http.routers.seafile.tls.certresolver=http"
     - "traefik.http.routers.seafile.entrypoints=internalsecure"
+    - "com.centurylinklabs.watchtower.enable=true"
     networks:
     - file
     - external

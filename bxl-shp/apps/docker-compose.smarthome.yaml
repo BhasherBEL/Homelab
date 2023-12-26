@@ -16,6 +16,7 @@ services:
     - "traefik.http.services.hass.loadbalancer.server.port=8123"
     - "traefik.http.routers.hass.tls=true"
     - "traefik.http.routers.hass.tls.certresolver=http"
+    - "com.centurylinklabs.watchtower.enable=true"
     depends_on:
     - authelia
     - traefik
@@ -31,6 +32,8 @@ services:
     ports:
     - 1883:1883
     - 9001:9001
+    labels:
+    - "com.centurylinklabs.watchtower.enable=true"
     networks:
     - smarthome
     - external
@@ -46,6 +49,8 @@ services:
     - /etc/localtime:/etc/localtime:ro
     devices:
     - /dev/ttyACM0:/dev/ttyACM0
+    labels:
+    - "com.centurylinklabs.watchtower.enable=true"
     networks:
     - smarthome
     depends_on:
@@ -69,6 +74,7 @@ services:
     - "traefik.http.routers.nodered.tls=true"
     - "traefik.http.routers.nodered.tls.certresolver=http"
     - "traefik.http.routers.nodered.middlewares=authelia@docker"
+    - "com.centurylinklabs.watchtower.enable=true"
     depends_on:
     - hass
 

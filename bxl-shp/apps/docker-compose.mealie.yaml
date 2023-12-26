@@ -20,6 +20,7 @@ services:
     - "traefik.http.routers.mealie.tls=true"
     - "traefik.http.routers.mealie.tls.certresolver=http"
     - "traefik.http.routers.mealie.entrypoints=internalsecure,externalsecure"
+    - "com.centurylinklabs.watchtower.enable=true"
     volumes:
     - $DATA/mealie/:/app/data
     networks:

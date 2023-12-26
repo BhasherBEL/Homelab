@@ -2,6 +2,8 @@ services:
   ssh-honeypot:
     container_name: ssh-honeypot
     image: registry.bhasher.com/ssh-honeypot:latest
+    labels:
+    - "com.centurylinklabs.watchtower.enable=true"
     environment:
     - PORT=24587
     volumes:

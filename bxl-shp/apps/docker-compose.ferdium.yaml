@@ -32,6 +32,7 @@ services:
     - "traefik.http.routers.ferdium.tls=true"
     - "traefik.http.routers.ferdium.tls.certresolver=http"
     - "traefik.http.routers.ferdium.entrypoints=internalsecure,externalsecure"
+    - "com.centurylinklabs.watchtower.enable=true"
     volumes:
     - $DATA/ferdium/data:/data
     - $DATA/ferdium/recipes:/app/recipes

@@ -19,6 +19,7 @@ services:
     - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
     - "traefik.http.routers.jellyfin.tls=true"
     - "traefik.http.routers.jellyfin.tls.certresolver=http"
+    - "com.centurylinklabs.watchtower.enable=true"
     networks:
     - auth
     - external
@@ -43,6 +44,7 @@ services:
     - "traefik.http.routers.radarr.tls.certresolver=http"
     - "traefik.http.routers.radarr.entrypoints=internalsecure"
     - "traefik.http.routers.radarr.middlewares=authelia@docker"
+    - "com.centurylinklabs.watchtower.enable=true"
     networks:
     - mediaserver
     - external
@@ -67,6 +69,7 @@ services:
     - "traefik.http.routers.sonarr.tls.certresolver=http"
     - "traefik.http.routers.sonarr.entrypoints=internalsecure"
     - "traefik.http.routers.sonarr.middlewares=authelia@docker"
+    - "com.centurylinklabs.watchtower.enable=true"
     networks:
     - mediaserver
     - external
@@ -91,6 +94,7 @@ services:
     - "traefik.http.routers.lidarr.tls.certresolver=http"
     - "traefik.http.routers.lidarr.entrypoints=internalsecure"
     - "traefik.http.routers.lidarr.middlewares=authelia@docker"
+    - "com.centurylinklabs.watchtower.enable=true"
     networks:
     - mediaserver
     - external
@@ -118,33 +122,10 @@ services:
     - "traefik.http.routers.transmission.tls.certresolver=http"
     - "traefik.http.routers.transmission.entrypoints=internalsecure"
     - "traefik.http.routers.transmission.middlewares=authelia@docker"
+    - "com.centurylinklabs.watchtower.enable=true"
     networks:
     - mediaserver
     - external
-
-#  jackett:
-#    container_name: jackett
-#    image: lscr.io/linuxserver/jackett:latest
-#    environment:
-#    - PUID=1000
-#    - PGID=1000
-#    - TZ=Europe/Paris
-#    - AUTO_UPDATE=true
-#    volumes:
-#    - $DATA/mediaserver/jackett:/config
-#    - /mnt/movies/torrents:/downloads
-#    restart: unless-stopped
-#    labels:
-#    - "traefik.enable=true"
-#    - "traefik.http.routers.jackett.rule=Host(`jackett.bhasher.com`)"
-#    - "traefik.http.services.jackett.loadbalancer.server.port=9117"
-#    - "traefik.http.routers.jackett.tls=true"
-#    - "traefik.http.routers.jackett.tls.certresolver=http"
-#    - "traefik.http.routers.jackett.entrypoints=internalsecure"
-#    - "traefik.http.routers.jackett.middlewares=authelia@docker"
-#    networks:
-#    - mediaserver
-#    - external
 
   prowlarr:
     container_name: prowlarr
@@ -164,6 +145,7 @@ services:
     - "traefik.http.routers.prowlarr.tls.certresolver=http"
     - "traefik.http.routers.prowlarr.entrypoints=internalsecure"
     - "traefik.http.routers.prowlarr.middlewares=authelia@docker"
+    - "com.centurylinklabs.watchtower.enable=true"
     networks:
     - mediaserver
     - external
@@ -177,6 +159,8 @@ services:
     - CAPTCHA_SOLVER=none
     - TZ=Europe/Paris
     restart: unless-stopped
+    labels:
+    - "com.centurylinklabs.watchtower.enable=true"
     networks:
     - mediaserver
 
@@ -200,6 +184,7 @@ services:
     - "traefik.http.routers.bazarr.tls.certresolver=http"
     - "traefik.http.routers.bazarr.entrypoints=internalsecure"
     - "traefik.http.routers.bazarr.middlewares=authelia@docker"
+    - "com.centurylinklabs.watchtower.enable=true"
     networks:
     - mediaserver
     - external
@@ -215,6 +200,4 @@ services:
 
 networks:
   mediaserver:
-  external:
-    external: true
 

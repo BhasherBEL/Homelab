@@ -27,6 +27,7 @@ services:
     - "traefik.http.routers.minifluxshare.tls=true"
     - "traefik.http.routers.minifluxshare.tls.certresolver=http"
     - "traefik.http.routers.minifluxshare.entrypoints=externalsecure"
+    - "com.centurylinklabs.watchtower.enable=true"
     healthcheck:
       test: ["CMD", "/usr/bin/miniflux", "-healthcheck", "auto"]
     networks:

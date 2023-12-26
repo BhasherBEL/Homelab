@@ -24,6 +24,7 @@ services:
     - "traefik.http.routers.joplin.tls=true"
     - "traefik.http.routers.joplin.tls.certresolver=http"
     - "traefik.http.routers.joplin.entrypoints=internalsecure"
+    - "com.centurylinklabs.watchtower.enable=true"
     networks:
     - storage
     - external

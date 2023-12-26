@@ -25,6 +25,7 @@ services:
     - "traefik.http.routers.focalboard.tls=true"
     - "traefik.http.routers.focalboard.tls.certresolver=http"
     - "traefik.http.routers.focalboard.entrypoints=internalsecure"
+    - "com.centurylinklabs.watchtower.enable=true"
     networks:
     - external
     - storage
