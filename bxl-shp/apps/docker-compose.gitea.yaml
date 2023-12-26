@@ -2,12 +2,12 @@ services:
   gitea:
     container_name: gitea
     image: gitea/gitea:1
+    restart: unless-stopped
     environment:
     - USER_UID=1000
     - USER_GID=1000
     - GITEA__database__PASSWD=${POSTGRES_PASSWORD}
     - GITEA__mailer__PASSWD=${SMTP_PASSWORD} 
-    restart: unless-stopped
     volumes:
     - $DATA/gitea:/data
     - /etc/timezone:/etc/timezone:ro
@@ -25,11 +25,19 @@ services:
     - "traefik.http.routers.gitea.tls.certresolver=http"
     - "traefik.http.routers.gitea.entrypoints=internalsecure,externalsecure"
     networks:
+    - gitea
     - external
     - storage
+  gitea-runner:
+    container_name: gitea-runner
+    image: gitea/act_runner:latest
+    restart: unless-stopped
+    environment:
+    - GITEA_INSTANCE_URL=https://git.bhasher.com
+    - GITEA_RUNNER_REGISTRATION_TOKEN=${GITEA_RUNNER_TOKEN}
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+
 
 networks:
-  external:
-    external: true
-  storage:
-    external: true
+  gitea:
