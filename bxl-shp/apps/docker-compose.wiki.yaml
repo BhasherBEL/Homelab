@@ -15,7 +15,7 @@ services:
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.wikijs.rule=Host(`wiki.bhasher.com`)"
-    - "traefik.http.routers.wikijs.entrypoints=internalsecure"
+    - "traefik.http.routers.wikijs.entrypoints=internalsecure,externalsecure"
     - "traefik.http.services.wikijs.loadbalancer.server.port=3000"
     - "traefik.http.routers.wikijs.tls=true"
     - "traefik.http.routers.wikijs.tls.certresolver=http"

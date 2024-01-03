@@ -6,6 +6,8 @@ services:
     - "com.centurylinklabs.watchtower.enable=true"
     environment:
     - PORT=24587
+    - TZ=Europe/Paris
     volumes:
+    - /etc/localtime:/etc/localtime:ro
     - $DATA/honeypots/ssh-honeypot:/app/data:rw
     network_mode: host

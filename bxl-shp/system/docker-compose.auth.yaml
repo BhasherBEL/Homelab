@@ -84,7 +84,8 @@ services:
     - 'traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'
     volumes:
     - $CONFIG/idp/authelia.configuration.yaml:/config/configuration.yml:ro
-    - $DATA/authelia:/secrets:ro
+    - $DATA/authelia/secrets:/secrets:ro
+    - $DATA/authelia/logs:/logs:rw
     networks:
     - auth
     - storage

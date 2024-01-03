@@ -6,7 +6,9 @@ server:
   port: 9091
 
 log:
-  level: info
+  level: warn
+  file_path: /logs/authelia.log
+  #format: json
 
 totp:
   disable: false

@@ -11,6 +11,8 @@ services:
     volumes:
     - $DATA/fail2ban:/data
     - $DATA/vaultwarden:/remotelogs/vaultwarden:ro
+    - $DATA/honeypots/ssh-honeypot:/remotelogs/ssh-honeypot:ro
+    - $DATA/authelia/logs:/remotelogs/authelia:ro
     - type: bind
       source: /home/shp/.ssh/mkrouter
       target: /ssh-key/mkrouter
