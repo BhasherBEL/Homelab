@@ -1,0 +1,31 @@
+services:
+  focus-backend:
+    container_name: focus-backend
+    image: git.bhasher.com/bhasher/focus-backend:latest
+    volumes:
+    - $DATA/focus:/data
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.focus-backend.rule=Host(`focus.bhasher.com`) && PathPrefix(`/api/`)"
+    - "traefik.http.services.focus-backend.loadbalancer.server.port=3000"
+    - "traefik.http.routers.focus-backend.tls=true"
+    - "traefik.http.routers.focus-backend.tls.certresolver=http"
+    - "traefik.http.routers.focus-backend.entrypoints=internalsecure"
+    networks:
+    - external
+
+  focus-frontend:
+    container_name: focus-frontend
+    image: git.bhasher.com/bhasher/focus-frontend:latest
+    environment:
+    - PUBLIC_BACKEND_URL=https://focus.bhasher.com
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.focus-frontend.rule=Host(`focus.bhasher.com`)"
+    - "traefik.http.services.focus-frontend.loadbalancer.server.port=4173"
+    - "traefik.http.routers.focus-frontend.tls=true"
+    - "traefik.http.routers.focus-frontend.tls.certresolver=http"
+    - "traefik.http.routers.focus-frontend.entrypoints=internalsecure"
+    networks:
+    - external
+
