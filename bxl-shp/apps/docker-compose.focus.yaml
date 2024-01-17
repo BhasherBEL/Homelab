@@ -1,7 +1,8 @@
 services:
   focus-backend:
     container_name: focus-backend
-    image: registry.bhasher.com/focus-backend:dev
+    image: git.bhasher.com/bhasher/focus-backend:latest
+    pull_policy: always
     volumes:
     - $DATA/focus:/data
     labels:
@@ -17,8 +18,8 @@ services:
 
   focus-frontend:
     container_name: focus-frontend
-    #image: git.bhasher.com/bhasher/focus-frontend:latest
-    image: registry.bhasher.com/focus-frontend:dev
+    image: git.bhasher.com/bhasher/focus-frontend:latest
+    pull_policy: always
     environment:
     - PUBLIC_BACKEND_URL=https://focus.bhasher.com
     labels:
