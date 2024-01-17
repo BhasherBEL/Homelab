@@ -4,7 +4,7 @@ services:
     image: ferdium/ferdium-server:latest
     environment:
     - NODE_ENV=development
-    - APP_URL=ferdium.bhasher.com
+    - APP_URL=https://ferdium.bhasher.com
     - DB_CONNECTION=pg
     - DB_HOST=postgres
     - DB_PORT=5432
