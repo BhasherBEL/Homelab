@@ -1,0 +1,8 @@
+master:
+  hosts:
+    shp
+
+edges:
+  hosts:
+    snode0
+    

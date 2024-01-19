@@ -1,0 +1,60 @@
+---
+- hosts: edges
+  remote_user: pi
+  become: true
+  tasks:
+  - name: Remove conflicting packages 
+    apt:
+      name: "{{item}}"
+      state: absent
+      update_cache: yes
+    loop:
+    - docker.io
+    - docker-doc
+    - docker-compose
+    - docker-compose-v2
+    - podman-docker
+    - containerd
+    - runc
+  - name: Install dependencies
+    apt:
+      name: "{{item}}"
+      state: present
+      update_cache: yes
+    loop:
+    - ca-certificates
+    - curl
+    - gnupg
+  - name: add GPG key
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+  - name: add docker repository to apt
+    apt_repository:
+      repo: deb https://download.docker.com/linux/ubuntu bionic stable
+      state: present
+  - name: install docker
+    apt:
+      name: "{{item}}"
+      state: latest
+      update_cache: yes
+    loop:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-buildx-plugin
+    - docker-compose-plugin
+  - name: check docker is active
+    service:
+      name: docker
+      state: started
+      enabled: yes
+  - name: Ensure group "docker" exists
+    ansible.builtin.group:
+      name: docker
+      state: present
+  - name: adding ubuntu to docker group
+    user:
+      name: pi
+      groups: docker
+      append: yes

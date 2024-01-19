@@ -1,0 +1,20 @@
+---
+- hosts: edges
+  remote_user: pi
+  become: true
+  tasks:
+  - name: Copy docker compose files
+    ansible.builtin.copy:
+      src: .
+      dest: /home/pi/edge
+  - name: Start edge services
+    community.docker.docker_compose_v2:
+      project_src: /home/pi/edge
+      build: never
+      env_files: .env
+      state: present
+    register: output
+
+  - name: Show results
+    ansible.builtin.debug:
+      var: output
