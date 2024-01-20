@@ -11,7 +11,7 @@ services:
     - MATRIX=true
     - MATRIX_URL=https://maubot.bhasher.com/_matrix/maubot/plugin/webhook/send
     - MATRIX_BASIC_AUTH_USER=${MATRIX_WEBHOOK_USER}
-    - MATRIX_BASIC_AUTH_PASS=${MATRIX_WEBHOOK_PASS}
+   - MATRIX_BASIC_AUTH_PASS=${MATRIX_WEBHOOK_PASS}
     volumes:
     - $DATA/tg2:/data
     labels:

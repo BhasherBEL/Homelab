@@ -1,0 +1,33 @@
+services:
+  goatcounter:
+    container_name: goatcounter
+    image: baethon/goatcounter:latest
+    restart: unless-stopped
+    volumes:
+    - $DATA/goatcounter:/goatcounter/db:rw
+    environment:
+    - GOATCOUNTER_DOMAIN=counter.bhasher.com
+    - GOATCOUNTER_EMAIL=counter.lan@bhasher.com
+    - GOATCOUNTER_PASSWORD=${GOATCOUNTER_PASSWORD}
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.goatcounter.rule=Host(`counter.bhasher.com`)"
+    - "traefik.http.routers.goatcounter.service=goatcounter"
+    - "traefik.http.routers.goatcounter.entrypoints=internalsecure"
+    - "traefik.http.services.goatcounter.loadbalancer.server.port=8080"
+    - "traefik.http.routers.goatcounter.tls=true"
+    - "traefik.http.routers.goatcounter.tls.certresolver=http"
+    - "traefik.http.routers.goatcounter.middlewares=authelia@docker"
+
+    - "traefik.http.routers.goatc.rule=Host(`c.bhasher.com`)"
+    - "traefik.http.routers.goatc.service=goatc"
+    - "traefik.http.services.goatc.loadbalancer.server.port=8080"
+    - "traefik.http.routers.goatc.tls=true"
+    - "traefik.http.routers.goatc.tls.certresolver=http"
+    - "traefik.http.routers.goatc.entrypoints=internalsecure,externalsecure"
+    - "traefik.http.routers.goatc.middlewares=counter-strip@docker"
+    - "traefik.http.middlewares.counter-strip.addprefix.prefix=/count"
+
+    - "com.centurylinklabs.watchtower.enable=true"
+    networks:
+    - external

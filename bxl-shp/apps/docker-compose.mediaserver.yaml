@@ -189,6 +189,46 @@ services:
     - mediaserver
     - external
 
+  tdarr:
+    container_name: tdarr
+    image: ghcr.io/haveagitgat/tdarr:latest
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Paris
+      - PUID=1000
+      - PGID=1000
+      #- UMASK_SET=002
+      #- serverIP=0.0.0.0
+      #- serverPort=8266
+      #- webUIPort=8265
+      - internalNode=true
+      - inContainer=true
+      #- ffmpegVersion=6
+      - nodeName=shp
+      #- NVIDIA_DRIVER_CAPABILITIES=all
+      #- NVIDIA_VISIBLE_DEVICES=all
+    volumes:
+      - $DATA/mediaserver/tdarr/server:/app/server
+      - $DATA/mediaserver/tdarr/configs:/app/configs
+      - $DATA/mediaserver/tdarr/logs:/app/logs
+      - /mnt/movies/movies:/media/moves
+      - /mnt/movies/series:/media/tv
+      - /tmp/tdarr:/temp
+    devices:
+      - /dev/dri:/dev/dri
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.tdarr.rule=Host(`tdarr.bhasher.com`)"
+    - "traefik.http.services.tdarr.loadbalancer.server.port=8265"
+    - "traefik.http.routers.tdarr.tls=true"
+    - "traefik.http.routers.tdarr.tls.certresolver=http"
+    - "traefik.http.routers.tdarr.entrypoints=internalsecure"
+    - "traefik.http.routers.tdarr.middlewares=authelia@docker"
+    - "com.centurylinklabs.watchtower.enable=true"
+    networks:
+    #- mediaserver
+    - external
+
   #sonarr_youtubedl:
   #  image: whatdaybob/sonarr_youtubedl:latest
   #  container_name: sonarr_youtubedl
