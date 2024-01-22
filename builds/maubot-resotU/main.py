@@ -37,6 +37,7 @@ class UCLouvainRestoUBot(Plugin):
   # Highly inspired by https://github.com/maubot/echo
   @command.new("ping", help="Ping")
   async def ping_handler(self, evt: MessageEvent, message: str = "") -> None:
+    print('PING')
     diff = int(time() * 1000) - evt.timestamp
     
     content = TextMessageEventContent(
