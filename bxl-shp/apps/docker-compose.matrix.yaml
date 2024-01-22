@@ -45,6 +45,7 @@ services:
     container_name: matrix-maubot
     image: dock.mau.dev/maubot/maubot:latest
     restart: unless-stopped
+    command: "sh -c \"/usr/bin/python3 -m pip install bs4 && /opt/maubot/docker/run.sh\""
     environment:
     - TZ=Europe/Paris
     volumes:

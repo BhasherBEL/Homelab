@@ -1,17 +1,19 @@
 services:
   tg2:
     container_name: tg2
-    image: registry.bhasher.com/tg2:latest
+    image: git.bhasher.com/bhasher/tg2:latest
+    pull_policy: always
     restart: on-failure:10
     environment:
     - TGTG_EMAIL=tgtg.trash@bhasher.com
-    #- TELEGRAM=true
+    - TELEGRAM=true
     - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
     - TELEGRAM_ID=${TELEGRAM_ID}
-    - MATRIX=true
+    - MATRIX=false
     - MATRIX_URL=https://maubot.bhasher.com/_matrix/maubot/plugin/webhook/send
     - MATRIX_BASIC_AUTH_USER=${MATRIX_WEBHOOK_USER}
-   - MATRIX_BASIC_AUTH_PASS=${MATRIX_WEBHOOK_PASS}
+    - MATRIX_BASIC_AUTH_PASS=${MATRIX_WEBHOOK_PASS}
+    - PYTHONUNBUFFERED=1
     volumes:
     - $DATA/tg2:/data
     labels:
