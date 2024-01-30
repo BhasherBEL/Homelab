@@ -18,6 +18,7 @@ services:
     - "traefik.http.routers.syncthing.tls=true"
     - "traefik.http.routers.syncthing.tls.certresolver=http"
     - "traefik.http.routers.syncthing.middlewares=authelia@docker"
+    - "com.centurylinklabs.watchtower.enable=true"
     ports:
     - 22000:22000/tcp # TCP file transfers
     - 22000:22000/udp # QUIC file transfers
