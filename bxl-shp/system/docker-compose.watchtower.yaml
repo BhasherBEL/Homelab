@@ -8,6 +8,7 @@ services:
     - /etc/localtime:/etc/localtime:ro
     command:
     - "--cleanup"
+    - "--remove-volumes"
     - "--schedule=0 0 3 * * SAT"
     - "--label-enable"
     #- "--monitor-only"
