@@ -37,4 +37,8 @@ scrape_configs:
   - job_name: 'mikrotik'
     static_configs:
           - targets: ['mikrotik:9436']
-
+  - job_name: 'uptime'
+    static_configs:
+      - targets: ['uptime.vps.bhasher.com']
+    basic_auth: 
+      password_file: /prometheus/uptime
