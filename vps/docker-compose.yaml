@@ -19,7 +19,7 @@ services:
     - "--certificatesresolvers.http.acme.httpchallenge.entrypoint=web"
     - "--certificatesresolvers.http.acme.email=acme@bhasher.com"
     - "--certificatesresolvers.http.acme.storage=acme.json"
-    - "--log.level=DEBUG"
+    #- "--log.level=DEBUG"
     environment:
     - TZ=Europe/Paris
     restart: always
@@ -31,6 +31,10 @@ services:
     - type: bind
       source: /etc/letsencrypt/acme.json
       target: /acme.json
+    labels:
+    - 'traefik.http.middlewares.authelia.forwardAuth.address=https://idp.bhasher.com/api/verify?rd=https%3A%2F%2Fidp.bhasher.com%2F'
+    - 'traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader=true'
+    - 'traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'
     networks:
     - external
 
@@ -187,6 +191,25 @@ services:
     - "traefik.http.routers.whoami.tls=true"
     - "traefik.http.routers.whoami.tls.certresolver=http"
     #- "traefik.http.routers.whoami.entrypoints=websecure"
+    networks:
+    - external
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    restart: unless-stopped
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.uptime-kuma.rule=Host(`uptime.vps.bhasher.com`)"
+    - "traefik.http.services.uptime-kuma.loadbalancer.server.port=3001"
+    - "traefik.http.routers.uptime-kuma.tls=true"
+    - "traefik.http.routers.uptime-kuma.tls.certresolver=http"
+    - "traefik.http.routers.uptime-kuma.entrypoints=websecure"
+    #- "traefik.http.routers.uptime-kuma.middlewares=authelia@docker"
+    environment:
+    - TZ=Europe/Paris
+    volumes:
+    - $DATA/uptime-kuma:/app/data:rw
     networks:
     - external
 
