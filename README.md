@@ -28,7 +28,6 @@ Finally, a directory `builds/` contains the custom services.
 | Media | Transmission | ✅ | L+A | BitTorrent client |
 | Media | Prowlarr | ✅ | L+A | Indexer manager |
 | Media | Flaresolverr | ✅ | - | CAPTCHA solver |
-| Media | Sonarr ytdlp | ❌ | - | Custom Sonarr yt-dlp addon |
 | Home | Home Assistant | ✅ | L+A* | Home automation and smart home control platform |
 | Home | Node RED | ✅ | L+A | Flow-based development for IoT and automation |
 | Home | Zigbee2mqtt | ✅ | - | Zigbee to MQTT bridge for home automation |
@@ -36,14 +35,12 @@ Finally, a directory `builds/` contains the custom services.
 | Home | Pi-Hole | ✅ | L+(A) | Network-wide ad blocker and DNS sinkhole |
 | Pro | Dashy SD | ✅ | L+A | Services dashboard |
 | Pro | Invoiceplane | ✅ | L+A* | Invoicing and billing software |
-| Pro | Portfolio | ❌ | P | Personal portfolio |
 | Tools | Joplin | ✅ | L | Note-taking and to-do list application |
 | Tools | Vaultwarden | ✅ | P+A* | Bitwarden password manager |
 | Tools | Mealie | ✅ | L+(A*) | Recipe management and meal planning |
 | Tools | Dashy | ✅ | L+A | Dashboard for data visualization and control |
 | Tools | Focalboard | ✅ | L+A* | Projects and tasks management |
 | Tools | Baikal | ✅ | P+A* | CalDAV and CardDAV server |
-| Tools | Seafile | ✅ | L+A | Cloud file storage |
 | Tools | Onlyoffice-editor | ✅ | P+A* | Online realtime office collaboration |
 | Script | tg2 | ✅ | - | Telegram bot for Too Good To Go|
 | VPN | Wireguard | ✅ | P+A* | Secure and easy-to-configure VPN solution |
