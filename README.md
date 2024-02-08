@@ -63,7 +63,7 @@ Finally, a directory `builds/` contains the custom services.
 | Storage | Registry | ✅ | L | Docker image registry |
 | Storage | Registry UI | ✅ | L | UI for docker image registry |
 | Backup | Borgmatic | ✅ | - | Automatic backup |
-| Backup | Borgmatic VPS | ✅ | - | Automatic backup for VPS |
+| Backup | Borgmatic VPS | ❌ | - | Automatic backup for VPS |
 | Reverse Proxy | Traefik | ✅ | P+(A) | Reverse proxy for containerized applications |
 | Reverse Proxy | wellknown-nginx | ✅ | P | Serve well-known services |
 | Update | Watchtower | ✅ | - | Automatic container image updating |
