@@ -18,9 +18,16 @@ async def extract_picture_url(url, base_url):
 
       images = soup.find_all('img')
 
-      for img in images:
-        src = img.get('src')
-        if src and src.startswith(base_url):
+      for a in soup.find_all('a'):
+        href = a.get('href')
+        if not href or not href.startswith(base_url):
+          continue
+
+        for img in a.find_all('img'):
+          src = img.get('src')
+          if not src or not src.startswith(base_url):
+            continue
+
           if src.startswith('//'):
             return f"https:{src}"
           else:
@@ -59,7 +66,7 @@ class UCLouvainRestoUBot(Plugin):
     data = await download_image(
       await extract_picture_url(
         "https://uclouvain.be/fr/decouvrir/resto-u/le-galilee-self.html",
-        "//cdn.uclouvain.be/groups/cms-editors-resto-u/menu"
+        "//cdn.uclouvain.be/groups/cms-editors-resto-u/"
       )
     )
     url = await self.client.upload_media(data, mime_type="application/json")

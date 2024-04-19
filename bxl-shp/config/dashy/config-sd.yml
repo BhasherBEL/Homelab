@@ -87,3 +87,8 @@ sections:
         url: https://uclouvain.atlassian.net/jira/dashboards/10025
         statusCheck: false
         id: 5_1631_jira
+      - title: Gestion accès externes
+        url: >-
+          https://sites.uclouvain.be/sgsi-apps/shib-accesressources/prod/index.php
+        statusCheck: false
+        id: 6_1631_gestionaccsexternes
