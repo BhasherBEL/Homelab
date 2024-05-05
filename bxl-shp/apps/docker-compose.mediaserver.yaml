@@ -6,7 +6,7 @@ services:
     - $DATA/mediaserver/jellyfin:/config
     - /mnt/movies/series:/data/tvshows
     - /mnt/movies/movies:/data/movies
-    - /mnt/movies/musics:/data/musics
+    - /mnt/syncDocuments/music:/data/musics
     environment:
     - PUID=1000
     - PGID=1000
@@ -83,7 +83,7 @@ services:
     - TZ=Europe/Paris
     volumes:
     - $DATA/mediaserver/lidarr:/config
-    - /mnt/movies/musics:/music
+    - /mnt/syncDocuments/music:/music
     - /mnt/movies/tmp:/downloads
     restart: unless-stopped
     labels:
