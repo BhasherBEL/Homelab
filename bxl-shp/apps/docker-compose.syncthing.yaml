@@ -9,7 +9,7 @@ services:
     volumes:
     - $DATA/syncthing:/var/syncthing:rw
     - /mnt/syncDocuments:/mnt/SyncDocuments:rw
-    - /mnt/brieuc-pictures:/mnt/pictures:rw
+    - /mnt/brieuc:/mnt/brieuc:rw
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.syncthing.rule=Host(`syncthing.bhasher.com`)"

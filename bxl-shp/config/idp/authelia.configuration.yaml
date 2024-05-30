@@ -62,6 +62,19 @@ access_control:
     policy: two_factor
     subject:
     - "group:admin"
+  - domain: 'mealie.bhasher.com'
+    policy: one_factor
+    subject:
+    - "group:member"
+    methods:
+    - "GET"
+    - "HEAD"
+    - "POST"
+    - "PUT"
+    - "DELETE"
+    - "CONNECT"
+    - "OPTIONS"
+    - "TRACE"
   - domain: '*.bhasher.com'
     policy: one_factor
     subject:
@@ -125,6 +138,13 @@ telemetry:
 identity_providers:
   oidc:
     enforce_pkce: public_clients_only
+    cors:
+      allowed_origins_from_client_redirect_uris: true
+      endpoints:
+        - 'authorization'
+        - 'token'
+        - 'revocation'
+        - 'introspection'
     clients:
     - id: grafana
       description: Grafana
@@ -229,6 +249,21 @@ identity_providers:
       authorization_policy: one_factor
       redirect_uris:
         - https://wiki.bhasher.com/login/4b20571d-a8d7-4384-a95c-589fe7fc7ab6/callback
+      consent_mode: implicit
+      scopes:
+        - openid
+        - profile
+        - email
+        - groups
+      userinfo_signing_algorithm: none
+
+    - id: mealie
+      description: Mealie
+      public: true
+      authorization_policy: one_factor
+      redirect_uris:
+        - https://recipes.bhasher.com/login
+        - https://recipes.bhasher.com/login?direct=1
       consent_mode: implicit
       scopes:
         - openid
