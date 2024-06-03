@@ -27,10 +27,10 @@ services:
 
   matrix-riot:
     container_name: matrix-element
-    image: ghcr.io/bubuntux/element-web
+    image: vectorim/element-web
     restart: unless-stopped
     volumes:
-    - $CONFIG/riot/config.json:/etc/element-web/config.json:ro
+    - $CONFIG/riot/config.json:/app/config/config.json:ro
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.matrix-riot.rule=Host(`element.bhasher.com`)"
