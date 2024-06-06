@@ -1,11 +1,22 @@
 services:
   opentripplanner:
     container_name: opentripplanner
-    image: docker.io/opentripplanner/opentripplanner:latest
+    image: docker.io/opentripplanner/opentripplanner:2.5.0
     command: --load --serve
     restart: unless-stopped
     volumes:
-    - $DATA/opentripplanner:/var/opentripplanner:ro
+    #- type: bind
+    #  source: $DATA/opentripplanner/graph.obj
+    #  target: /var/opentripplanner/graph.obj
+    #- type: bind
+    #  source: $CONFIG/otp/otp-config.json
+    #  target: /var/opentripplanner/otp-config.json,readonly
+    #- type: bind
+    #  source: $CONFIG/otp/router-config.json
+    #  target: /var/opentripplanner/router-config.json,readonly
+    - $DATA/opentripplanner/graph.obj:/var/opentripplanner/graph.obj
+    - $CONFIG/otp:/var/opentripplanner
+
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.otp.rule=Host(`maps.bhasher.com`)"
