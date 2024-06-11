@@ -13,12 +13,17 @@ services:
     - OIDC_AUTH_ENABLED=true
     - OIDC_SIGNUP_ENABLE=true
     - OIDC_REMEMBER_ME=true
-    - OIDC_AUTO_REDIRECT=true
+    - OIDC_AUTO_REDIRECT=false
     - OIDC_CONFIGURATION_URL=https://idp.bhasher.com/.well-known/openid-configuration
     - OIDC_CLIENT_ID=mealie
     - OIDC_PROVIDER_NAME=Authelia
     - OIDC_USER_GROUP=everybody
     - OIDC_ADMIN_GROUP=admin
+    - OPENAI_BASE_URL=https://api.mistral.ai/v1/chat/completions
+    - OPENAI_API_KEY=${MISTRAL_API_KEY}
+    - OPENAI_MODEL=mistral-large-latest
+    - OPENAI_WORKERS=2
+    - OPENAI_SEND_DATABASE_DATA=true
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.mealie.rule=Host(`recipes.bhasher.com`)"
@@ -28,7 +33,7 @@ services:
     - "traefik.http.routers.mealie.entrypoints=internalsecure,externalsecure"
     - "com.centurylinklabs.watchtower.enable=true"
     volumes:
-    - $DATA/mealiev1/:/app/data
+    - $DATA/mealie/v2:/app/data
     networks:
     - external
 
