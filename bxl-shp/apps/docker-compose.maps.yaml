@@ -24,7 +24,7 @@ services:
     - "traefik.http.services.otp.loadbalancer.server.port=8080"
     - "traefik.http.routers.otp.tls=true"
     - "traefik.http.routers.otp.tls.certresolver=http"
-    - "traefik.http.routers.otp.middlewares=authelia@docker"
+    #- "traefik.http.routers.otp.middlewares=authelia@docker"
     - "com.centurylinklabs.watchtower.enable=true"
     networks:
     - external
