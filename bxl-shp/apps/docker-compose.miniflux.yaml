@@ -1,7 +1,7 @@
 services:
   miniflux:
     container_name: miniflux
-    image: miniflux/miniflux:latest
+    image: bhasherbel/miniflux:latest
     restart: unless-stopped
     environment:
     - BASE_URL=https://miniflux.bhasher.com
