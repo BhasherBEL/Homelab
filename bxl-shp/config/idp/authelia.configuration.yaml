@@ -261,7 +261,6 @@ identity_providers:
         - email
         - groups
       userinfo_signing_algorithm: none
-
     - id: mealie
       description: Mealie
       public: true
@@ -269,6 +268,20 @@ identity_providers:
       redirect_uris:
         - https://recipes.bhasher.com/login
         - https://recipes.bhasher.com/login?direct=1
+      consent_mode: implicit
+      scopes:
+        - openid
+        - profile
+        - email
+        - groups
+      userinfo_signing_algorithm: none
+    - id: paperless-ngx
+      description: Paperless NGX
+      secret: '$argon2id$v=19$m=65536,t=3,p=4$kujFSqxNtfP0neWECtdwoQ$bmEqT9v47rXXKEDtLWiZO10VH7yGgNPRjflM/UWwCXg'
+      public: false
+      authorization_policy: two_factor
+      redirect_uris:
+        - https://paperless.bhasher.com/accounts/oidc/authelia/login/callback/
       consent_mode: implicit
       scopes:
         - openid

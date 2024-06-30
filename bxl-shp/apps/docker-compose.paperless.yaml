@@ -23,12 +23,13 @@ services:
     - PAPERLESS_SECRET_KEY=${PAPERLESS_SECRET_KEY}
     - PAPERLESS_TIME_ZONE=Europe/Paris
     - PAPERLESS_OCR_LANGUAGE=fra
-    - PAPERLESS_ENABLE_HTTP_REMOTE_USER=true
     - PAPERLESS_USE_X_FORWARD_HOST=true
     - PAPERLESS_USE_X_FORWARD_PORT=true
     - PAPERLESS_PROXY_SSL_HEADER=["HTTP_X_FORWARDED_PROTO", "https"]
     - PAPERLESS_TASK_WORKERS=4
-
+    - PAPERLESS_SOCIALACCOUNT_PROVIDERS=${PAPERLESS_PROVIDERS}
+    - PAPERLESS_APPS=allauth.socialaccount.providers.openid_connect
+    - PAPERLESS_DISABLE_REGULAR_LOGIN=true
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.paperless.rule=Host(`paperless.bhasher.com`)"
@@ -36,7 +37,6 @@ services:
     - "traefik.http.services.paperless.loadbalancer.server.port=8000"
     - "traefik.http.routers.paperless.tls=true"
     - "traefik.http.routers.paperless.tls.certresolver=http"
-    - "traefik.http.routers.paperless.middlewares=authelia@docker"
     networks:
     - auth
     - storage
