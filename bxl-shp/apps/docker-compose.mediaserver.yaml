@@ -74,31 +74,6 @@ services:
     - mediaserver
     - external
 
-  lidarr:
-    container_name: lidarr
-    image: lscr.io/linuxserver/lidarr:latest
-    environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Europe/Paris
-    volumes:
-    - $DATA/mediaserver/lidarr:/config
-    - /mnt/syncDocuments/music:/music
-    - /mnt/movies/tmp:/downloads
-    restart: unless-stopped
-    labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.lidarr.rule=Host(`lidarr.bhasher.com`)"
-    - "traefik.http.services.lidarr.loadbalancer.server.port=8686"
-    - "traefik.http.routers.lidarr.tls=true"
-    - "traefik.http.routers.lidarr.tls.certresolver=http"
-    - "traefik.http.routers.lidarr.entrypoints=internalsecure"
-    - "traefik.http.routers.lidarr.middlewares=authelia@docker"
-    - "com.centurylinklabs.watchtower.enable=true"
-    networks:
-    - mediaserver
-    - external
-
   transmission:
     container_name: transmission
     image: lscr.io/linuxserver/transmission:latest
