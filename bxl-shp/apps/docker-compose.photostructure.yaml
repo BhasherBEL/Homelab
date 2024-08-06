@@ -1,0 +1,36 @@
+services:
+  photostructure:
+    container_name: photostructure
+    image: photostructure/server:stable
+    restart: unless-stopped
+    depends_on:
+    - traefik
+    stop_grace_period: 2m
+    volumes:
+    - type: bind
+      source: /mnt/sync/photostructure/library
+      target: /ps/library
+    - type: bind
+      source: $DATA/photostructure/tmp
+      target: /ps/tmp
+    - type: bind
+      source: $DATA/photostructure/config
+      target: /ps/config
+    - type: bind
+      source: $DATA/photostructure/logs
+      target: /ps/logs
+    environment:
+    - TZ=Europe/Paris
+    - PUID=1000
+    - PGID=1000
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.photostructure.rule=Host(`photos.bhasher.com`)"
+    - "traefik.http.routers.photostructure.entrypoints=internalsecure"
+    - "traefik.http.services.photostructure.loadbalancer.server.port=1787"
+    - "traefik.http.routers.photostructure.tls=true"
+    - "traefik.http.routers.photostructure.tls.certresolver=http"
+    - "traefik.http.routers.photostructure.middlewares=authelia@docker"
+    - "com.centurylinklabs.watchtower.enable=true"
+    networks:
+    - external

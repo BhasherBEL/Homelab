@@ -8,10 +8,10 @@ services:
     - postgres
     - redis
     volumes:
-    - $DATA/paperless/data:/usr/src/paperless/data
-    - $DATA/paperless/media:/usr/src/paperless/media
-    - $DATA/paperless/export:/usr/src/paperless/export
-    - $DATA/paperless/consume:/usr/src/paperless/consume
+    - /mnt/sync/paperless/data:/usr/src/paperless/data
+    - /mnt/sync/paperless/media:/usr/src/paperless/media
+    - /mnt/sync/paperless/export:/usr/src/paperless/export
+    - /mnt/sync/paperless/consume:/usr/src/paperless/consume
     environment:
     - PAPERLESS_REDIS=redis://redis:6379
     - PAPERLESS_DBENGINE=postgresql
