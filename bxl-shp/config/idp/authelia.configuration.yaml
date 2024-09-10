@@ -289,4 +289,21 @@ identity_providers:
         - email
         - groups
       userinfo_signing_algorithm: none
+    - id: immich
+      description: Immich
+      secret: '$argon2id$v=19$m=65536,t=3,p=4$vyO+G6qB9FRnIMHVq6FsYQ$U6LkvG5c/cq1lcEnlNhhqAW7+ILn0i+yZIIxls6qp0g'
+      public: false
+      authorization_policy: two_factor
+      redirect_uris:
+        - https://photos.bhasher.com/auth/login
+        - https://photos.bhasher.com/user-settings
+        - app.immich:/
+      consent_mode: implicit
+      scopes:
+        - openid
+        - profile
+        - email
+        - groups
+      userinfo_signing_algorithm: none
+
 

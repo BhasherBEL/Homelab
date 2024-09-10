@@ -16,6 +16,7 @@ services:
     - PAPERLESS_REDIS=redis://redis:6379
     - PAPERLESS_DBENGINE=postgresql
     - PAPERLESS_DBHOST=postgres
+    - PAPERLESS_DBPORT=5432
     - PAPERLESS_DBNAME=paperless
     - PAPERLESS_DBUSER=postgres
     - PAPERLESS_DBPASS=${POSTGRES_PASSWORD}
@@ -38,6 +39,6 @@ services:
     - "traefik.http.routers.paperless.tls=true"
     - "traefik.http.routers.paperless.tls.certresolver=http"
     networks:
-    - auth
+    #- auth
     - storage
     - external

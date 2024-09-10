@@ -25,7 +25,7 @@ services:
     - PGID=1000
     labels:
     - "traefik.enable=true"
-    - "traefik.http.routers.photostructure.rule=Host(`photos.bhasher.com`)"
+    - "traefik.http.routers.photostructure.rule=Host(`old-photos.bhasher.com`)"
     - "traefik.http.routers.photostructure.entrypoints=internalsecure"
     - "traefik.http.services.photostructure.loadbalancer.server.port=1787"
     - "traefik.http.routers.photostructure.tls=true"
