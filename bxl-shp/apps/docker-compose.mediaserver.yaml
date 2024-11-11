@@ -1,12 +1,11 @@
 services:
   jellyfin:
     container_name: jellyfin
-    image: linuxserver/jellyfin:latest
+    image: jellyfin/jellyfin:latest
     volumes:
-    - $DATA/mediaserver/jellyfin:/config
-    - /mnt/movies/series:/data/tvshows
-    - /mnt/movies/movies:/data/movies
-    - /mnt/syncDocuments/music:/data/musics
+    - $DATA/mediaserver/jellyfin2:/config
+    - /mnt/movies/series:/media/tvshows
+    - /mnt/movies/movies:/media/movies
     environment:
     - PUID=1000
     - PGID=1000

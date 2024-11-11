@@ -34,10 +34,17 @@ services:
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.paperless.rule=Host(`paperless.bhasher.com`)"
+    #- "traefik.http.routers.paperless.service=paperless-service"
     - "traefik.http.routers.paperless.entrypoints=internalsecure"
     - "traefik.http.services.paperless.loadbalancer.server.port=8000"
     - "traefik.http.routers.paperless.tls=true"
     - "traefik.http.routers.paperless.tls.certresolver=http"
+    #- "traefik.http.routers.paperlessshare.rule=Host(`paperless.bhasher.com`) && (PathPrefix(`/share/`))"
+    #- "traefik.http.routers.paperlessshare.service=paperlessshare-service"
+    #- "traefik.http.routers.paperlessshare.entrypoints=externalsecure"
+    #- "traefik.http.services.paperlessshare.loadbalancer.server.port=8000"
+    #- "traefik.http.routers.paperlessshare.tls=true"
+    #- "traefik.http.routers.paperlessshare.tls.certresolver=http"
     networks:
     #- auth
     - storage
