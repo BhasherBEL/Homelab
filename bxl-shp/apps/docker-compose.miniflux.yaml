@@ -1,6 +1,6 @@
 services:
-  miniflux:
-    container_name: miniflux
+  miniflux2:
+    container_name: miniflux2
     image: bhasherbel/miniflux:latest
     restart: unless-stopped
     environment:

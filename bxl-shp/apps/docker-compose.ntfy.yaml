@@ -1,0 +1,35 @@
+services:
+  ntfy:
+    image: binwiederhier/ntfy
+    container_name: ntfy
+    command:
+      - serve
+    environment:
+      - TZ=Europe/Paris    
+      - NTFY_BASE_URL=http://ntfy.bhasher.com
+      - NTFY_BEHIND_PROXY=true
+      - NTFY_ATTACHMENT_CACHE_DIR=/var/lib/ntfy/attachments
+      - NTFY_CACHE_FILE=/var/lib/ntfy/cache.db
+      - NTFY_AUTH_FILE=/var/lib/ntfy/user.db
+      - NTFY_AUTH_DEFAULT_ACCESS=deny-all
+    volumes:
+      - $DATA/ntfy/cache:/var/cache/ntfy
+      - $DATA/ntfy/data:/etc/ntfy
+      - $DATA/ntfy/lib:/var/lib/ntfy
+    user: 1000:1000
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.ntfy.rule=Host(`ntfy.bhasher.com`)"
+    - "traefik.http.services.ntfy.loadbalancer.server.port=80"
+    - "traefik.http.routers.ntfy.tls=true"
+    - "traefik.http.routers.ntfy.tls.certresolver=http"
+    - "traefik.http.routers.ntfy.entrypoints=internalsecure"
+    healthcheck:
+        test: ["CMD-SHELL", "wget -q --tries=1 http://localhost:80/v1/health -O - | grep -Eo '\"healthy\"\\s*:\\s*true' || exit 1"]
+        interval: 60s
+        timeout: 10s
+        retries: 3
+        start_period: 40s
+    restart: unless-stopped
+    networks:
+    - external
