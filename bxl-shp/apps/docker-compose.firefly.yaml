@@ -1,0 +1,39 @@
+services:
+  firefly:
+    container_name: firefly
+    image: fireflyiii/core:version-6
+    restart: unless-stopped
+    volumes:
+      - $DATA/firefly/upload:/var/www/html/storage/upload
+    environment:
+      - APP_KEY=${FIREFLY_APP_KEY}
+      - TZ=Europe/Paris
+      - TRUSTED_PROXIES=**
+      - DB_CONNECTION=pgsql
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=firefly
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - ENABLE_EXTERNAL_MAP=true
+      - MAP_DEFAULT_LAT=50.7399
+      - MAP_DEFAULT_LONG=4.4543
+      - MAP_DEFAULT_ZOOM=10
+      - AUTHENTICATION_GUARD=remote_user_guard
+      - AUTHENTICATION_GUARD_HEADER=HTTP_REMOTE_USER
+      - AUTHENTICATION_GUARD_EMAIL=
+      - APP_URL=https://firefly.bhasher.com
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.firefly.rule=Host(`firefly.bhasher.com`)"
+    - "traefik.http.routers.firefly.entrypoints=internalsecure"
+    - "traefik.http.services.firefly.loadbalancer.server.port=8080"
+    - "traefik.http.routers.firefly.tls=true"
+    - "traefik.http.routers.firefly.tls.certresolver=http"
+    - "traefik.http.routers.firefly.middlewares=authelia@docker"
+    - "com.centurylinklabs.watchtower.enable=true"
+    depends_on:
+      - postgres
+    networks:
+      - storage
+      - external
