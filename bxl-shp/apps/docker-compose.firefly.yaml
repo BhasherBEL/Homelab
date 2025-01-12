@@ -21,7 +21,7 @@ services:
       - MAP_DEFAULT_ZOOM=10
       - AUTHENTICATION_GUARD=remote_user_guard
       - AUTHENTICATION_GUARD_HEADER=HTTP_REMOTE_USER
-      - AUTHENTICATION_GUARD_EMAIL=
+      - AUTHENTICATION_GUARD_EMAIL=HTTP_REMOTE_EMAIL
       - APP_URL=https://firefly.bhasher.com
     labels:
     - "traefik.enable=true"
