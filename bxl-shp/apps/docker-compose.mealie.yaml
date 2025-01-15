@@ -16,6 +16,7 @@ services:
     - OIDC_AUTO_REDIRECT=false
     - OIDC_CONFIGURATION_URL=https://idp.bhasher.com/.well-known/openid-configuration
     - OIDC_CLIENT_ID=mealie
+    - OIDC_CLIENT_SECRET=${MEALIE_OIDC_SECRET}
     - OIDC_PROVIDER_NAME=Authelia
     - OIDC_USER_GROUP=everybody
     - OIDC_ADMIN_GROUP=admin

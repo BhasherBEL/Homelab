@@ -263,11 +263,11 @@ identity_providers:
       userinfo_signing_algorithm: none
     - id: mealie
       description: Mealie
-      public: true
+      client_secret: '$argon2id$v=19$m=65536,t=3,p=4$H+PWfdgUPIh0DOyTF6Wjxw$3OT1G0i1BzOOmHKNc8gjuxWeCEs7SWYh1X9xd7/3SNU'
+      public: false
       authorization_policy: one_factor
       redirect_uris:
         - https://recipes.bhasher.com/login
-        - https://recipes.bhasher.com/login?direct=1
       consent_mode: implicit
       scopes:
         - openid
