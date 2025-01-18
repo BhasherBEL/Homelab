@@ -89,9 +89,9 @@ session:
   name: auth_session
   domain: bhasher.com
   same_site: lax
-  expiration: 1d
-  inactivity: 3h
-  remember_me_duration: 1w
+  expiration: 1w
+  inactivity: 1d
+  remember_me_duration: 4w
   redis:
     host: redis
     port: 6379
