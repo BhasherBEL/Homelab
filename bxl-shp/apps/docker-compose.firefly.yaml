@@ -24,23 +24,50 @@ services:
       - AUTHENTICATION_GUARD_EMAIL=HTTP_REMOTE_EMAIL
       - APP_URL=https://firefly.bhasher.com
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.firefly.rule=Host(`firefly.bhasher.com`)"
-    - "traefik.http.routers.firefly.service=firefly-service"
-    - "traefik.http.routers.firefly.entrypoints=internalsecure"
-    - "traefik.http.services.firefly-service.loadbalancer.server.port=8080"
-    - "traefik.http.routers.firefly.tls=true"
-    - "traefik.http.routers.firefly.tls.certresolver=http"
-    - "traefik.http.routers.firefly.middlewares=authelia@docker"
-    - "traefik.http.routers.firefly-api.rule=Host(`firefly.bhasher.com`) && PathPrefix(`/api/`)"
-    - "traefik.http.routers.firefly-api.service=firefly-api"
-    - "traefik.http.routers.firefly-api.entrypoints=internalsecure"
-    - "traefik.http.services.firefly-api.loadbalancer.server.port=8080"
-    - "traefik.http.routers.firefly-api.tls=true"
-    - "traefik.http.routers.firefly-api.tls.certresolver=http"
-    - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.firefly.rule=Host(`firefly.bhasher.com`)"
+      - "traefik.http.routers.firefly.service=firefly-service"
+      - "traefik.http.routers.firefly.entrypoints=internalsecure"
+      - "traefik.http.services.firefly-service.loadbalancer.server.port=8080"
+      - "traefik.http.routers.firefly.tls=true"
+      - "traefik.http.routers.firefly.tls.certresolver=http"
+      - "traefik.http.routers.firefly.middlewares=authelia@docker"
+      - "traefik.http.routers.firefly-api.rule=Host(`firefly.bhasher.com`) && PathPrefix(`/api/`)"
+      - "traefik.http.routers.firefly-api.service=firefly-api"
+      - "traefik.http.routers.firefly-api.entrypoints=internalsecure"
+      - "traefik.http.services.firefly-api.loadbalancer.server.port=8080"
+      - "traefik.http.routers.firefly-api.tls=true"
+      - "traefik.http.routers.firefly-api.tls.certresolver=http"
+      - "com.centurylinklabs.watchtower.enable=true"
     depends_on:
       - postgres
     networks:
+      - firefly
       - storage
       - external
+  firefly-importer:
+    container_name: firefly-importer
+    image: fireflyiii/data-importer:latest
+    restart: unless-stopped
+    environment:
+      - FIREFLY_III_ACCESS_TOKEN=${FIREFLY_TOKEN}
+      - FIREFLY_III_URL=http://firefly:8080
+      - VANITY_URL=https://firefly.bhasher.com
+      - TZ=Europe/Paris
+      - TRUSTED_PROXIES=**
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.firefly-importer.rule=Host(`firefly-importer.bhasher.com`)"
+      - "traefik.http.routers.firefly-importer.entrypoints=internalsecure"
+      - "traefik.http.services.firefly-importer.loadbalancer.server.port=8080"
+      - "traefik.http.routers.firefly-importer.tls=true"
+      - "traefik.http.routers.firefly-importer.tls.certresolver=http"
+      - "traefik.http.routers.firefly-importer.middlewares=authelia@docker"
+    depends_on:
+      - firefly
+    networks:
+      - firefly
+      - external
+
+networks:
+  firefly:
