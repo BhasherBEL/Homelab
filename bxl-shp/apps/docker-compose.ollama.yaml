@@ -17,3 +17,45 @@ services:
     #- "traefik.http.routers.ollama.middlewares=authelia@docker"
     networks:
     - external
+    - ai
+
+  openwebui:
+    container_name: openwebui
+    image: ghcr.io/open-webui/open-webui:main
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Paris
+      - WEBUI_NAME=Bhasher's AI
+      - WEBUI_URL=https://ai.bhasher.com
+      - JWT_EXPIRES_IN=1w
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OPENAI_API_KEY=${OPENWEBUI_OPENAI_API_KEY}
+      - ENABLE_OAUTH_SIGNUP=true
+      - ENABLE_LOGIN_FORM=false
+      - ENABLE_SIGNUP=false
+      - DEFAULT_USER_ROLE=user
+      - OAUTH_CLIENT_ID=openwebui
+      - OAUTH_CLIENT_SECRET=${OPENWEBUI_AUTHELIA_SECRET}
+      - OPENID_PROVIDER_URL=https://idp.bhasher.com/.well-known/openid-configuration
+      - OAUTH_PROVIDER_NAME=Authelia
+      - OAUTH_ADMIN_ROLES=admin
+      - OAUTH_ALLOWED_ROLES=ai,admin
+      - DEFAULT_MODELS=mistral
+      - TASK_MODEL=mistral
+      - RAG_WEB_SEARCH_ENGINE=duckduckgo
+      - ENABLE_RAG_WEB_SEARCH=true
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.open-webui.rule=Host(`ai.bhasher.com`)"
+    - "traefik.http.services.open-webui.loadbalancer.server.port=8080"
+    - "traefik.http.routers.open-webui.tls=true"
+    - "traefik.http.routers.open-webui.tls.certresolver=http"
+    - "traefik.http.routers.open-webui.entrypoints=internalsecure,externalsecure"
+    volumes:
+      - $DATA/open-webui:/app/backend/data
+    networks:
+    - external
+    - ai
+
+networks:
+  ai:

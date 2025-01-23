@@ -305,5 +305,19 @@ identity_providers:
         - email
         - groups
       userinfo_signing_algorithm: none
+    - id: openwebui
+      description: OpenWebUI
+      secret: '$argon2id$v=19$m=65536,t=3,p=4$8zijuZcGfh2m5RjqL42dLg$ZEiQJz3tRNSZlFpRQaKkxtaieCV7u57QGA3vo9Uu8jA'
+      public: false
+      authorization_policy: one_factor
+      redirect_uris:
+        - https://ai.bhasher.com/oauth/oidc/callback
+      consent_mode: implicit
+      scopes:
+        - openid
+        - profile
+        - email
+        - groups
+      userinfo_signing_algorithm: none
 
 
