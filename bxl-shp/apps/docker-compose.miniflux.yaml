@@ -33,16 +33,16 @@ services:
     networks:
     - storage
     - external
-  miniflux_ai:
-    container_name: miniflux_ai
-    image: ghcr.io/qetesh/miniflux-ai:latest
-    restart: unless-stopped
-    environment:
-      - TZ=Europe/Paris
-    volumes:
-      - $CONFIG/miniflux/ai.yaml:/app/config.yml
-    networks:
-      - ai
+  #miniflux_ai:
+  #  container_name: miniflux_ai
+  #  image: ghcr.io/qetesh/miniflux-ai:latest
+  #  restart: unless-stopped
+  #  environment:
+  #    - TZ=Europe/Paris
+  #  volumes:
+  #    - $CONFIG/miniflux/ai.yaml:/app/config.yml
+  #  networks:
+  #    - ai
 
 networks:
   storage:
