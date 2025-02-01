@@ -319,5 +319,22 @@ identity_providers:
         - email
         - groups
       userinfo_signing_algorithm: none
+    - id: mas
+      description: Matrix Authentication Service
+      secret: "$argon2id$v=19$m=65536,t=3,p=4$4oeGB2RcziBGMvSnVJBmAw$B/6yUd4XH6mqW3QXISNdg1F3HQwzaoA6czhWsNvNWBY"
+      public: false
+      redirect_uris:
+        - https://mas.bhasher.com/upstream/callback/01JJZD84RP70N2Q5YSTG2H6SPV
+      consent_mode: implicit
+      scopes:
+        - openid
+        - groups
+        - profile
+        - email
+      grant_types:
+        - 'refresh_token'
+        - 'authorization_code'
+      response_types:
+        - code
 
 

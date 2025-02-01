@@ -1,7 +1,7 @@
 services:
   matrix-synapse:
     container_name: matrix-synapse
-    image: matrixdotorg/synapse:v1.92.3
+    image: matrixdotorg/synapse:v1.123.0
     restart: unless-stopped
     environment:
     - SYNAPSE_SERVER_NAME=bhasher.com
@@ -24,22 +24,6 @@ services:
     networks:
     - external
     - matrix
-
-  matrix-riot:
-    container_name: matrix-element
-    image: vectorim/element-web
-    restart: unless-stopped
-    volumes:
-    - $CONFIG/riot/config.json:/app/config/config.json:ro
-    labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.matrix-riot.rule=Host(`element.bhasher.com`)"
-    - "traefik.http.routers.matrix-riot.tls=true"
-    - "traefik.http.routers.matrix-riot.tls.certresolver=http"
-    - "traefik.http.routers.matrix-riot.entrypoints=internalsecure,externalsecure"
-    - "traefik.http.services.matrix-riot.loadbalancer.server.port=80"
-    networks:
-    - external
 
   matrix-maubot:
     container_name: matrix-maubot
@@ -64,15 +48,51 @@ services:
     - storage
     - matrix
 
-  #mautrix-slack:
-  #  container_name: mautrix-slack
-  #  image: dock.mau.dev/mautrix/slack:latest
-  #  restart: unless-stopped
-  #  volumes:
-  #  - $DATA/matrix/slack:/data
-  #  networks:
-  #  - matrix
-  #  - storage
+  matrix-sync:
+    image: ghcr.io/matrix-org/sliding-sync:latest
+    container_name: matrix-sync
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - matrix-synapse
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.matrix-sync.rule=Host(`syncv3.bhasher.com`)"
+    - "traefik.http.routers.matrix-sync.tls=true"
+    - "traefik.http.routers.matrix-sync.tls.certresolver=http"
+    - "traefik.http.routers.matrix-sync.entrypoints=internalsecure,externalsecure"
+    - "traefik.http.services.matrix-sync.loadbalancer.server.port=8009"
+    networks:
+      - external
+      - storage
+      - matrix
+    environment:
+      - SYNCV3_SERVER=http://matrix-synapse:8008
+      - SYNCV3_DB=postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/matrix_sync?sslmode=disable
+      - SYNCV3_SECRET=${MATRIX_SYNC_SECRET}
+      - SYNCV3_BINDADDR=:8009
+
+  matrix-mas:
+    image: ghcr.io/element-hq/matrix-authentication-service:latest
+    container_name: matrix-mas
+    restart: unless-stopped
+    command: "server --config=/data/config.yaml"
+    volumes:
+      - ${DATA}/matrix/mas:/data:rw
+    depends_on:
+      - postgres
+      - matrix-synapse
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.matrix-mas.rule=Host(`mas.bhasher.com`)"
+    - "traefik.http.routers.matrix-mas.tls=true"
+    - "traefik.http.routers.matrix-mas.tls.certresolver=http"
+    - "traefik.http.routers.matrix-mas.entrypoints=internalsecure,externalsecure"
+    - "traefik.http.services.matrix-mas.loadbalancer.server.port=8080"
+    networks:
+      - external
+      - storage
+      - matrix
 
 
 networks:
