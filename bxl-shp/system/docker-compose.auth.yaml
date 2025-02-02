@@ -61,6 +61,10 @@ services:
     container_name: authelia
     image: authelia/authelia:latest
     restart: unless-stopped
+    depends_on:
+    - valkey
+    - openldap
+    - postgres
     environment:
     - TZ=Europe/Paris
     - AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD=${LDAP_READONLY_PASSWORD}

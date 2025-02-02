@@ -93,7 +93,7 @@ session:
   inactivity: 1d
   remember_me_duration: 4w
   redis:
-    host: redis
+    host: valkey
     port: 6379
 
 regulation:

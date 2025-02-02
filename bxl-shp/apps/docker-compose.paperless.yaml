@@ -6,14 +6,14 @@ services:
     depends_on:
     - traefik
     - postgres
-    - redis
+    - valkey
     volumes:
     - /mnt/sync/paperless/data:/usr/src/paperless/data
     - /mnt/sync/paperless/media:/usr/src/paperless/media
     - /mnt/sync/paperless/export:/usr/src/paperless/export
     - /mnt/sync/paperless/consume:/usr/src/paperless/consume
     environment:
-    - PAPERLESS_REDIS=redis://redis:6379
+    - PAPERLESS_REDIS=redis://valkey:6379
     - PAPERLESS_DBENGINE=postgresql
     - PAPERLESS_DBHOST=postgres
     - PAPERLESS_DBPORT=5432

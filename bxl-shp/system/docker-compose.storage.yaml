@@ -11,9 +11,9 @@ services:
     networks:
     - storage
 
-  redis:
-    container_name: redis
-    image: redis:latest
+  valkey:
+    container_name: valkey
+    image: valkey/valkey:alpine
     restart: unless-stopped
     networks:
     - storage
