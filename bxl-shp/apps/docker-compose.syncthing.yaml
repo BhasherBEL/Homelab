@@ -10,6 +10,7 @@ services:
     - $DATA/syncthing:/var/syncthing:rw
     - /mnt/syncDocuments:/mnt/SyncDocuments:rw
     - /mnt/sync/photostructure/library:/mnt/photostructure:rw
+    - /mnt/photos:/mnt/photos:rw
     labels:
     - "traefik.enable=true"
     - "traefik.http.routers.syncthing.rule=Host(`syncthing.bhasher.com`)"

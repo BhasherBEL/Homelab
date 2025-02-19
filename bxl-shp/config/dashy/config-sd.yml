@@ -35,8 +35,8 @@ sections:
         id: 1_1507_services
       - title: Wifi (public)
         icon: ''
-        url: https://uclouvain.be/fr/decouvrir/wifi.html
-        statusCheck: false
+        url: >-
+          https://uclouvain.atlassian.net/wiki/spaces/CDSMEXTP/pages/293798036/Permanences+WiFi+et+MFA+pour+les+tudiants#%C3%80-Louvain-La-Neuve
         id: 2_1507_wifipublic
       - title: Wifi (intra)
         url: >-
@@ -53,6 +53,10 @@ sections:
         url: https://uclouvain.be/fr/facultes/sc/comment-fonctionne-ade.html
         statusCheck: false
         id: 5_1507_adeinfos
+      - title: Doc (public)
+        url: >-
+          https://uclouvain.atlassian.net/wiki/spaces/CDSMEXTP/pages/1003749410/Logiciels+libres
+        id: 6_1507_docpublic
   - name: Private services
     displayData:
       sortBy: default
