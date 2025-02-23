@@ -1,0 +1,15 @@
+services:
+  hugo:
+    container_name: blog
+    image: ghcr.io/bhasherbel/blog:latest
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.hugo.rule=Host(`blog.bhasher.com`)"
+      - "traefik.http.routers.hugo.entrypoints=externalsecure,internalsecure"
+      - "traefik.http.services.hugo.loadbalancer.server.port=80"
+      - "traefik.http.routers.hugo.tls=true"
+      - "traefik.http.routers.hugo.tls.certresolver=http"
+      - "com.centurylinklabs.watchtower.enable=true"
+    networks:
+      - external
