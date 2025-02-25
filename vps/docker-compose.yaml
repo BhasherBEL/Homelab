@@ -160,9 +160,11 @@ services:
     image: docker.io/traefik/whoami:latest
     labels:
     - "traefik.enable=true"
-    - "traefik.http.routers.whoami.rule=Host(`bhasher.com`, `imap.bhasher.com`, `smtp.bhasher.com`)"
+    - "traefik.http.routers.whoami.rule=Host(`mail.bhasher.com`, `imap.bhasher.com`, `smtp.bhasher.com`)"
+    - "traefik.http.services.whoami.loadbalancer.server.port=80"
     - "traefik.http.routers.whoami.tls=true"
     - "traefik.http.routers.whoami.tls.certresolver=http"
+    - "traefik.http.routers.whoami.entrypoints=websecure"
     networks:
     - external
 
@@ -192,11 +194,11 @@ services:
     - $CONFIG/well-known/nginx.conf:/etc/nginx/nginx.conf:ro
     labels:
     - "traefik.enable=true"
-    - "traefik.http.routers.-nginx.rule=Host(`bhasher.com`) && PathPrefix(`/.well-known`)"
-    - "traefik.http.routers.-nginx.tls=true"
-    - "traefik.http.routers.-nginx.tls.certresolver=http"
-    - "traefik.http.routers.-nginx.entrypoints=websecure"
-    - "traefik.http.services.-nginx.loadbalancer.server.port=80"
+    - "traefik.http.routers.wellknown-nginx.rule=Host(`bhasher.com`) && PathPrefix(`/.well-known`)"
+    - "traefik.http.routers.wellknown-nginx.tls=true"
+    - "traefik.http.routers.wellknown-nginx.tls.certresolver=http"
+    - "traefik.http.routers.wellknown-nginx.entrypoints=websecure"
+    - "traefik.http.services.wellknown-nginx.loadbalancer.server.port=80"
     networks:
     - external
 
