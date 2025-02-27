@@ -20,7 +20,7 @@ services:
     - OIDC_PROVIDER_NAME=Authelia
     - OIDC_USER_GROUP=everybody
     - OIDC_ADMIN_GROUP=admin
-    - OPENAI_BASE_URL=https://api.mistral.ai/v1/chat/completions
+    - OPENAI_BASE_URL=https://api.mistral.ai/v1
     - OPENAI_API_KEY=${MISTRAL_API_KEY}
     - OPENAI_MODEL=mistral-large-latest
     - OPENAI_WORKERS=2
