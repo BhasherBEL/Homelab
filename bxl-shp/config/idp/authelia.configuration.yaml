@@ -1,13 +1,12 @@
-default_redirection_url: https://hub.bhasher.com
 theme: dark
 
 server:
-  host: 0.0.0.0
-  port: 9091
+  address: 0.0.0.0:9091
 
 log:
-  level: warn
+  level: debug
   file_path: /logs/authelia.log
+  keep_stdout: true
   #format: json
 
 totp:
@@ -29,19 +28,20 @@ authentication_backend:
   ldap:
     user: cn=readonly,dc=bhasher,dc=com
     implementation: custom
-    url: ldap://openldap
+    address: ldap://openldap
     timeout: 5s
     start_tls: false
     base_dn: DC=bhasher,DC=com
-    username_attribute: uid
     additional_users_dn: ou=users
     users_filter: (&({username_attribute}={input})(objectClass=inetOrgPerson))
     additional_groups_dn: ou=groups
     groups_filter: (&(uniqueMember={dn})(objectClass=groupOfUniqueNames))
-    group_name_attribute: cn
-    mail_attribute: mail
-    display_name_attribute: cn
     permit_referrals: false
+    attributes:
+      username: uid
+      group_name: cn
+      mail: mail
+      display_name: cn
 
 access_control:
   default_policy: deny
@@ -86,12 +86,15 @@ access_control:
     - "group:admin"
 
 session:
-  name: auth_session
-  domain: bhasher.com
-  same_site: lax
-  expiration: 1w
-  inactivity: 1d
-  remember_me_duration: 4w
+  name: 'auth_session'
+  same_site: 'lax'
+  inactivity: '1d'
+  expiration: '1w'
+  remember_me: '1M'
+  cookies:
+  - domain: 'bhasher.com'
+    authelia_url: 'https://idp.bhasher.com'
+    default_redirection_url: 'https://hub.bhasher.com'
   redis:
     host: valkey
     port: 6379
@@ -105,16 +108,15 @@ storage:
   # local:
   #   path: /data/db.sqlite3
   postgres:
-    host: postgres
-    port: 5432
+    address: postgres:5432
     database: authelia
     schema: public
     username: postgres
 
 notifier:
+  disable_startup_check: true
   smtp:
-    host: bdubois.io
-    port: 587
+    address: 'smtp://bhasher.com:587'
     sender: no-reply@bhasher.com
 
 password_policy:
@@ -151,9 +153,9 @@ identity_providers:
         - 'revocation'
         - 'introspection'
     clients:
-    - id: grafana
-      description: Grafana
-      secret: '$argon2id$v=19$m=65536,t=3,p=4$dQfNyInvlh1Lgw3JXi7G6A$M/WaNpHJkAyaQcXIMsOTl0+gBWGPPVBoCm7NpEQfTpI'
+    - client_id: grafana
+      client_name: Grafana
+      client_secret: '$argon2id$v=19$m=65536,t=3,p=4$dQfNyInvlh1Lgw3JXi7G6A$M/WaNpHJkAyaQcXIMsOTl0+gBWGPPVBoCm7NpEQfTpI'
       public: false
       authorization_policy: one_factor
       redirect_uris:
@@ -164,10 +166,10 @@ identity_providers:
       - profile
       - groups
       - email
-      userinfo_signing_algorithm: none
-    - id: matrix_synapse
-      description: Matrix Synapse
-      secret: '$argon2id$v=19$m=65536,t=3,p=4$Z+6HONrjDp54s+MhXuq1cA$bjc5tMGD3gR6AaBYIDx3S2mz/UfPv6a0n1Vf3q2Ifik'
+      userinfo_signed_response_alg: none
+    - client_id: matrix_synapse
+      client_name: Matrix Synapse
+      client_secret: '$argon2id$v=19$m=65536,t=3,p=4$Z+6HONrjDp54s+MhXuq1cA$bjc5tMGD3gR6AaBYIDx3S2mz/UfPv6a0n1Vf3q2Ifik'
       public: false
       authorization_policy: one_factor
       redirect_uris:
@@ -177,24 +179,10 @@ identity_providers:
       - openid
       - profile
       - email
-      userinfo_signing_algorithm: none
-    - id: portainer
-      description: Portainer
-      secret: '$argon2id$v=19$m=65536,t=3,p=4$7bqhx/sMH6Hes4ggVwpEPg$uue9QyGkROpAihkGpbDV6YjKCJlZVXj1JBkJfyLj2MI'
-      public: false
-      authorization_policy: two_factor
-      redirect_uris:
-      - https://portainer.bxl.bhasher.com
-      consent_mode: implicit
-      scopes:
-      - openid
-      - profile
-      - groups
-      - email
-      userinfo_signing_algorithm: none
-    - id: jellyfin
-      description: Jellyfn
-      secret: '$argon2id$v=19$m=65536,t=3,p=4$+AqLF91LkfyZJIhjxq3lVQ$m0aSF/XYaWAU1NgRUlwMC3cB0k09Jg+HBBXa8iJWCLk'
+      userinfo_signed_response_alg: none
+    - client_id: jellyfin
+      client_name: Jellyfn
+      client_secret: '$argon2id$v=19$m=65536,t=3,p=4$+AqLF91LkfyZJIhjxq3lVQ$m0aSF/XYaWAU1NgRUlwMC3cB0k09Jg+HBBXa8iJWCLk'
       public: false
       authorization_policy: one_factor
       redirect_uris:
@@ -205,10 +193,10 @@ identity_providers:
       - profile
       - groups
       - email
-      userinfo_signing_algorithm: none
-    - id: miniflux
-      description: Miniflux
-      secret: '$argon2id$v=19$m=65536,t=3,p=4$6CLrUJhwSMsOAryD/Fn0JA$1Lw6ECq0SSxDOQhbxM3nuHaXaEbXyVOgndGjAkTmkbc'
+      userinfo_signed_response_alg: none
+    - client_id: miniflux
+      client_name: Miniflux
+      client_secret: '$argon2id$v=19$m=65536,t=3,p=4$6CLrUJhwSMsOAryD/Fn0JA$1Lw6ECq0SSxDOQhbxM3nuHaXaEbXyVOgndGjAkTmkbc'
       public: false
       authorization_policy: one_factor
       redirect_uris:
@@ -219,50 +207,9 @@ identity_providers:
       - profile
       - groups
       - email
-      userinfo_signing_algorithm: none
-    - id: gitea
-      description: Gitea
-      secret: '$argon2id$v=19$m=65536,t=3,p=4$hVcRat4GdQSCfaikh6C7xQ$KydT/DYUVnazMHhhZgYN9+LMaAI9vpX9x53PcYgsrko'
-      public: false
-      authorization_policy: two_factor
-      redirect_uris:
-      - https://git.bhasher.com/user/oauth2/Authelia/callback
-      consent_mode: implicit
-      scopes:
-      - openid
-      - profile
-      - groups
-      - email
-      userinfo_signing_algorithm: none
-    - id: seafile
-      description: Seafile
-      secret: '$argon2id$v=19$m=65536,t=3,p=4$vZ7/eiJGrPeuEWwllkN7zw$IhspEFbyQe/rBzchVs8iigsQKbYsXPfBBhR2Loo0afI'
-      public: false
-      authorization_policy: one_factor
-      redirect_uris:
-        - https://file.bhasher.com/oauth/callback/
-      consent_mode: implicit
-      scopes:
-        - openid
-        - profile
-        - email
-      userinfo_signing_algorithm: none
-    - id: wikijs
-      description: WikiJS
-      secret: '$argon2id$v=19$m=65536,t=3,p=4$aAnFAm2XL8rGMOLhMpgL1Q$ZBJ3v0d1guzLj/FVBTJz2v+ZAhy/jZc7B4iNozvx+hU'
-      public: false
-      authorization_policy: one_factor
-      redirect_uris:
-        - https://wiki.bhasher.com/login/4b20571d-a8d7-4384-a95c-589fe7fc7ab6/callback
-      consent_mode: implicit
-      scopes:
-        - openid
-        - profile
-        - email
-        - groups
-      userinfo_signing_algorithm: none
-    - id: mealie
-      description: Mealie
+      userinfo_signed_response_alg: none
+    - client_id: mealie
+      client_name: Mealie
       client_secret: '$argon2id$v=19$m=65536,t=3,p=4$H+PWfdgUPIh0DOyTF6Wjxw$3OT1G0i1BzOOmHKNc8gjuxWeCEs7SWYh1X9xd7/3SNU'
       public: false
       authorization_policy: one_factor
@@ -274,10 +221,10 @@ identity_providers:
         - profile
         - email
         - groups
-      userinfo_signing_algorithm: none
-    - id: paperless-ngx
-      description: Paperless NGX
-      secret: '$argon2id$v=19$m=65536,t=3,p=4$kujFSqxNtfP0neWECtdwoQ$bmEqT9v47rXXKEDtLWiZO10VH7yGgNPRjflM/UWwCXg'
+      userinfo_signed_response_alg: none
+    - client_id: paperless-ngx
+      client_name: Paperless NGX
+      client_secret: '$argon2id$v=19$m=65536,t=3,p=4$kujFSqxNtfP0neWECtdwoQ$bmEqT9v47rXXKEDtLWiZO10VH7yGgNPRjflM/UWwCXg'
       public: false
       authorization_policy: two_factor
       redirect_uris:
@@ -288,26 +235,10 @@ identity_providers:
         - profile
         - email
         - groups
-      userinfo_signing_algorithm: none
-    - id: immich
-      description: Immich
-      secret: '$argon2id$v=19$m=65536,t=3,p=4$vyO+G6qB9FRnIMHVq6FsYQ$U6LkvG5c/cq1lcEnlNhhqAW7+ILn0i+yZIIxls6qp0g'
-      public: false
-      authorization_policy: two_factor
-      redirect_uris:
-        - https://photos.bhasher.com/auth/login
-        - https://photos.bhasher.com/user-settings
-        - app.immich:/
-      consent_mode: implicit
-      scopes:
-        - openid
-        - profile
-        - email
-        - groups
-      userinfo_signing_algorithm: none
-    - id: openwebui
-      description: OpenWebUI
-      secret: '$argon2id$v=19$m=65536,t=3,p=4$8zijuZcGfh2m5RjqL42dLg$ZEiQJz3tRNSZlFpRQaKkxtaieCV7u57QGA3vo9Uu8jA'
+      userinfo_signed_response_alg: none
+    - client_id: openwebui
+      client_name: OpenWebUI
+      client_secret: '$argon2id$v=19$m=65536,t=3,p=4$8zijuZcGfh2m5RjqL42dLg$ZEiQJz3tRNSZlFpRQaKkxtaieCV7u57QGA3vo9Uu8jA'
       public: false
       authorization_policy: one_factor
       redirect_uris:
@@ -318,10 +249,10 @@ identity_providers:
         - profile
         - email
         - groups
-      userinfo_signing_algorithm: none
-    - id: mas
-      description: Matrix Authentication Service
-      secret: "$argon2id$v=19$m=65536,t=3,p=4$4oeGB2RcziBGMvSnVJBmAw$B/6yUd4XH6mqW3QXISNdg1F3HQwzaoA6czhWsNvNWBY"
+      userinfo_signed_response_alg: none
+    - client_id: mas
+      client_name: Matrix Authentication Service
+      client_secret: "$argon2id$v=19$m=65536,t=3,p=4$4oeGB2RcziBGMvSnVJBmAw$B/6yUd4XH6mqW3QXISNdg1F3HQwzaoA6czhWsNvNWBY"
       public: false
       redirect_uris:
         - https://mas.bhasher.com/upstream/callback/01JJZD84RP70N2Q5YSTG2H6SPV
@@ -331,9 +262,9 @@ identity_providers:
         - groups
         - profile
         - email
-      grant_types:
-        - 'refresh_token'
-        - 'authorization_code'
+        #grant_types:
+        #- 'refresh_token'
+        #- 'authorization_code'
       response_types:
         - code
 
