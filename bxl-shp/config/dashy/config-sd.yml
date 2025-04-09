@@ -96,3 +96,6 @@ sections:
           https://sites.uclouvain.be/sgsi-apps/shib-accesressources/prod/index.php
         statusCheck: false
         id: 6_1631_gestionaccsexternes
+      - title: Backup
+        url: https://backup.sisg.ucl.ac.be/admin/
+        id: 7_1631_backup
