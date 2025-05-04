@@ -1,23 +1,19 @@
-services: 
+services:
   baikal:
     container_name: baikal
     image: ckulka/baikal:nginx
     restart: unless-stopped
     environment:
-    - TZ=Europe/Paris
+      - TZ=Europe/Paris
     volumes:
-    - $DATA/baikal/config:/var/www/baikal/config
-    - $DATA/baikal/data:/var/www/baikal/Specific
+      - $DATA/baikal/config:/var/www/baikal/config
+      - $DATA/baikal/data:/var/www/baikal/Specific
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.baikal.rule=Host(`baikal.bxl.bhasher.com`)"
-    - "traefik.http.services.baikal.loadbalancer.server.port=80"
-    - "traefik.http.routers.baikal.tls=true"
-    - "traefik.http.routers.baikal.tls.certresolver=http"
-    - "traefik.http.routers.baikal.entrypoints=internalsecure,externalsecure"
+      - "traefik.enable=true"
+      - "traefik.http.routers.baikal.rule=Host(`baikal.bxl.bhasher.com`)"
+      - "traefik.http.services.baikal.loadbalancer.server.port=80"
+      - "traefik.http.routers.baikal.tls=true"
+      - "traefik.http.routers.baikal.tls.certresolver=http"
+      - "traefik.http.routers.baikal.entrypoints=internalsecure,externalsecure"
     networks:
-    - external
-
-networks:
-  external:
-    external: true
+      - external

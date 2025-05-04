@@ -46,55 +46,55 @@ authentication_backend:
 access_control:
   default_policy: deny
   rules:
-  - domain: 'radarr.bhasher.com'
-    policy: one_factor
-    subject:
-    - "group:mediaserver"
-  - domain: 'sonarr.bhasher.com'
-    policy: one_factor
-    subject:
-    - "group:mediaserver"
-  - domain: 'jellyfin.bhasher.com'
-    policy: one_factor
-    subject:
-    - "group:mediaserver"
-  - domain: 'lum.bhasher.com'
-    policy: two_factor
-    subject:
-    - "group:admin"
-  - domain: 'paperless.bhasher.com'
-    policy: two_factor
-    subject:
-    - "group:family"
-    - "group:admin"
-  - domain: 'mealie.bhasher.com'
-    policy: one_factor
-    subject:
-    - "group:member"
-    methods:
-    - "GET"
-    - "HEAD"
-    - "POST"
-    - "PUT"
-    - "DELETE"
-    - "CONNECT"
-    - "OPTIONS"
-    - "TRACE"
-  - domain: '*.bhasher.com'
-    policy: one_factor
-    subject:
-    - "group:admin"
+    - domain: "radarr.bhasher.com"
+      policy: one_factor
+      subject:
+        - "group:mediaserver"
+    - domain: "sonarr.bhasher.com"
+      policy: one_factor
+      subject:
+        - "group:mediaserver"
+    - domain: "jellyfin.bhasher.com"
+      policy: one_factor
+      subject:
+        - "group:mediaserver"
+    - domain: "lum.bhasher.com"
+      policy: two_factor
+      subject:
+        - "group:admin"
+    - domain: "paperless.bhasher.com"
+      policy: two_factor
+      subject:
+        - "group:family"
+        - "group:admin"
+    - domain: "mealie.bhasher.com"
+      policy: one_factor
+      subject:
+        - "group:member"
+      methods:
+        - "GET"
+        - "HEAD"
+        - "POST"
+        - "PUT"
+        - "DELETE"
+        - "CONNECT"
+        - "OPTIONS"
+        - "TRACE"
+    - domain: "*.bhasher.com"
+      policy: one_factor
+      subject:
+        - "group:admin"
 
 session:
-  name: 'auth_session'
-  same_site: 'lax'
-  inactivity: '1d'
-  expiration: '1w'
-  remember_me: '1M'
+  name: "auth_session"
+  same_site: "lax"
+  inactivity: "1d"
+  expiration: "1w"
+  remember_me: "1M"
   cookies:
-  - domain: 'bhasher.com'
-    authelia_url: 'https://idp.bhasher.com'
-    default_redirection_url: 'https://hub.bhasher.com'
+    - domain: "bhasher.com"
+      authelia_url: "https://idp.bhasher.com"
+      default_redirection_url: "https://hub.bhasher.com"
   redis:
     host: valkey
     port: 6379
@@ -116,7 +116,7 @@ storage:
 notifier:
   disable_startup_check: true
   smtp:
-    address: 'smtp://bhasher.com:587'
+    address: "smtp://bhasher.com:587"
     sender: no-reply@bhasher.com
 
 password_policy:
@@ -141,131 +141,142 @@ telemetry:
       write: 6s
       idle: 30s
 
-
 identity_providers:
   oidc:
     enforce_pkce: public_clients_only
     cors:
       allowed_origins_from_client_redirect_uris: true
       endpoints:
-        - 'authorization'
-        - 'token'
-        - 'revocation'
-        - 'introspection'
+        - "authorization"
+        - "token"
+        - "revocation"
+        - "introspection"
     clients:
-    - client_id: grafana
-      client_name: Grafana
-      client_secret: '$argon2id$v=19$m=65536,t=3,p=4$dQfNyInvlh1Lgw3JXi7G6A$M/WaNpHJkAyaQcXIMsOTl0+gBWGPPVBoCm7NpEQfTpI'
-      public: false
-      authorization_policy: one_factor
-      redirect_uris:
-      - https://grafana.bhasher.com/login/generic_oauth
-      consent_mode: implicit
-      scopes:
-      - openid
-      - profile
-      - groups
-      - email
-      userinfo_signed_response_alg: none
-    - client_id: matrix_synapse
-      client_name: Matrix Synapse
-      client_secret: '$argon2id$v=19$m=65536,t=3,p=4$Z+6HONrjDp54s+MhXuq1cA$bjc5tMGD3gR6AaBYIDx3S2mz/UfPv6a0n1Vf3q2Ifik'
-      public: false
-      authorization_policy: one_factor
-      redirect_uris:
-      - https://matrix.bhasher.com/_synapse/client/oidc/callback
-      consent_mode: implicit
-      scopes:
-      - openid
-      - profile
-      - email
-      userinfo_signed_response_alg: none
-    - client_id: jellyfin
-      client_name: Jellyfn
-      client_secret: '$argon2id$v=19$m=65536,t=3,p=4$+AqLF91LkfyZJIhjxq3lVQ$m0aSF/XYaWAU1NgRUlwMC3cB0k09Jg+HBBXa8iJWCLk'
-      public: false
-      authorization_policy: one_factor
-      redirect_uris:
-      - https://jellyfin.bhasher.com/sso/OID/redirect/Authelia
-      consent_mode: implicit
-      scopes:
-      - openid
-      - profile
-      - groups
-      - email
-      userinfo_signed_response_alg: none
-    - client_id: miniflux
-      client_name: Miniflux
-      client_secret: '$argon2id$v=19$m=65536,t=3,p=4$6CLrUJhwSMsOAryD/Fn0JA$1Lw6ECq0SSxDOQhbxM3nuHaXaEbXyVOgndGjAkTmkbc'
-      public: false
-      authorization_policy: one_factor
-      redirect_uris:
-      - https://miniflux.bhasher.com/oauth2/oidc/callback
-      consent_mode: implicit
-      scopes:
-      - openid
-      - profile
-      - groups
-      - email
-      userinfo_signed_response_alg: none
-    - client_id: mealie
-      client_name: Mealie
-      client_secret: '$argon2id$v=19$m=65536,t=3,p=4$H+PWfdgUPIh0DOyTF6Wjxw$3OT1G0i1BzOOmHKNc8gjuxWeCEs7SWYh1X9xd7/3SNU'
-      public: false
-      authorization_policy: one_factor
-      redirect_uris:
-        - https://recipes.bhasher.com/login
-      consent_mode: implicit
-      scopes:
-        - openid
-        - profile
-        - email
-        - groups
-      userinfo_signed_response_alg: none
-    - client_id: paperless-ngx
-      client_name: Paperless NGX
-      client_secret: '$argon2id$v=19$m=65536,t=3,p=4$kujFSqxNtfP0neWECtdwoQ$bmEqT9v47rXXKEDtLWiZO10VH7yGgNPRjflM/UWwCXg'
-      public: false
-      authorization_policy: two_factor
-      redirect_uris:
-        - https://paperless.bhasher.com/accounts/oidc/authelia/login/callback/
-      consent_mode: implicit
-      scopes:
-        - openid
-        - profile
-        - email
-        - groups
-      userinfo_signed_response_alg: none
-    - client_id: openwebui
-      client_name: OpenWebUI
-      client_secret: '$argon2id$v=19$m=65536,t=3,p=4$8zijuZcGfh2m5RjqL42dLg$ZEiQJz3tRNSZlFpRQaKkxtaieCV7u57QGA3vo9Uu8jA'
-      public: false
-      authorization_policy: one_factor
-      redirect_uris:
-        - https://ai.bhasher.com/oauth/oidc/callback
-      consent_mode: implicit
-      scopes:
-        - openid
-        - profile
-        - email
-        - groups
-      userinfo_signed_response_alg: none
-    - client_id: mas
-      client_name: Matrix Authentication Service
-      client_secret: "$argon2id$v=19$m=65536,t=3,p=4$4oeGB2RcziBGMvSnVJBmAw$B/6yUd4XH6mqW3QXISNdg1F3HQwzaoA6czhWsNvNWBY"
-      public: false
-      redirect_uris:
-        - https://mas.bhasher.com/upstream/callback/01JJZD84RP70N2Q5YSTG2H6SPV
-      consent_mode: implicit
-      scopes:
-        - openid
-        - groups
-        - profile
-        - email
-        #grant_types:
-        #- 'refresh_token'
-        #- 'authorization_code'
-      response_types:
-        - code
-
-
+      - client_id: grafana
+        client_name: Grafana
+        client_secret: "$argon2id$v=19$m=65536,t=3,p=4$dQfNyInvlh1Lgw3JXi7G6A$M/WaNpHJkAyaQcXIMsOTl0+gBWGPPVBoCm7NpEQfTpI"
+        public: false
+        authorization_policy: one_factor
+        redirect_uris:
+          - https://grafana.bhasher.com/login/generic_oauth
+        consent_mode: implicit
+        scopes:
+          - openid
+          - profile
+          - groups
+          - email
+        userinfo_signed_response_alg: none
+      - client_id: matrix_synapse
+        client_name: Matrix Synapse
+        client_secret: "$argon2id$v=19$m=65536,t=3,p=4$Z+6HONrjDp54s+MhXuq1cA$bjc5tMGD3gR6AaBYIDx3S2mz/UfPv6a0n1Vf3q2Ifik"
+        public: false
+        authorization_policy: one_factor
+        redirect_uris:
+          - https://matrix.bhasher.com/_synapse/client/oidc/callback
+        consent_mode: implicit
+        scopes:
+          - openid
+          - profile
+          - email
+        userinfo_signed_response_alg: none
+      - client_id: jellyfin
+        client_name: Jellyfn
+        client_secret: "$argon2id$v=19$m=65536,t=3,p=4$+AqLF91LkfyZJIhjxq3lVQ$m0aSF/XYaWAU1NgRUlwMC3cB0k09Jg+HBBXa8iJWCLk"
+        public: false
+        authorization_policy: one_factor
+        redirect_uris:
+          - https://jellyfin.bhasher.com/sso/OID/redirect/Authelia
+        consent_mode: implicit
+        scopes:
+          - openid
+          - profile
+          - groups
+          - email
+        userinfo_signed_response_alg: none
+      - client_id: miniflux
+        client_name: Miniflux
+        client_secret: "$argon2id$v=19$m=65536,t=3,p=4$6CLrUJhwSMsOAryD/Fn0JA$1Lw6ECq0SSxDOQhbxM3nuHaXaEbXyVOgndGjAkTmkbc"
+        public: false
+        authorization_policy: one_factor
+        redirect_uris:
+          - https://miniflux.bhasher.com/oauth2/oidc/callback
+        consent_mode: implicit
+        scopes:
+          - openid
+          - profile
+          - groups
+          - email
+        userinfo_signed_response_alg: none
+      - client_id: mealie
+        client_name: Mealie
+        client_secret: "$argon2id$v=19$m=65536,t=3,p=4$H+PWfdgUPIh0DOyTF6Wjxw$3OT1G0i1BzOOmHKNc8gjuxWeCEs7SWYh1X9xd7/3SNU"
+        public: false
+        authorization_policy: one_factor
+        redirect_uris:
+          - https://recipes.bhasher.com/login
+        consent_mode: implicit
+        scopes:
+          - openid
+          - profile
+          - email
+          - groups
+        userinfo_signed_response_alg: none
+      - client_id: paperless-ngx
+        client_name: Paperless NGX
+        client_secret: "$argon2id$v=19$m=65536,t=3,p=4$kujFSqxNtfP0neWECtdwoQ$bmEqT9v47rXXKEDtLWiZO10VH7yGgNPRjflM/UWwCXg"
+        public: false
+        authorization_policy: two_factor
+        redirect_uris:
+          - https://paperless.bhasher.com/accounts/oidc/authelia/login/callback/
+        consent_mode: implicit
+        scopes:
+          - openid
+          - profile
+          - email
+          - groups
+        userinfo_signed_response_alg: none
+      - client_id: openwebui
+        client_name: OpenWebUI
+        client_secret: "$argon2id$v=19$m=65536,t=3,p=4$8zijuZcGfh2m5RjqL42dLg$ZEiQJz3tRNSZlFpRQaKkxtaieCV7u57QGA3vo9Uu8jA"
+        public: false
+        authorization_policy: one_factor
+        redirect_uris:
+          - https://ai.bhasher.com/oauth/oidc/callback
+        consent_mode: implicit
+        scopes:
+          - openid
+          - profile
+          - email
+          - groups
+        userinfo_signed_response_alg: none
+      - client_id: mas
+        client_name: Matrix Authentication Service
+        client_secret: "$argon2id$v=19$m=65536,t=3,p=4$4oeGB2RcziBGMvSnVJBmAw$B/6yUd4XH6mqW3QXISNdg1F3HQwzaoA6czhWsNvNWBY"
+        public: false
+        redirect_uris:
+          - https://mas.bhasher.com/upstream/callback/01JJZD84RP70N2Q5YSTG2H6SPV
+        consent_mode: implicit
+        scopes:
+          - openid
+          - groups
+          - profile
+          - email
+          #grant_types:
+          #- 'refresh_token'
+          #- 'authorization_code'
+        response_types:
+          - code
+      - client_id: audiobookshelf
+        client_name: AudioBookShelf
+        client_secret: "$argon2id$v=19$m=65536,t=3,p=4$LaDUN+jpADJ5A8cH1MCeXg$bfWOAiHbxkhPsJ1+ks2kdKwi8frSuCMm3HXX+Qu7KXc"
+        public: false
+        redirect_uris:
+          - https://audio.bhasher.com/auth/openid/callback
+          - https://audio.bhasher.com/auth/openid/mobile-redirect
+        authorization_policy: one_factor
+        consent_mode: implicit
+        scopes:
+          - openid
+          - groups
+          - profile
+          - email

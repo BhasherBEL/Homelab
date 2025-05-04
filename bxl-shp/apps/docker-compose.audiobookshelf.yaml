@@ -1,0 +1,21 @@
+services:
+  audiobookshelf:
+    container_name: audiobookshelf
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    volumes:
+      - $DATA/audiobookshelf/audiobooks:/audiobooks
+      - $DATA/audiobookshelf/podcasts:/podcasts
+      - $DATA/audiobookshelf/config:/config
+      - $DATA/audiobookshelf/metadata:/metadata
+    environment:
+      - TZ=Europe/Paris
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.audiobookshelf.rule=Host(`audio.bhasher.com`)"
+      - "traefik.http.routers.audiobookshelf.entrypoints=internalsecure"
+      - "traefik.http.services.audiobookshelf.loadbalancer.server.port=80"
+      - "traefik.http.routers.audiobookshelf.tls=true"
+      - "traefik.http.routers.audiobookshelf.tls.certresolver=http"
+      - "com.centurylinklabs.watchtower.enable=true"
+    networks:
+      - external
