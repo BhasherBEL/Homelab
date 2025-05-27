@@ -4,32 +4,32 @@ services:
     container_name: vaultwarden
     restart: unless-stopped
     volumes:
-    - $DATA/vaultwarden:/data
+      - $DATA/vaultwarden:/data
     environment:
-    - TZ=Europe/Paris
-    - DATABASE_URL=${VAULT_DATABASE_URL}
-    - SIGNUPS_ALLOWED=false
-    - DOMAIN=https://vault.bhasher.com
-    - ADMIN_TOKEN=${VAULT_ADMIN}
-    - SMTP_HOST=bdubois.io
-    - SMTP_FROM=no-reply@bhasher.com
-    - SMTP_PORT=587
-    - SMTP_SECURITY=starttls
-    - SMTP_USERNAME=${SMTP_USER}
-    - SMTP_PASSWORD=${SMTP_PASSWORD}
-    - LOG_LEVEL=error
-    - EXTENDED_LOGGING=true
-    - LOG_FILE=/data/vaultwarden.log
+      - TZ=Europe/Paris
+      - DATABASE_URL=${VAULT_DATABASE_URL}
+      - SIGNUPS_ALLOWED=false
+      - DOMAIN=https://vault.bhasher.com
+      - ADMIN_TOKEN=${VAULT_ADMIN}
+      - SMTP_HOST=mail.bhasher.com
+      - SMTP_FROM=no-reply@bhasher.com
+      - SMTP_PORT=587
+      - SMTP_SECURITY=starttls
+      - SMTP_USERNAME=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - LOG_LEVEL=error
+      - EXTENDED_LOGGING=true
+      - LOG_FILE=/data/vaultwarden.log
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.vaultwarden.rule=Host(`vault.bhasher.com`)"
-    - "traefik.http.routers.vaultwarden.entrypoints=internalsecure,externalsecure"
-    - "traefik.http.services.vaultwarden.loadbalancer.server.port=80"
-    - "traefik.http.routers.vaultwarden.tls=true"
-    - "traefik.http.routers.vaultwarden.tls.certresolver=http"
+      - "traefik.enable=true"
+      - "traefik.http.routers.vaultwarden.rule=Host(`vault.bhasher.com`)"
+      - "traefik.http.routers.vaultwarden.entrypoints=internalsecure,externalsecure"
+      - "traefik.http.services.vaultwarden.loadbalancer.server.port=80"
+      - "traefik.http.routers.vaultwarden.tls=true"
+      - "traefik.http.routers.vaultwarden.tls.certresolver=http"
     networks:
-    - external
-    - storage
+      - external
+      - storage
 
 networks:
   external:

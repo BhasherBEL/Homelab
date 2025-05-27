@@ -1,5 +1,6 @@
 {
   "otpFeatures": {
-    "FaresV2": true
+    "FaresV2": true,
+    "SandboxAPIGeocoder": true
   }
 }

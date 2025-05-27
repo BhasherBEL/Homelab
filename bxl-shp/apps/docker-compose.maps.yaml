@@ -1,0 +1,24 @@
+services:
+  opentripplanner:
+    container_name: opentripplanner
+    image: docker.io/opentripplanner/opentripplanner:2.8.0_2025-05-15T14-25
+    command: --load --serve
+    restart: unless-stopped
+    volumes:
+      - $DATA/opentripplanner/graph.obj:/var/opentripplanner/graph.obj
+      - $CONFIG/otp:/var/opentripplanner
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.otp.rule=Host(`maps.bhasher.com`)"
+      - "traefik.http.routers.otp.entrypoints=internalsecure"
+      - "traefik.http.services.otp.loadbalancer.server.port=8080"
+      - "traefik.http.routers.otp.tls=true"
+      - "traefik.http.routers.otp.tls.certresolver=http"
+      #- "com.centurylinklabs.watchtower.enable=true"
+    networks:
+      - external
+
+networks:
+  external:
+    external: true
