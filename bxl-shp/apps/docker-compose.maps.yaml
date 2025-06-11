@@ -1,7 +1,7 @@
 services:
   opentripplanner:
     container_name: opentripplanner
-    image: docker.io/opentripplanner/opentripplanner:2.8.0_2025-05-15T14-25
+    image: docker.io/opentripplanner/opentripplanner:latest
     command: --load --serve
     restart: unless-stopped
     volumes:
