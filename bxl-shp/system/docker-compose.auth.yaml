@@ -4,98 +4,109 @@ services:
     image: osixia/openldap:1.5.0
     restart: unless-stopped
     environment:
-    - LDAP_ADMIN_USERNAME=admin
-    - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_PASSWORD}
-    - LDAP_READONLY_USER=true
-    - LDAP_READONLY_USER_USERNAME=readonly
-    - LDAP_READONLY_USER_PASSWORD=${LDAP_READONLY_PASSWORD}
-    - LDAP_DOMAIN=bhasher.com
-    - LDAP_ORGANISATION=Bhasher
-    - LDAP_RFC2307BIS_SCHEMA=true
-    - LDAP_TLS=false
+      - LDAP_ADMIN_USERNAME=admin
+      - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_PASSWORD}
+      - LDAP_READONLY_USER=true
+      - LDAP_READONLY_USER_USERNAME=readonly
+      - LDAP_READONLY_USER_PASSWORD=${LDAP_READONLY_PASSWORD}
+      - LDAP_DOMAIN=bhasher.com
+      - LDAP_ORGANISATION=Bhasher
+      - LDAP_RFC2307BIS_SCHEMA=true
+      - LDAP_TLS=false
     volumes:
-    - $DATA/openldap/ldap:/var/lib/ldap
-    - $DATA/openldap/slapd.d:/etc/ldap/slapd.d
+      - $DATA/openldap/ldap:/var/lib/ldap
+      - $DATA/openldap/slapd.d:/etc/ldap/slapd.d
     networks:
-    - auth
+      - auth
 
   ldapusermanager:
     container_name: ldapusermanager
     image: wheelybird/ldap-user-manager:latest
     restart: unless-stopped
     environment:
-    - LDAP_URI=ldap://openldap
-    - LDAP_BASE_DN=dc=bhasher,dc=com
-    - LDAP_ADMIN_BIND_DN=cn=admin,dc=bhasher,dc=com
-    - LDAP_ADMINS_GROUP=admin
-    - SERVER_HOSTNAME=lum.bhasher.com
-    - NO_HTTPS=true
-    - ORGANISATION_NAME=Bhasher
-    - LDAP_REQUIRE_STARTTLS=false
-    - FORCE_RFC2307BIS=true
-    - SHOW_POSIX_ATTRIBUTES=false
-    - LDAP_ADMIN_BIND_PWD=${LDAP_ADMIN_PASSWORD}
-    - LDAP_USER_OU=users
-    - LDAP_GROUP_OU=groups
-    - LDAP_ACCOUNT_ATTRIBUTE=uid
-    - LDAP_GROUP_ATTRIBUTE=cn
-    - USERNAME_FORMAT={first_name}.{last_name}
-    - ENFORCE_SAFE_SYSTEM_NAMES=false
-    - PASSWORD_HASH=SHA512CRYPT
-    - ACCEPT_WEAK_PASSWORDS=false
-    - LDAP_ACCOUNT_ADDITIONAL_ATTRIBUTES=jpegPhoto^:Profile picture,sshpubkey^+:SSH public key
-    - REMOTE_HTTP_HEADERS_LOGIN=true
+      - LDAP_URI=ldap://openldap
+      - LDAP_BASE_DN=dc=bhasher,dc=com
+      - LDAP_ADMIN_BIND_DN=cn=admin,dc=bhasher,dc=com
+      - LDAP_ADMINS_GROUP=admin
+      - SERVER_HOSTNAME=lum.bhasher.com
+      - NO_HTTPS=true
+      - ORGANISATION_NAME=Bhasher
+      - LDAP_REQUIRE_STARTTLS=false
+      - FORCE_RFC2307BIS=true
+      - SHOW_POSIX_ATTRIBUTES=false
+      - LDAP_ADMIN_BIND_PWD=${LDAP_ADMIN_PASSWORD}
+      - LDAP_USER_OU=users
+      - LDAP_GROUP_OU=groups
+      - LDAP_ACCOUNT_ATTRIBUTE=uid
+      - LDAP_GROUP_ATTRIBUTE=cn
+      - USERNAME_FORMAT={first_name}.{last_name}
+      - ENFORCE_SAFE_SYSTEM_NAMES=false
+      - PASSWORD_HASH=SHA512CRYPT
+      - ACCEPT_WEAK_PASSWORDS=false
+      - LDAP_ACCOUNT_ADDITIONAL_ATTRIBUTES=jpegPhoto^:Profile picture,sshpubkey^+:SSH public key
+      - REMOTE_HTTP_HEADERS_LOGIN=true
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.lum.rule=Host(`lum.bhasher.com`)"
-    - "traefik.http.routers.lum.entrypoints=internalsecure"
-    - "traefik.http.services.lum.loadbalancer.server.port=80"
-    - "traefik.http.routers.lum.tls=true"
-    - "traefik.http.routers.lum.tls.certresolver=http"
-    - "traefik.http.routers.lum.middlewares=authelia@docker"
+      - "traefik.enable=true"
+      - "traefik.http.routers.lum.rule=Host(`lum.bhasher.com`)"
+      - "traefik.http.routers.lum.entrypoints=internalsecure"
+      - "traefik.http.services.lum.loadbalancer.server.port=80"
+      - "traefik.http.routers.lum.tls=true"
+      - "traefik.http.routers.lum.tls.certresolver=http"
+      - "traefik.http.routers.lum.middlewares=authelia@docker"
+      - "homepage.group=Security"
+      - "homepage.name=LDAP User Manager"
+      - "homepage.icon=ldap-account-manager.svg"
+      - "homepage.href=https://lum.bhasher.com"
+      - "homepage.description=Accounts Manager"
     networks:
-    - auth
-    - external
+      - auth
+      - external
 
   authelia:
     container_name: authelia
     image: authelia/authelia:latest
     restart: unless-stopped
     depends_on:
-    - valkey
-    - openldap
-    - postgres
+      - valkey
+      - openldap
+      - postgres
     environment:
-    - TZ=Europe/Paris
-    - AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD=${LDAP_READONLY_PASSWORD}
-    #- AUTHELIA_JWT_SECRET=${AUTHELIA_JWT_SECRET}
-    #identity_validation.reset_password.jwt_secret
-    - AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET=${AUTHELIA_JWT_SECRET}
-    - AUTHELIA_SESSION_SECRET=${AUTHELIA_SESSION_SECRET}
-    - AUTHELIA_STORAGE_ENCRYPTION_KEY=${AUTHELIA_ENCRYPTION_KEY}
-    - AUTHELIA_STORAGE_POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    - AUTHELIA_NOTIFIER_SMTP_PASSWORD=${SMTP_PASSWORD}
-    - AUTHELIA_NOTIFIER_SMTP_USERNAME=${SMTP_USER}
-    - AUTHELIA_IDENTITY_PROVIDERS_OIDC_ISSUER_PRIVATE_KEY_FILE=/secrets/oidc_certificate.pem
-    - AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET=${AUTHELIA_OIDC_HMAC}
+      - TZ=Europe/Paris
+      - AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD=${LDAP_READONLY_PASSWORD}
+      #- AUTHELIA_JWT_SECRET=${AUTHELIA_JWT_SECRET}
+      #identity_validation.reset_password.jwt_secret
+      - AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET=${AUTHELIA_JWT_SECRET}
+      - AUTHELIA_SESSION_SECRET=${AUTHELIA_SESSION_SECRET}
+      - AUTHELIA_STORAGE_ENCRYPTION_KEY=${AUTHELIA_ENCRYPTION_KEY}
+      - AUTHELIA_STORAGE_POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - AUTHELIA_NOTIFIER_SMTP_PASSWORD=${SMTP_PASSWORD}
+      - AUTHELIA_NOTIFIER_SMTP_USERNAME=${SMTP_USER}
+      - AUTHELIA_IDENTITY_PROVIDERS_OIDC_ISSUER_PRIVATE_KEY_FILE=/secrets/oidc_certificate.pem
+      - AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET=${AUTHELIA_OIDC_HMAC}
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.authelia.rule=Host(`idp.bhasher.com`)"
-    - "traefik.http.routers.authelia.entrypoints=internalsecure,externalsecure"
-    - "traefik.http.services.authelia.loadbalancer.server.port=9091"
-    - "traefik.http.routers.authelia.tls=true"
-    - "traefik.http.routers.authelia.tls.certresolver=http"
-    - 'traefik.http.middlewares.authelia.forwardAuth.address=http://authelia:9091/api/verify?rd=https%3A%2F%2Fidp.bhasher.com%2F'
-    - 'traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader=true'
-    - 'traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'
+      - "traefik.enable=true"
+      - "traefik.http.routers.authelia.rule=Host(`idp.bhasher.com`)"
+      - "traefik.http.routers.authelia.entrypoints=internalsecure,externalsecure"
+      - "traefik.http.services.authelia.loadbalancer.server.port=9091"
+      - "traefik.http.routers.authelia.tls=true"
+      - "traefik.http.routers.authelia.tls.certresolver=http"
+      - "traefik.http.middlewares.authelia.forwardAuth.address=http://authelia:9091/api/verify?rd=https%3A%2F%2Fidp.bhasher.com%2F"
+      - "traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader=true"
+      - "traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email"
+      - "homepage.group=Security"
+      - "homepage.name=Authelia"
+      - "homepage.icon=authelia.svg"
+      - "homepage.href=https://idp.bhasher.com"
+      - "homepage.description=Identity Provider"
     volumes:
-    - $CONFIG/idp/authelia.configuration.yaml:/config/configuration.yml:ro
-    - $DATA/authelia/secrets:/secrets:ro
-    - $DATA/authelia/logs:/logs:rw
+      - $CONFIG/idp/authelia.configuration.yaml:/config/configuration.yml:ro
+      - $DATA/authelia/secrets:/secrets:ro
+      - $DATA/authelia/logs:/logs:rw
     networks:
-    - auth
-    - storage
-    - external
+      auth:
+      storage:
+        mac_address: "02:42:ac:1c:00:05"
+      external:
 
 networks:
   auth:

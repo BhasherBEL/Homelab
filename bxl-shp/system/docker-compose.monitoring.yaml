@@ -1,97 +1,107 @@
 services:
   prometheus:
     container_name: prometheus
-    image:  prom/prometheus:latest
+    image: prom/prometheus:latest
     restart: unless-stopped
     user: root
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.prom.rule=Host(`prometheus.bhasher.com`)"
-    - "traefik.http.routers.prom.entrypoints=internalsecure"
-    - "traefik.http.services.prom.loadbalancer.server.port=9090"
-    - "traefik.http.routers.prom.tls=true"
-    - "traefik.http.routers.prom.tls.certresolver=http"
-    - "traefik.http.routers.prom.middlewares=authelia@docker"
+      - "traefik.enable=true"
+      - "traefik.http.routers.prom.rule=Host(`prometheus.bhasher.com`)"
+      - "traefik.http.routers.prom.entrypoints=internalsecure"
+      - "traefik.http.services.prom.loadbalancer.server.port=9090"
+      - "traefik.http.routers.prom.tls=true"
+      - "traefik.http.routers.prom.tls.certresolver=http"
+      - "traefik.http.routers.prom.middlewares=authelia@docker"
+      - "homepage.group=Monitoring"
+      - "homepage.name=Prometheus"
+      - "homepage.icon=prometheys.svg"
+      - "homepage.href=https://prometheus.bhasher.com"
+      - "homepage.description=Monitoring Registry"
     extra_hosts:
-    - "host.docker.internal:host-gateway"
+      - "host.docker.internal:host-gateway"
     volumes:
-    - $CONFIG/monitoring/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
-    - $DATA/monitoring/prometheus:/prometheus
-    - /etc/localtime:/etc/localtime:ro
+      - $CONFIG/monitoring/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
+      - $DATA/monitoring/prometheus:/prometheus
+      - /etc/localtime:/etc/localtime:ro
     networks:
-    - monitoring
-    - external
+      - monitoring
+      - external
 
   grafana:
     container_name: grafana
-    image:  grafana/grafana
+    image: grafana/grafana
     restart: unless-stopped
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.grafana.rule=Host(`grafana.bhasher.com`)"
-    - "traefik.http.routers.grafana.entrypoints=internalsecure"
-    - "traefik.http.services.grafana.loadbalancer.server.port=3000"
-    - "traefik.http.routers.grafana.tls=true"
-    - "traefik.http.routers.grafana.tls.certresolver=http"
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.bhasher.com`)"
+      - "traefik.http.routers.grafana.entrypoints=internalsecure"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      - "traefik.http.routers.grafana.tls=true"
+      - "traefik.http.routers.grafana.tls.certresolver=http"
+      - "homepage.group=Monitoring"
+      - "homepage.name=Grafana"
+      - "homepage.icon=grafana.svg"
+      - "homepage.href=https://grafana.bhasher.com"
+      - "homepage.description=Monitoring Dashboard"
     environment:
-    - GF_SERVER_ROOT_URL=https://grafana.bhasher.com
-    - GF_SMTP_ENABLED=true
-    - GF_SMTP_HOST=bdubois.io:465
-    - GF_SMTP_USER=${SMTP_USER}
-    - GF_SMTP_PASSWORD=${SMTP_PASSWORD}
-    - GF_SMTP_FROM_ADDRESS=grafana@bhasher.com
-    - GF_AUTH_LOGIN_DISABLE_LOGIN_FORM=true
-    - GF_AUTH_DISABLE_SIGNOUT_MENU=true
-    - GF_AUTH_OAUTH_AUTO_LOGIN=true
-    - GF_AUTH_GENERIC_OAUTH_ENABLED=true
-    - GF_AUTH_GENERIC_OAUTH_ICON=signin
-    - GF_AUTH_GENERIC_OAUTH_NAME=Authelia
-    - GF_AUTH_GENERIC_OAUTH_CLIENT_ID=grafana
-    - GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET=${GRAFANA_OAUTH}
-    - GF_AUTH_GENERIC_OAUTH_SCOPES=openid profile email groups
-    - GF_AUTH_GENERIC_OAUTH_EMPTY_SCOPES=false
-    - GF_AUTH_GENERIC_OAUTH_AUTH_URL=https://idp.bhasher.com/api/oidc/authorization
-    - GF_AUTH_GENERIC_OAUTH_TOKEN_URL=https://idp.bhasher.com/api/oidc/token
-    - GF_AUTH_GENERIC_OAUTH_API_URL=https://idp.bhasher.com/api/oidc/userinfo
-    - GF_AUTH_GENERIC_OAUTH_LOGIN_ATTRIBUTE_PATH=preferred_username
-    - GF_AUTH_GENERIC_OAUTH_GROUPS_ATTRIBUTE_PATH=groups
-    - GF_AUTH_GENERIC_OAUTH_NAME_ATTRIBUTE_PATH=name
-    - GF_AUTH_GENERIC_OAUTH_USE_PKCE=false
-    - GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH=contains(groups[*], 'admin') && 'Admin' || 'Viewer'
-    - GF_AUTH_GENERIC_OAUTH_GROUPS_PATH=groups
-    - GF_AUTH_GENERIC_OAUTH_ALLOWED_GROUPS=admin
-    - GF_AUTH_OAUTH_ALLOW_INSECURE_EMAIL_LOOKUP=true
-    - GF_RENDERING_SERVER_URL=http://grafana-renderer:8081/render
-    - GF_RENDERING_CALLBACK_URL=http://grafana:3000/
+      - GF_SERVER_ROOT_URL=https://grafana.bhasher.com
+      - GF_SMTP_ENABLED=true
+      - GF_SMTP_HOST=bdubois.io:465
+      - GF_SMTP_USER=${SMTP_USER}
+      - GF_SMTP_PASSWORD=${SMTP_PASSWORD}
+      - GF_SMTP_FROM_ADDRESS=grafana@bhasher.com
+      - GF_AUTH_LOGIN_DISABLE_LOGIN_FORM=true
+      - GF_AUTH_DISABLE_SIGNOUT_MENU=true
+      - GF_AUTH_OAUTH_AUTO_LOGIN=true
+      - GF_AUTH_GENERIC_OAUTH_ENABLED=true
+      - GF_AUTH_GENERIC_OAUTH_ICON=signin
+      - GF_AUTH_GENERIC_OAUTH_NAME=Authelia
+      - GF_AUTH_GENERIC_OAUTH_CLIENT_ID=grafana
+      - GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET=${GRAFANA_OAUTH}
+      - GF_AUTH_GENERIC_OAUTH_SCOPES=openid profile email groups
+      - GF_AUTH_GENERIC_OAUTH_EMPTY_SCOPES=false
+      - GF_AUTH_GENERIC_OAUTH_AUTH_URL=https://idp.bhasher.com/api/oidc/authorization
+      - GF_AUTH_GENERIC_OAUTH_TOKEN_URL=https://idp.bhasher.com/api/oidc/token
+      - GF_AUTH_GENERIC_OAUTH_API_URL=https://idp.bhasher.com/api/oidc/userinfo
+      - GF_AUTH_GENERIC_OAUTH_LOGIN_ATTRIBUTE_PATH=preferred_username
+      - GF_AUTH_GENERIC_OAUTH_GROUPS_ATTRIBUTE_PATH=groups
+      - GF_AUTH_GENERIC_OAUTH_NAME_ATTRIBUTE_PATH=name
+      - GF_AUTH_GENERIC_OAUTH_USE_PKCE=false
+      - GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH=contains(groups[*], 'admin') && 'Admin' || 'Viewer'
+      - GF_AUTH_GENERIC_OAUTH_GROUPS_PATH=groups
+      - GF_AUTH_GENERIC_OAUTH_ALLOWED_GROUPS=admin
+      - GF_AUTH_OAUTH_ALLOW_INSECURE_EMAIL_LOOKUP=true
+      - GF_RENDERING_SERVER_URL=http://grafana-renderer:8081/render
+      - GF_RENDERING_CALLBACK_URL=http://grafana:3000/
     volumes:
-    - $DATA/monitoring/grafana:/var/lib/grafana
-    - /etc/localtime:/etc/localtime:ro
+      - $DATA/monitoring/grafana:/var/lib/grafana
+      - /etc/localtime:/etc/localtime:ro
     networks:
-    - external
-    - monitoring
+      - external
+      - monitoring
 
   cadvisor:
     container_name: cadvisor
     image: gcr.io/cadvisor/cadvisor:v0.47.0 #v0.47.1
     volumes:
-    - /:/rootfs:ro
-    - /var/run:/var/run:rw
-    - /sys:/sys:ro
-    - /var/lib/docker/:/var/lib/docker:ro
-    - /etc/localtime:/etc/localtime:ro
-    - /etc/machine-id:/etc/machine-id:ro
-    - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id:ro
-    - /dev/disk/:/dev/disk:ro
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/machine-id:/etc/machine-id:ro
+      - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id:ro
+      - /dev/disk/:/dev/disk:ro
     restart: always
     command:
-    - "--housekeeping_interval=60s"
-    - "--docker_only=true"
-    - "--store_container_labels=false"
-    - "--disable_metrics=percpu,sched,tcp,udp,disk,diskIO,hugetlb,referenced_memory,cpu_topology,resctrl"
+      - "--housekeeping_interval=60s"
+      - "--docker_only=true"
+      - "--store_container_labels=false"
+      - "--disable_metrics=percpu,sched,tcp,udp,disk,diskIO,hugetlb,referenced_memory,cpu_topology,resctrl"
     networks:
-    - monitoring
+      - monitoring
     devices:
-    - /dev/kmsg
+      - /dev/kmsg
     healthcheck:
       test: wget --quiet --tries=1 --spider http://localhost:8080/healthz || exit 1
       interval: 15s
@@ -103,47 +113,47 @@ services:
     container_name: node-exporter
     image: quay.io/prometheus/node-exporter:latest
     volumes:
-    - /proc:/host/proc:ro
-    - /sys:/host/sys:ro
-    - /:/rootfs:ro
-    - /:/host:ro,rslave
-    - /etc/localtime:/etc/localtime:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /:/host:ro,rslave
+      - /etc/localtime:/etc/localtime:ro
     command:
-    - '--path.rootfs=/host'
-    - '--path.procfs=/host/proc'
-    - '--path.sysfs=/host/sys'
-    - '--collector.filesystem.ignored-mount-points'
-    - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+      - "--path.rootfs=/host"
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.ignored-mount-points"
+      - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
     restart: always
     networks:
-    - monitoring
+      - monitoring
 
   mikrotik:
     container_name: mikrotik
     image: ogi4i/mikrotik-exporter:latest
     #image: nshttpd/mikrotik-exporter-linux-arm64:1.0.12-DEVEL
     command:
-    - -config-file
-    - /config.yaml
+      - -config-file
+      - /config.yaml
     restart: unless-stopped
     environment:
-    - CONFIG_FILE=/config.yaml
+      - CONFIG_FILE=/config.yaml
     volumes:
-    - $CONFIG/monitoring/mikrotik.yaml:/config.yaml:ro
-    - /etc/localtime:/etc/localtime:ro
+      - $CONFIG/monitoring/mikrotik.yaml:/config.yaml:ro
+      - /etc/localtime:/etc/localtime:ro
     networks:
-    - monitoring
+      - monitoring
     depends_on:
-    - prometheus
+      - prometheus
 
   grafana-renderer:
     container_name: grafana-renderer
     image: grafana/grafana-image-renderer:latest
     restart: unless-stopped
     networks:
-    - monitoring
+      - monitoring
     depends_on:
-    - grafana
+      - grafana
 
   grafana-reporter:
     container_name: grafana-reporter
@@ -151,32 +161,32 @@ services:
     restart: unless-stopped
     command: "-ip grafana:3000 -cmd_enable=0 -grid-layout=1"
     networks:
-    - monitoring
-    - external
+      - monitoring
+      - external
     depends_on:
-    - grafana
-    - grafana-renderer
+      - grafana
+      - grafana-renderer
 
   grafana-sendreport:
     container_name: grafana-sendreport
     image: registry.bhasher.com/send-report:latest
     restart: unless-stopped
     environment:
-    - PDF_URL=grafana-reporter:8686/api/v5/report/64nrElFmj?apitoken=${GRAFANA_TOKEN}&var-interval=5m&from=now-7d&to=now
-    - TO_EMAIL=grafana.report@bhasher.com
-    - FROM=Grafana Report <no-reply@bhasher.com>
-    - SMTP_SERVER=bdubois.io
-    - SMTP_PORT=465
-    - SMTP_USER=${SMTP_USER}
-    - SMTP_PASSWORD=${SMTP_PASSWORD}
-    - CRON_SCHEDULE=0 4 * * 0
+      - PDF_URL=grafana-reporter:8686/api/v5/report/64nrElFmj?apitoken=${GRAFANA_TOKEN}&var-interval=5m&from=now-7d&to=now
+      - TO_EMAIL=grafana.report@bhasher.com
+      - FROM=Grafana Report <no-reply@bhasher.com>
+      - SMTP_SERVER=bdubois.io
+      - SMTP_PORT=465
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - CRON_SCHEDULE=0 4 * * 0
     networks:
-    - monitoring
+      - monitoring
     volumes:
-    - /etc/localtime:/etc/localtime:ro
-    - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     depends_on:
-    - grafana-reporter
+      - grafana-reporter
 
 networks:
   monitoring:

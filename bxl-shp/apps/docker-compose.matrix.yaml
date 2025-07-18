@@ -4,10 +4,10 @@ services:
     image: matrixdotorg/synapse:v1.123.0
     restart: unless-stopped
     environment:
-    - SYNAPSE_SERVER_NAME=bhasher.com
-    - SYNAPSE_REPORT_STATS=no
+      - SYNAPSE_SERVER_NAME=bhasher.com
+      - SYNAPSE_REPORT_STATS=no
     volumes:
-    - $DATA/matrix/synapse:/data:rw
+      - $DATA/matrix/synapse:/data:rw
     healthcheck:
       test: ["CMD", "curl", "-fSs", "http://localhost:8008/health"]
       interval: 15s
@@ -15,38 +15,43 @@ services:
       retries: 3
       start_period: 5s
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.matrix-synapse.rule=Host(`matrix.bhasher.com`)"
-    - "traefik.http.routers.matrix-synapse.tls=true"
-    - "traefik.http.routers.matrix-synapse.tls.certresolver=http"
-    - "traefik.http.routers.matrix-synapse.entrypoints=internalsecure,externalsecure"
-    - "traefik.http.services.matrix-synapse.loadbalancer.server.port=8008"
+      - "traefik.enable=true"
+      - "traefik.http.routers.matrix-synapse.rule=Host(`matrix.bhasher.com`)"
+      - "traefik.http.routers.matrix-synapse.tls=true"
+      - "traefik.http.routers.matrix-synapse.tls.certresolver=http"
+      - "traefik.http.routers.matrix-synapse.entrypoints=internalsecure,externalsecure"
+      - "traefik.http.services.matrix-synapse.loadbalancer.server.port=8008"
+      - "homepage.group=Management"
+      - "homepage.name=Matrix Synapse"
+      - "homepage.icon=matrix-synapse.webp"
+      - "homepage.href=https://matrix.bhasher.com"
+      - "homepage.description=Decentralised Communication"
     networks:
-    - external
-    - matrix
+      - external
+      - matrix
 
   matrix-maubot:
     container_name: matrix-maubot
     image: dock.mau.dev/maubot/maubot:latest
     restart: unless-stopped
-    command: "sh -c \"/usr/bin/python3 -m pip install bs4 && /opt/maubot/docker/run.sh\""
+    command: 'sh -c "/usr/bin/python3 -m pip install bs4 && /opt/maubot/docker/run.sh"'
     environment:
-    - TZ=Europe/Paris
-    - PYTHONUNBUFFERED=1
+      - TZ=Europe/Paris
+      - PYTHONUNBUFFERED=1
     volumes:
-    - $DATA/matrix/maubot:/data
-    - /home/shp/homelab/builds/maubot-resotU:/plugin:ro
+      - $DATA/matrix/maubot:/data
+      - /home/shp/homelab/builds/maubot-resotU:/plugin:ro
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.matrix-maubot.rule=Host(`maubot.bhasher.com`)"
-    - "traefik.http.routers.matrix-maubot.tls=true"
-    - "traefik.http.routers.matrix-maubot.tls.certresolver=http"
-    - "traefik.http.routers.matrix-maubot.entrypoints=internalsecure"
-    - "traefik.http.services.matrix-maubot.loadbalancer.server.port=29316"
+      - "traefik.enable=true"
+      - "traefik.http.routers.matrix-maubot.rule=Host(`maubot.bhasher.com`)"
+      - "traefik.http.routers.matrix-maubot.tls=true"
+      - "traefik.http.routers.matrix-maubot.tls.certresolver=http"
+      - "traefik.http.routers.matrix-maubot.entrypoints=internalsecure"
+      - "traefik.http.services.matrix-maubot.loadbalancer.server.port=29316"
     networks:
-    - external
-    - storage
-    - matrix
+      - external
+      - storage
+      - matrix
 
   matrix-sync:
     image: ghcr.io/matrix-org/sliding-sync:latest
@@ -56,12 +61,12 @@ services:
       - postgres
       - matrix-synapse
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.matrix-sync.rule=Host(`syncv3.bhasher.com`)"
-    - "traefik.http.routers.matrix-sync.tls=true"
-    - "traefik.http.routers.matrix-sync.tls.certresolver=http"
-    - "traefik.http.routers.matrix-sync.entrypoints=internalsecure,externalsecure"
-    - "traefik.http.services.matrix-sync.loadbalancer.server.port=8009"
+      - "traefik.enable=true"
+      - "traefik.http.routers.matrix-sync.rule=Host(`syncv3.bhasher.com`)"
+      - "traefik.http.routers.matrix-sync.tls=true"
+      - "traefik.http.routers.matrix-sync.tls.certresolver=http"
+      - "traefik.http.routers.matrix-sync.entrypoints=internalsecure,externalsecure"
+      - "traefik.http.services.matrix-sync.loadbalancer.server.port=8009"
     networks:
       - external
       - storage
@@ -83,17 +88,16 @@ services:
       - postgres
       - matrix-synapse
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.matrix-mas.rule=Host(`mas.bhasher.com`)"
-    - "traefik.http.routers.matrix-mas.tls=true"
-    - "traefik.http.routers.matrix-mas.tls.certresolver=http"
-    - "traefik.http.routers.matrix-mas.entrypoints=internalsecure,externalsecure"
-    - "traefik.http.services.matrix-mas.loadbalancer.server.port=8080"
+      - "traefik.enable=true"
+      - "traefik.http.routers.matrix-mas.rule=Host(`mas.bhasher.com`)"
+      - "traefik.http.routers.matrix-mas.tls=true"
+      - "traefik.http.routers.matrix-mas.tls.certresolver=http"
+      - "traefik.http.routers.matrix-mas.entrypoints=internalsecure,externalsecure"
+      - "traefik.http.services.matrix-mas.loadbalancer.server.port=8080"
     networks:
       - external
       - storage
       - matrix
-
 
 networks:
   matrix:

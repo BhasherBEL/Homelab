@@ -1,53 +1,73 @@
 services:
+  homepage:
+    container_name: homepage
+    image: ghcr.io/gethomepage/homepage:latest
+    volumes:
+      - $CONFIG/homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homepage.rule=Host(`home.bhasher.com`)"
+      - "traefik.http.routers.homepage.entrypoints=internalsecure"
+      - "traefik.http.services.homepage.loadbalancer.server.port=3000"
+      - "traefik.http.routers.homepage.tls=true"
+      - "traefik.http.routers.homepage.tls.certresolver=http"
+      - "traefik.http.routers.homepage.middlewares=authelia@docker"
+      - "com.centurylinklabs.watchtower.enable=true"
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: gethomepage.dev,home.bhasher.com
+    networks:
+      - external
+
   dashy:
     container_name: dashy
     image: dashy
     environment:
-    - NODE_ENV=production
+      - NODE_ENV=production
     restart: unless-stopped
     volumes:
-    - $CONFIG/dashy/config.yml:/app/public/conf.yml
+      - $CONFIG/dashy/config.yml:/app/public/conf.yml
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.dashy.rule=Host(`hub.bhasher.com`)"
-    - "traefik.http.routers.dashy.entrypoints=internalsecure"
-    - "traefik.http.services.dashy.loadbalancer.server.port=80"
-    - "traefik.http.routers.dashy.tls=true"
-    - "traefik.http.routers.dashy.tls.certresolver=http"
-    - "traefik.http.routers.dashy.middlewares=authelia@docker"
-    - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashy.rule=Host(`hub.bhasher.com`)"
+      - "traefik.http.routers.dashy.entrypoints=internalsecure"
+      - "traefik.http.services.dashy.loadbalancer.server.port=80"
+      - "traefik.http.routers.dashy.tls=true"
+      - "traefik.http.routers.dashy.tls.certresolver=http"
+      - "traefik.http.routers.dashy.middlewares=authelia@docker"
+      - "com.centurylinklabs.watchtower.enable=true"
     healthcheck:
-      test: ['CMD', 'node', '/app/services/healthcheck']
+      test: ["CMD", "node", "/app/services/healthcheck"]
       interval: 1m30s
       timeout: 10s
       retries: 3
     networks:
-    - external
+      - external
 
   dashy-SD:
     container_name: dashy-SD
     image: dashy
     environment:
-    - NODE_ENV=production
+      - NODE_ENV=production
     restart: unless-stopped
     volumes:
-    - $CONFIG/dashy/config-sd.yml:/app/public/conf.yml
+      - $CONFIG/dashy/config-sd.yml:/app/public/conf.yml
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.dashy-sd.rule=Host(`hub-sd.bhasher.com`)"
-    - "traefik.http.routers.dashy-sd.entrypoints=internalsecure,externalsecure"
-    - "traefik.http.services.dashy-sd.loadbalancer.server.port=80"
-    - "traefik.http.routers.dashy-sd.tls=true"
-    - "traefik.http.routers.dashy-sd.tls.certresolver=http"
-    - "traefik.http.routers.dashy-sd.middlewares=authelia@docker"
-    - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashy-sd.rule=Host(`hub-sd.bhasher.com`)"
+      - "traefik.http.routers.dashy-sd.entrypoints=internalsecure,externalsecure"
+      - "traefik.http.services.dashy-sd.loadbalancer.server.port=80"
+      - "traefik.http.routers.dashy-sd.tls=true"
+      - "traefik.http.routers.dashy-sd.tls.certresolver=http"
+      - "traefik.http.routers.dashy-sd.middlewares=authelia@docker"
+      - "com.centurylinklabs.watchtower.enable=true"
     healthcheck:
-      test: ['CMD', 'node', '/app/services/healthcheck']
+      test: ["CMD", "node", "/app/services/healthcheck"]
       interval: 1m30s
       timeout: 10s
       retries: 3
     networks:
-    - external
+      - external
 
 networks:
   external:

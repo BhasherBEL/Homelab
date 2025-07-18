@@ -1,0 +1,21 @@
+---
+title: Bhasher's Homepage
+
+maxGroupColumns: 5
+
+layout:
+  Main Apps:
+    style: row
+    columns: 4
+  Media:
+    style: row
+    columns: 4
+  Apps:
+  Media Server:
+  Management:
+  Security:
+  Monitoring:
+  Calendar:
+    style: row
+    columns: 2
+    header: false

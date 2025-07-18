@@ -17,5 +17,10 @@ services:
       - "traefik.http.routers.audiobookshelf.tls=true"
       - "traefik.http.routers.audiobookshelf.tls.certresolver=http"
       - "com.centurylinklabs.watchtower.enable=true"
+      - "homepage.group=Apps"
+      - "homepage.name=AudioBookShelf"
+      - "homepage.icon=audiobookshelf.webp"
+      - "homepage.href=https://audio.bhasher.com"
+      - "homepage.description=Audio Book Manager"
     networks:
       - external

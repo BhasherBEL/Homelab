@@ -3,22 +3,27 @@ services:
     container_name: owntracks_recorder
     image: owntracks/recorder
     environment:
-    - OTR_PORT=0
-    - OTR_HTTPHOST=0.0.0.0
+      - OTR_PORT=0
+      - OTR_HTTPHOST=0.0.0.0
     volumes:
-    - $DATA/owntracks/store:/store
+      - $DATA/owntracks/store:/store
     restart: unless-stopped
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.owntracks-recorder.rule=Host(`owntracks.bhasher.com`)"
-    - "traefik.http.routers.owntracks-recorder.entrypoints=internalsecure"
-    - "traefik.http.services.owntracks-recorder.loadbalancer.server.port=8083"
-    - "traefik.http.routers.owntracks-recorder.tls=true"
-    - "traefik.http.routers.owntracks-recorder.tls.certresolver=http"
-    #- "traefik.http.routers.owntracks-recorder.middlewares=authelia@docker"
-    - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.owntracks-recorder.rule=Host(`owntracks.bhasher.com`)"
+      - "traefik.http.routers.owntracks-recorder.entrypoints=internalsecure"
+      - "traefik.http.services.owntracks-recorder.loadbalancer.server.port=8083"
+      - "traefik.http.routers.owntracks-recorder.tls=true"
+      - "traefik.http.routers.owntracks-recorder.tls.certresolver=http"
+      #- "traefik.http.routers.owntracks-recorder.middlewares=authelia@docker"
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "homepage.group=Apps"
+      - "homepage.name=OwnTracks"
+      - "homepage.icon=https://owntracks.bhasher.com/static/favicon.svg"
+      - "homepage.href=https://owntracks.bhasher.com"
+      - "homepage.description=Location Sharing"
     networks:
-    - external
+      - external
 
 networks:
   external:

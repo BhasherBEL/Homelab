@@ -15,5 +15,10 @@ services:
       - "traefik.http.routers.baikal.tls=true"
       - "traefik.http.routers.baikal.tls.certresolver=http"
       - "traefik.http.routers.baikal.entrypoints=internalsecure,externalsecure"
+      - "homepage.group=Management"
+      - "homepage.name=Baikal"
+      - "homepage.icon=baikal.webp"
+      - "homepage.href=https://baikal.bxl.bhasher.com"
+      - "homepage.description=Calendar and Contact Manager"
     networks:
       - external

@@ -16,6 +16,11 @@ services:
       - "traefik.http.routers.otp.tls=true"
       - "traefik.http.routers.otp.tls.certresolver=http"
       #- "com.centurylinklabs.watchtower.enable=true"
+      - "homepage.group=Management"
+      - "homepage.name=OpenTripPlanner"
+      - "homepage.icon=openstreetmap.webp"
+      - "homepage.href=https://maps.bhasher.com"
+      - "homepage.description=Routing Server"
     networks:
       - external
 

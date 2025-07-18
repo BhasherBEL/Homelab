@@ -3,83 +3,63 @@ services:
     container_name: traefik
     image: traefik:v2.9
     command:
-    - "--api.insecure=true"
-    - "--providers.docker=true"
-    - "--providers.docker.exposedbydefault=false"
-    - "--providers.docker.network=external"
-    - "--entrypoints.internal.address=:80"
-    - "--entrypoints.internalsecure.address=:443"
-    - "--entrypoints.internal.http.redirections.entryPoint.to=internalsecure"
-    - "--entrypoints.internal.http.redirections.entryPoint.scheme=https"
-    - "--entrypoints.internal.http.redirections.entryPoint.permanent=true"
-    - "--certificatesresolvers.http.acme.httpchallenge=true"
-    - "--certificatesresolvers.http.acme.httpchallenge.entrypoint=external"
-    - "--certificatesresolvers.http.acme.email=acme@bhasher.com"
-    - "--certificatesresolvers.http.acme.storage=acme.json"
-    - "--entrypoints.external.address=:81"
-    - "--entrypoints.externalsecure.address=:444"
-    - "--entrypoints.external.http.redirections.entryPoint.to=externalsecure"
-    - "--entrypoints.external.http.redirections.entryPoint.scheme=https"
-    - "--entrypoints.external.http.redirections.entryPoint.permanent=true"
-    #- "--log.level=DEBUG"
-    - "--metrics.prometheus=true"
-    - "--api.dashboard=true"
-    - "--providers.file.filename=/etc/traefik/dynamic-config.yaml"
-    - "--experimental.plugins.sablier.modulename=github.com/acouvreur/sablier"
-    - "--experimental.plugins.sablier.version=v1.5.0"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=external"
+      - "--entrypoints.internal.address=:80"
+      - "--entrypoints.internalsecure.address=:443"
+      - "--entrypoints.internal.http.redirections.entryPoint.to=internalsecure"
+      - "--entrypoints.internal.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.internal.http.redirections.entryPoint.permanent=true"
+      - "--certificatesresolvers.http.acme.httpchallenge=true"
+      - "--certificatesresolvers.http.acme.httpchallenge.entrypoint=external"
+      - "--certificatesresolvers.http.acme.email=acme@bhasher.com"
+      - "--certificatesresolvers.http.acme.storage=acme.json"
+      - "--entrypoints.external.address=:81"
+      - "--entrypoints.externalsecure.address=:444"
+      - "--entrypoints.external.http.redirections.entryPoint.to=externalsecure"
+      - "--entrypoints.external.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.external.http.redirections.entryPoint.permanent=true"
+      #- "--log.level=DEBUG"
+      - "--metrics.prometheus=true"
+      - "--api.dashboard=true"
+      - "--providers.file.filename=/etc/traefik/dynamic-config.yaml"
+      - "--experimental.plugins.sablier.modulename=github.com/acouvreur/sablier"
+      - "--experimental.plugins.sablier.version=v1.5.0"
     environment:
-    - TZ=Europe/Paris
+      - TZ=Europe/Paris
     ports:
-    - "80:80"
-    - "443:443"
-    - "81:81"
-    - "444:444"
+      - "80:80"
+      - "443:443"
+      - "81:81"
+      - "444:444"
     #- "8080:8080"
     volumes:
-    - /var/run/docker.sock:/var/run/docker.sock:ro
-    - type: bind
-      source: $DATA/traefik/acme.json
-      target: /acme.json
-    - type: bind
-      source: $CONFIG/traefik/traefik.yaml
-      target: /etc/traefik/dynamic-config.yaml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - type: bind
+        source: $DATA/traefik/acme.json
+        target: /acme.json
+      - type: bind
+        source: $CONFIG/traefik/traefik.yaml
+        target: /etc/traefik/dynamic-config.yaml
     restart: always
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.traefik.rule=Host(`traefik.bhasher.com`)"
-    - "traefik.http.services.traefik.loadbalancer.server.port=8080"
-    - "traefik.http.routers.traefik.tls=true"
-    - "traefik.http.routers.traefik.tls.certresolver=http"
-    - "traefik.http.routers.traefik.entrypoints=internalsecure"
-    - "traefik.http.routers.traefik.middlewares=authelia@docker"
-    - "traefik.http.middlewares.httpsupgrade.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.bhasher.com`)"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.routers.traefik.tls.certresolver=http"
+      - "traefik.http.routers.traefik.entrypoints=internalsecure"
+      - "traefik.http.routers.traefik.middlewares=authelia@docker"
+      - "traefik.http.middlewares.httpsupgrade.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "homepage.group=Security"
+      - "homepage.name=Traefik"
+      - "homepage.icon=traefik.svg"
+      - "homepage.href=https://traefik.bhasher.com"
+      - "homepage.description=Reverse Proxy"
     networks:
-    - external
-
-  sablier:
-    container_name: sablier
-    image: acouvreur/sablier:latest
-    command:
-    - start
-    - --provider.name=docker
-    volumes:
-    - '/var/run/docker.sock:/var/run/docker.sock'
-    labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.sablier.rule=Host(`sablier.bhasher.com`)"
-    - "traefik.http.services.sablier.loadbalancer.server.port=80"
-    - "traefik.http.routers.sablier.tls=true"
-    - "traefik.http.routers.sablier.tls.certresolver=http"
-    - "traefik.http.routers.sablier.entrypoints=internalsecure"
-    - "traefik.http.middlewares.sablier1h.plugin.sablier.group=default"
-    - "traefik.http.middlewares.sablier1h.plugin.sablier.dynamic.displayName=My Title"
-    - "traefik.http.middlewares.sablier1h.plugin.sablier.dynamic.refreshFrequency=5s"
-    - "traefik.http.middlewares.sablier1h.plugin.sablier.dynamic.showDetails=true"
-    - "traefik.http.middlewares.sablier1h.plugin.sablier.dynamic.theme=hacker-terminal"
-    - "traefik.http.middlewares.sablier1h.plugin.sablier.sablierUrl=http://sablier:10000"
-    - "traefik.http.middlewares.sablier1h.plugin.sablier.sessionDuration=1m"
-    networks:
-    - external
+      - external
 
 networks:
   external:

@@ -27,6 +27,11 @@ services:
       - "traefik.http.routers.dmarc.tls=true"
       - "traefik.http.routers.dmarc.tls.certresolver=http"
       - "com.centurylinklabs.watchtower.enable=true"
+      - "homepage.group=Management"
+      - "homepage.name=DMARC Reports"
+      - "homepage.icon=poste.webp"
+      - "homepage.href=https://dmarc.bhasher.com"
+      - "homepage.description=DMARC Reports Analyzer"
     depends_on:
       - postgres
     networks:

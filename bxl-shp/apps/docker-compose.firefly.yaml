@@ -39,6 +39,15 @@ services:
       - "traefik.http.routers.firefly-api.tls=true"
       - "traefik.http.routers.firefly-api.tls.certresolver=http"
       - "com.centurylinklabs.watchtower.enable=true"
+      - "homepage.group=Main Apps"
+      - "homepage.name=Firefly III"
+      - "homepage.icon=firefly-iii.webp"
+      - "homepage.href=https://firefly.bhasher.com"
+      - "homepage.description=Finance Manager"
+      - "homepage.widget.type=firefly"
+      - "homepage.widget.url=http://firefly:8080"
+      - "homepage.widget.key=${FIREFLY_TOKEN}"
+      - 'homepage.widget.fields=["networth" ,"budget"]'
     depends_on:
       - postgres
     networks:

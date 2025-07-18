@@ -3,40 +3,45 @@ services:
     container_name: hass
     image: ghcr.io/home-assistant/home-assistant:stable
     volumes:
-    - $DATA/hass:/config
-    - /etc/localtime:/etc/localtime:ro
+      - $DATA/hass:/config
+      - /etc/localtime:/etc/localtime:ro
     networks:
-    - smarthome
-    - external
+      - smarthome
+      - external
     restart: unless-stopped
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.hass.rule=Host(`hass.bhasher.com`)"
-    - "traefik.http.routers.hass.entrypoints=internalsecure"
-    - "traefik.http.services.hass.loadbalancer.server.port=8123"
-    - "traefik.http.routers.hass.tls=true"
-    - "traefik.http.routers.hass.tls.certresolver=http"
-    - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.hass.rule=Host(`hass.bhasher.com`)"
+      - "traefik.http.routers.hass.entrypoints=internalsecure"
+      - "traefik.http.services.hass.loadbalancer.server.port=8123"
+      - "traefik.http.routers.hass.tls=true"
+      - "traefik.http.routers.hass.tls.certresolver=http"
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "homepage.group=Apps"
+      - "homepage.name=Home Assistant"
+      - "homepage.icon=home-assistant.svg"
+      - "homepage.href=https://hass.bhasher.com"
+      - "homepage.description=Home Automation"
     depends_on:
-    - authelia
-    - traefik
+      - authelia
+      - traefik
 
   mosquitto:
     container_name: mosquitto
     image: eclipse-mosquitto:latest
     volumes:
-    - $CONFIG/smarthome/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
-    - $DATA/mosquitto/data:/mosquitto/data
-    - $DATA/mosquitto/passwordfile:/mosquitto/passwordfile
-    - /etc/localtime:/etc/localtime:ro
+      - $CONFIG/smarthome/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - $DATA/mosquitto/data:/mosquitto/data
+      - $DATA/mosquitto/passwordfile:/mosquitto/passwordfile
+      - /etc/localtime:/etc/localtime:ro
     ports:
-    - 1883:1883
-    - 9001:9001
+      - 1883:1883
+      - 9001:9001
     labels:
-    - "com.centurylinklabs.watchtower.enable=true"
+      - "com.centurylinklabs.watchtower.enable=true"
     networks:
-    - smarthome
-    - external
+      - smarthome
+      - external
     restart: unless-stopped
 
   zigbee2mqtt:
@@ -44,43 +49,41 @@ services:
     restart: unless-stopped
     image: koenkk/zigbee2mqtt:latest
     volumes:
-    - $DATA/zigbee2mqtt:/app/data
-    - /run/udev:/run/udev:ro
-    - /etc/localtime:/etc/localtime:ro
+      - $DATA/zigbee2mqtt:/app/data
+      - /run/udev:/run/udev:ro
+      - /etc/localtime:/etc/localtime:ro
     devices:
-    - /dev/ttyACM0:/dev/ttyACM0
+      - /dev/ttyACM0:/dev/ttyACM0
     labels:
-    - "com.centurylinklabs.watchtower.enable=true"
+      - "com.centurylinklabs.watchtower.enable=true"
     networks:
-    - smarthome
+      - smarthome
     depends_on:
-    - mosquitto
+      - mosquitto
 
   nodered:
     container_name: nodered
     restart: on-failure:5
     image: nodered/node-red:latest
     volumes:
-    - $DATA/nodered:/data
-    - /etc/localtime:/etc/localtime:ro
+      - $DATA/nodered:/data
+      - /etc/localtime:/etc/localtime:ro
     networks:
-    - smarthome
-    - external
+      - smarthome
+      - external
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.nodered.rule=Host(`nodered.bhasher.com`)"
-    - "traefik.http.routers.nodered.entrypoints=internalsecure"
-    - "traefik.http.services.nodered.loadbalancer.server.port=1880"
-    - "traefik.http.routers.nodered.tls=true"
-    - "traefik.http.routers.nodered.tls.certresolver=http"
-    - "traefik.http.routers.nodered.middlewares=authelia@docker"
-    - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.nodered.rule=Host(`nodered.bhasher.com`)"
+      - "traefik.http.routers.nodered.entrypoints=internalsecure"
+      - "traefik.http.services.nodered.loadbalancer.server.port=1880"
+      - "traefik.http.routers.nodered.tls=true"
+      - "traefik.http.routers.nodered.tls.certresolver=http"
+      - "traefik.http.routers.nodered.middlewares=authelia@docker"
+      - "com.centurylinklabs.watchtower.enable=true"
     depends_on:
-    - hass
-
+      - hass
 
 networks:
   smarthome:
   external:
     external: true
-

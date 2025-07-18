@@ -1,0 +1,33 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/info-widgets/
+
+- resources:
+    cpu: true
+    memory: true
+    disk:
+      - /
+    uptime: true
+
+- search:
+    provider: custom
+    url: https://kagi.com/search?q=
+    sugesstionUrl: https://kagi.com/api/autosuggest?q=
+    showSearchSuggestions: true
+    target: _self
+
+- openmeteo:
+    label: Brussels
+    latitude: 50.846523
+    longitude: 4.351763
+    timezone: Europe/Paris
+    units: metric
+    cache: 5
+
+- datetime:
+    text_size: xl
+    locale: gb
+    format:
+      dateStyle: full
+      timeStyle: short
+      hourCycle: h23

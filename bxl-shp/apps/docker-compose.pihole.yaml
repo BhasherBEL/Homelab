@@ -1,35 +1,40 @@
-services: 
+services:
   pihole:
     container_name: pihole
     image: cbcrowe/pihole-unbound:latest
     ports:
-    - 53:53/tcp
-    - 53:53/udp
+      - 53:53/tcp
+      - 53:53/udp
     environment:
-    - TZ=Europe/Paris
-    - WEBPASSWORD=
-    - WEBTHEME=default-dark
-    - REV_SERVER=false
-    - PIHOLE_DNS_=127.0.0.1#5335
-    - DNSSEC=true
-    - DNSMASQ_LISTENING=all
-    - FTLCONF_LOCAL_IPV4=192.168.1.221
-    - FTLCONF_RATE_LIMIT=0/0
-    - FTL_CMD=debug
-    - DNSMASQ_USER=root
+      - TZ=Europe/Paris
+      - WEBPASSWORD=
+      - WEBTHEME=default-dark
+      - REV_SERVER=false
+      - PIHOLE_DNS_=127.0.0.1#5335
+      - DNSSEC=true
+      - DNSMASQ_LISTENING=all
+      - FTLCONF_LOCAL_IPV4=192.168.1.221
+      - FTLCONF_RATE_LIMIT=0/0
+      - FTL_CMD=debug
+      - DNSMASQ_USER=root
     volumes:
-    - $DATA/pihole/config:/etc/pihole
-    - $DATA/pihole/dnsmasq.d:/etc/dnsmasq.d    
-    restart: unless-stopped 
+      - $DATA/pihole/config:/etc/pihole
+      - $DATA/pihole/dnsmasq.d:/etc/dnsmasq.d
+    restart: unless-stopped
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.pihole.rule=Host(`pihole.bhasher.com`)"
-    - "traefik.http.routers.pihole.entrypoints=internalsecure"
-    - "traefik.http.services.pihole.loadbalancer.server.port=80"
-    - "traefik.http.routers.pihole.tls=true"
-    - "traefik.http.routers.pihole.tls.certresolver=http"
-    - "traefik.http.routers.pihole.middlewares=pihole-strip,authelia@docker"
-    - "traefik.http.middlewares.pihole-strip.addprefix.prefix=/admin"
+      - "traefik.enable=true"
+      - "traefik.http.routers.pihole.rule=Host(`pihole.bhasher.com`)"
+      - "traefik.http.routers.pihole.entrypoints=internalsecure"
+      - "traefik.http.services.pihole.loadbalancer.server.port=80"
+      - "traefik.http.routers.pihole.tls=true"
+      - "traefik.http.routers.pihole.tls.certresolver=http"
+      - "traefik.http.routers.pihole.middlewares=pihole-strip,authelia@docker"
+      - "traefik.http.middlewares.pihole-strip.addprefix.prefix=/admin"
+      - "homepage.group=Management"
+      - "homepage.name=Pi Hole"
+      - "homepage.icon=pi-hole.svg"
+      - "homepage.href=https://pihole.bhasher.com"
+      - "homepage.description=DNS Server"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/admin/"]
       interval: 1m30s
@@ -37,7 +42,7 @@ services:
       retries: 3
       start_period: 1m
     networks:
-    - external
+      - external
 
 networks:
   external:

@@ -4,48 +4,57 @@ services:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
     depends_on:
-    - traefik
-    - postgres
-    - valkey
+      - traefik
+      - postgres
+      - valkey
     volumes:
-    - /mnt/sync/paperless/data:/usr/src/paperless/data
-    - /mnt/sync/paperless/media:/usr/src/paperless/media
-    - /mnt/sync/paperless/export:/usr/src/paperless/export
-    - /mnt/sync/paperless/consume:/usr/src/paperless/consume
+      - /mnt/sync/paperless/data:/usr/src/paperless/data
+      - /mnt/sync/paperless/media:/usr/src/paperless/media
+      - /mnt/sync/paperless/export:/usr/src/paperless/export
+      - /mnt/sync/paperless/consume:/usr/src/paperless/consume
     environment:
-    - PAPERLESS_REDIS=redis://valkey:6379
-    - PAPERLESS_DBENGINE=postgresql
-    - PAPERLESS_DBHOST=postgres
-    - PAPERLESS_DBPORT=5432
-    - PAPERLESS_DBNAME=paperless
-    - PAPERLESS_DBUSER=postgres
-    - PAPERLESS_DBPASS=${POSTGRES_PASSWORD}
-    - PAPERLESS_URL=https://paperless.bhasher.com
-    - PAPERLESS_SECRET_KEY=${PAPERLESS_SECRET_KEY}
-    - PAPERLESS_TIME_ZONE=Europe/Paris
-    - PAPERLESS_OCR_LANGUAGE=fra
-    - PAPERLESS_USE_X_FORWARD_HOST=true
-    - PAPERLESS_USE_X_FORWARD_PORT=true
-    - PAPERLESS_PROXY_SSL_HEADER=["HTTP_X_FORWARDED_PROTO", "https"]
-    - PAPERLESS_TASK_WORKERS=4
-    - PAPERLESS_SOCIALACCOUNT_PROVIDERS=${PAPERLESS_PROVIDERS}
-    - PAPERLESS_APPS=allauth.socialaccount.providers.openid_connect
-    - PAPERLESS_DISABLE_REGULAR_LOGIN=true
+      - PAPERLESS_REDIS=redis://valkey:6379
+      - PAPERLESS_DBENGINE=postgresql
+      - PAPERLESS_DBHOST=postgres
+      - PAPERLESS_DBPORT=5432
+      - PAPERLESS_DBNAME=paperless
+      - PAPERLESS_DBUSER=postgres
+      - PAPERLESS_DBPASS=${POSTGRES_PASSWORD}
+      - PAPERLESS_URL=https://paperless.bhasher.com
+      - PAPERLESS_SECRET_KEY=${PAPERLESS_SECRET_KEY}
+      - PAPERLESS_TIME_ZONE=Europe/Paris
+      - PAPERLESS_OCR_LANGUAGE=fra
+      - PAPERLESS_USE_X_FORWARD_HOST=true
+      - PAPERLESS_USE_X_FORWARD_PORT=true
+      - PAPERLESS_PROXY_SSL_HEADER=["HTTP_X_FORWARDED_PROTO", "https"]
+      - PAPERLESS_TASK_WORKERS=4
+      - PAPERLESS_SOCIALACCOUNT_PROVIDERS=${PAPERLESS_PROVIDERS}
+      - PAPERLESS_APPS=allauth.socialaccount.providers.openid_connect
+      - PAPERLESS_DISABLE_REGULAR_LOGIN=true
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.paperless.rule=Host(`paperless.bhasher.com`)"
-    - "traefik.http.routers.paperless.service=paperless-service"
-    - "traefik.http.routers.paperless.entrypoints=internalsecure"
-    - "traefik.http.services.paperless-service.loadbalancer.server.port=8000"
-    - "traefik.http.routers.paperless.tls=true"
-    - "traefik.http.routers.paperless.tls.certresolver=http"
-    - "traefik.http.routers.paperlessshare.rule=Host(`paperless.bhasher.com`) && (PathPrefix(`/share/`))"
-    - "traefik.http.routers.paperlessshare.service=paperlessshare-service"
-    - "traefik.http.routers.paperlessshare.entrypoints=externalsecure"
-    - "traefik.http.services.paperlessshare-service.loadbalancer.server.port=8000"
-    - "traefik.http.routers.paperlessshare.tls=true"
-    - "traefik.http.routers.paperlessshare.tls.certresolver=http"
+      - "traefik.enable=true"
+      - "traefik.http.routers.paperless.rule=Host(`paperless.bhasher.com`)"
+      - "traefik.http.routers.paperless.service=paperless-service"
+      - "traefik.http.routers.paperless.entrypoints=internalsecure"
+      - "traefik.http.services.paperless-service.loadbalancer.server.port=8000"
+      - "traefik.http.routers.paperless.tls=true"
+      - "traefik.http.routers.paperless.tls.certresolver=http"
+      - "traefik.http.routers.paperlessshare.rule=Host(`paperless.bhasher.com`) && (PathPrefix(`/share/`))"
+      - "traefik.http.routers.paperlessshare.service=paperlessshare-service"
+      - "traefik.http.routers.paperlessshare.entrypoints=externalsecure"
+      - "traefik.http.services.paperlessshare-service.loadbalancer.server.port=8000"
+      - "traefik.http.routers.paperlessshare.tls=true"
+      - "traefik.http.routers.paperlessshare.tls.certresolver=http"
+      - "homepage.group=Main Apps"
+      - "homepage.name=Paperless-Ngx"
+      - "homepage.icon=paperless.svg"
+      - "homepage.href=https://paperless.bhasher.com"
+      - "homepage.description=Document Organizer"
+      - "homepage.widget.type=paperlessngx"
+      - "homepage.widget.key=${PAPERLESS_API_KEY}"
+      - "homepage.widget.url=http://paperless:8000"
+      - 'homepage.widget.fields=["inbox","total"]'
     networks:
-    #- auth
-    - storage
-    - external
+      #- auth
+      - storage
+      - external

@@ -4,39 +4,44 @@ services:
     image: hkotel/mealie:latest
     restart: always
     environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Europe/Paris
-    - MAX_WORKERS=1
-    - WEB_CONCURRENCY=1
-    - BASE_URL=https://recipes.bhasher.com
-    - OIDC_AUTH_ENABLED=true
-    - OIDC_SIGNUP_ENABLE=true
-    - OIDC_REMEMBER_ME=true
-    - OIDC_AUTO_REDIRECT=false
-    - OIDC_CONFIGURATION_URL=https://idp.bhasher.com/.well-known/openid-configuration
-    - OIDC_CLIENT_ID=mealie
-    - OIDC_CLIENT_SECRET=${MEALIE_OIDC_SECRET}
-    - OIDC_PROVIDER_NAME=Authelia
-    - OIDC_USER_GROUP=everybody
-    - OIDC_ADMIN_GROUP=admin
-    - OPENAI_BASE_URL=https://api.mistral.ai/v1
-    - OPENAI_API_KEY=${MISTRAL_API_KEY}
-    - OPENAI_MODEL=mistral-large-latest
-    - OPENAI_WORKERS=2
-    - OPENAI_SEND_DATABASE_DATA=true
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      - MAX_WORKERS=1
+      - WEB_CONCURRENCY=1
+      - BASE_URL=https://recipes.bhasher.com
+      - OIDC_AUTH_ENABLED=true
+      - OIDC_SIGNUP_ENABLE=true
+      - OIDC_REMEMBER_ME=true
+      - OIDC_AUTO_REDIRECT=false
+      - OIDC_CONFIGURATION_URL=https://idp.bhasher.com/.well-known/openid-configuration
+      - OIDC_CLIENT_ID=mealie
+      - OIDC_CLIENT_SECRET=${MEALIE_OIDC_SECRET}
+      - OIDC_PROVIDER_NAME=Authelia
+      - OIDC_USER_GROUP=everybody
+      - OIDC_ADMIN_GROUP=admin
+      - OPENAI_BASE_URL=https://api.mistral.ai/v1
+      - OPENAI_API_KEY=${MISTRAL_API_KEY}
+      - OPENAI_MODEL=mistral-large-latest
+      - OPENAI_WORKERS=2
+      - OPENAI_SEND_DATABASE_DATA=true
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.mealie.rule=Host(`recipes.bhasher.com`)"
-    - "traefik.http.services.mealie.loadbalancer.server.port=9000"
-    - "traefik.http.routers.mealie.tls=true"
-    - "traefik.http.routers.mealie.tls.certresolver=http"
-    - "traefik.http.routers.mealie.entrypoints=internalsecure,externalsecure"
-    - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.mealie.rule=Host(`recipes.bhasher.com`)"
+      - "traefik.http.services.mealie.loadbalancer.server.port=9000"
+      - "traefik.http.routers.mealie.tls=true"
+      - "traefik.http.routers.mealie.tls.certresolver=http"
+      - "traefik.http.routers.mealie.entrypoints=internalsecure,externalsecure"
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "homepage.group=Apps"
+      - "homepage.name=Mealie"
+      - "homepage.icon=mealie.webp"
+      - "homepage.href=https://recipes.bhasher.com"
+      - "homepage.description=Recipe Manager"
     volumes:
-    - $DATA/mealie/v2:/app/data
+      - $DATA/mealie/v2:/app/data
     networks:
-    - external
+      - external
 
 networks:
   external:

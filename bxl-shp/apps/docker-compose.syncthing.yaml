@@ -1,32 +1,37 @@
-services: 
+services:
   syncthing:
     container_name: syncthing
     image: syncthing/syncthing:latest
     hostname: snode0
     environment:
-    - PUID=33
-    - PGID=33
+      - PUID=33
+      - PGID=33
     volumes:
-    - $DATA/syncthing:/var/syncthing:rw
-    - /mnt/syncDocuments:/mnt/SyncDocuments:rw
-    - /mnt/sync/photostructure/library:/mnt/photostructure:rw
-    - /mnt/photos:/mnt/photos:rw
+      - $DATA/syncthing:/var/syncthing:rw
+      - /mnt/syncDocuments:/mnt/SyncDocuments:rw
+      - /mnt/sync/photostructure/library:/mnt/photostructure:rw
+      - /mnt/photos:/mnt/photos:rw
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.syncthing.rule=Host(`syncthing.bhasher.com`)"
-    - "traefik.http.routers.syncthing.entrypoints=internalsecure"
-    - "traefik.http.services.syncthing.loadbalancer.server.port=8384"
-    - "traefik.http.routers.syncthing.tls=true"
-    - "traefik.http.routers.syncthing.tls.certresolver=http"
-    - "traefik.http.routers.syncthing.middlewares=authelia@docker"
-    - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.syncthing.rule=Host(`syncthing.bhasher.com`)"
+      - "traefik.http.routers.syncthing.entrypoints=internalsecure"
+      - "traefik.http.services.syncthing.loadbalancer.server.port=8384"
+      - "traefik.http.routers.syncthing.tls=true"
+      - "traefik.http.routers.syncthing.tls.certresolver=http"
+      - "traefik.http.routers.syncthing.middlewares=authelia@docker"
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "homepage.group=Management"
+      - "homepage.name=Syncthing"
+      - "homepage.icon=syncthing.svg"
+      - "homepage.href=https://syncthing.bhasher.com"
+      - "homepage.description=File Synchronization"
     ports:
-    - 22000:22000/tcp # TCP file transfers
-    - 22000:22000/udp # QUIC file transfers
-    - 21027:21027/udp # Receive local discovery broadcasts
+      - 22000:22000/tcp # TCP file transfers
+      - 22000:22000/udp # QUIC file transfers
+      - 21027:21027/udp # Receive local discovery broadcasts
     restart: unless-stopped
     networks:
-    - external
+      - external
 
 networks:
   external:

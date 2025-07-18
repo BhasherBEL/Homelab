@@ -4,20 +4,20 @@ services:
     image: lscr.io/linuxserver/wireguard:latest
     restart: always
     volumes:
-    - $DATA/wireguard:/config
-    - /lib/modules:/lib/modules
+      - $DATA/wireguard:/config
+      - /lib/modules:/lib/modules
     ports:
-    - 51822:51820/udp
+      - 51822:51820/udp
     environment:
-    - TZ=Europe/Paris
-    - SERVERURL=vpn.bhasher.com
-    - SERVERPORT=51822
-    - PEERS=10
-    - PEERDNS=auto
-    - INTERNAL_SUBNET=10.15.14.0
-    - ALLOWEDIPS=0.0.0.0/0
+      - TZ=Europe/Paris
+      - SERVERURL=vpn.bhasher.com
+      - SERVERPORT=51822
+      - PEERS=10
+      - PEERDNS=auto
+      - INTERNAL_SUBNET=10.15.14.0
+      - ALLOWEDIPS=0.0.0.0/0
     cap_add:
-    - NET_ADMIN
-    - SYS_MODULE
+      - NET_ADMIN
+      - SYS_MODULE
     sysctls:
-    - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv4.conf.all.src_valid_mark=1

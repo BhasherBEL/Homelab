@@ -11,5 +11,10 @@ services:
       - "traefik.http.routers.hugo.tls=true"
       - "traefik.http.routers.hugo.tls.certresolver=http"
       - "com.centurylinklabs.watchtower.enable=true"
+      - "homepage.group=Apps"
+      - "homepage.name=Blog"
+      - "homepage.icon=hugo.webp"
+      - "homepage.href=https://blog.bhasher.com"
+      - "homepage.description=Personal Blog"
     networks:
       - external

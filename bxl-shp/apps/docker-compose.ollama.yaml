@@ -1,24 +1,4 @@
 services:
-  ollama:
-    container_name: ollama
-    image: ghcr.io/bhasherbel/ollama:cpu
-    restart: unless-stopped
-    environment:
-      - TZ=Europe/Paris
-    volumes:
-      - $DATA/ollama:/root/.ollama
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.ollama.rule=Host(`ollama.bhasher.com`)"
-      - "traefik.http.services.ollama.loadbalancer.server.port=11434"
-      - "traefik.http.routers.ollama.tls=true"
-      - "traefik.http.routers.ollama.tls.certresolver=http"
-      - "traefik.http.routers.ollama.entrypoints=internalsecure"
-    #- "traefik.http.routers.ollama.middlewares=authelia@docker"
-    networks:
-      - external
-      - ai
-
   openwebui:
     container_name: openwebui
     image: ghcr.io/open-webui/open-webui:latest
@@ -52,11 +32,12 @@ services:
       - "traefik.http.routers.open-webui.tls.certresolver=http"
       - "traefik.http.routers.open-webui.entrypoints=internalsecure,externalsecure"
       - "com.centurylinklabs.watchtower.enable=true"
+      - "homepage.group=Apps"
+      - "homepage.name=OpenWebUI"
+      - "homepage.icon=https://ai.bhasher.com/static/favicon.svg"
+      - "homepage.href=https://ai.bhasher.com"
+      - "homepage.description=LLM Interface"
     volumes:
       - $DATA/open-webui:/app/backend/data
     networks:
       - external
-      - ai
-
-networks:
-  ai:

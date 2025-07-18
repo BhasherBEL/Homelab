@@ -1,0 +1,12 @@
+---
+- Calendar:
+    - Calendar:
+        icon: mdi-calendar-blank
+        widget:
+          type: calendar
+          view: monthly
+    - Events:
+        icon: mdi-calendar-blank
+        widget:
+          type: calendar
+          view: agenda

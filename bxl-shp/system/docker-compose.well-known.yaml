@@ -4,18 +4,17 @@ services:
     image: nginx:latest
     restart: unless-stopped
     volumes:
-    - $CONFIG/well-known/nginx.conf:/etc/nginx/nginx.conf:ro
+      - $CONFIG/well-known/nginx.conf:/etc/nginx/nginx.conf:ro
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.matrix-nginx.rule=Host(`bhasher.com`) && PathPrefix(`/.well-known`)"
-    - "traefik.http.routers.matrix-nginx.tls=true"
-    - "traefik.http.routers.matrix-nginx.tls.certresolver=http"
-    - "traefik.http.routers.matrix-nginx.entrypoints=internalsecure,externalsecure"
-    - "traefik.http.services.matrix-nginx.loadbalancer.server.port=80"
+      - "traefik.enable=true"
+      - "traefik.http.routers.matrix-nginx.rule=Host(`bhasher.com`) && PathPrefix(`/.well-known`)"
+      - "traefik.http.routers.matrix-nginx.tls=true"
+      - "traefik.http.routers.matrix-nginx.tls.certresolver=http"
+      - "traefik.http.routers.matrix-nginx.entrypoints=internalsecure,externalsecure"
+      - "traefik.http.services.matrix-nginx.loadbalancer.server.port=80"
     networks:
-    - external
+      - external
 
 networks:
   external:
     external: true
-

@@ -3,262 +3,220 @@ services:
     container_name: jellyfin
     image: jellyfin/jellyfin:latest
     volumes:
-    - $DATA/mediaserver/jellyfin2:/config
-    - /mnt/movies/series:/media/tvshows
-    - /mnt/movies/movies:/media/movies
+      - $DATA/mediaserver/jellyfin2:/config
+      - /mnt/movies/series:/media/tvshows
+      - /mnt/movies/movies:/media/movies
     environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Europe/Paris
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
     restart: unless-stopped
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.bhasher.com`)"
-    - "traefik.http.routers.jellyfin.entrypoints=internalsecure,externalsecure"
-    - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
-    - "traefik.http.routers.jellyfin.tls=true"
-    - "traefik.http.routers.jellyfin.tls.certresolver=http"
-    - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.bhasher.com`)"
+      - "traefik.http.routers.jellyfin.entrypoints=internalsecure,externalsecure"
+      - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
+      - "traefik.http.routers.jellyfin.tls=true"
+      - "traefik.http.routers.jellyfin.tls.certresolver=http"
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "homepage.group=Media"
+      - "homepage.weight=100"
+      - "homepage.name=Jellyfin"
+      - "homepage.icon=jellyfin.svg"
+      - "homepage.href=https://jellyfin.bhasher.com"
+      - "homepage.description=Media Server"
+      - "homepage.widget.type=jellyfin"
+      - "homepage.widget.key=${JELLYFIN_API_KEY}"
+      - "homepage.widget.url=http://jellyfin:8096"
+      - 'homepage.widget.fields=["movies","series"]'
+      - "homepage.widget.enableBlocks=true"
+      - "homepage.widget.enableNowPlaying=true"
+      - "homepage.widget.enableUser=true"
+      - "homepage.widget.showEpisodeNumber=true"
     networks:
-    - auth
-    - external
+      - auth
+      - external
 
   radarr:
     container_name: radarr
     image: lscr.io/linuxserver/radarr:latest
     environment:
-    - TZ=Europe/Paris
-    - PUID=1000
-    - PGID=1000
+      - TZ=Europe/Paris
+      - PUID=1000
+      - PGID=1000
     volumes:
-    - $DATA/mediaserver/radarr:/config
-    - /mnt/movies/movies:/movies
-    - /mnt/movies/tmp:/downloads
+      - $DATA/mediaserver/radarr:/config
+      - /mnt/movies/movies:/movies
+      - /mnt/movies/tmp:/downloads
     restart: unless-stopped
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.radarr.rule=Host(`radarr.bhasher.com`)"
-    - "traefik.http.services.radarr.loadbalancer.server.port=7878"
-    - "traefik.http.routers.radarr.tls=true"
-    - "traefik.http.routers.radarr.tls.certresolver=http"
-    - "traefik.http.routers.radarr.entrypoints=internalsecure"
-    - "traefik.http.routers.radarr.middlewares=authelia@docker"
-    - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.radarr.rule=Host(`radarr.bhasher.com`)"
+      - "traefik.http.services.radarr.loadbalancer.server.port=7878"
+      - "traefik.http.routers.radarr.tls=true"
+      - "traefik.http.routers.radarr.tls.certresolver=http"
+      - "traefik.http.routers.radarr.entrypoints=internalsecure"
+      - "traefik.http.routers.radarr.middlewares=authelia@docker"
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "homepage.group=Media"
+      - "homepage.weight=101"
+      - "homepage.name=Radarr"
+      - "homepage.icon=radarr.svg"
+      - "homepage.href=https://radarr.bhasher.com"
+      - "homepage.description=Movies Management"
+      - "homepage.widget.type=radarr"
+      - "homepage.widget.key=${RADARR_API_KEY}"
+      - "homepage.widget.url=http://radarr:7878"
+      - "homepage.widget.enableQueue=true"
+      - 'homepage.widget.fields=["wanted","queued","missing"]'
     networks:
-    - mediaserver
-    - external
+      - mediaserver
+      - external
 
   sonarr:
     container_name: sonarr
     image: lscr.io/linuxserver/sonarr:latest
     environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Europe/Paris
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
     volumes:
-    - $DATA/mediaserver/sonarr:/config
-    - /mnt/movies/series:/tv
-    - /mnt/movies/tmp:/downloads
+      - $DATA/mediaserver/sonarr:/config
+      - /mnt/movies/series:/tv
+      - /mnt/movies/tmp:/downloads
     restart: unless-stopped
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.sonarr.rule=Host(`sonarr.bhasher.com`)"
-    - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
-    - "traefik.http.routers.sonarr.tls=true"
-    - "traefik.http.routers.sonarr.tls.certresolver=http"
-    - "traefik.http.routers.sonarr.entrypoints=internalsecure"
-    - "traefik.http.routers.sonarr.middlewares=authelia@docker"
-    - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.sonarr.rule=Host(`sonarr.bhasher.com`)"
+      - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
+      - "traefik.http.routers.sonarr.tls=true"
+      - "traefik.http.routers.sonarr.tls.certresolver=http"
+      - "traefik.http.routers.sonarr.entrypoints=internalsecure"
+      - "traefik.http.routers.sonarr.middlewares=authelia@docker"
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "homepage.group=Media"
+      - "homepage.weight=102"
+      - "homepage.name=Sonarr"
+      - "homepage.icon=sonarr.svg"
+      - "homepage.href=https://sonarr.bhasher.com"
+      - "homepage.description=Shows Management"
+      - "homepage.widget.type=sonarr"
+      - "homepage.widget.key=${SONARR_API_KEY}"
+      - "homepage.widget.url=http://sonarr:8989"
+      - "homepage.widget.enableQueue=true"
+      - 'homepage.widget.fields=["wanted","series","queued"]'
     networks:
-    - mediaserver
-    - external
+      - mediaserver
+      - external
 
   transmission:
     container_name: transmission
     image: lscr.io/linuxserver/transmission:latest
     environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Europe/Paris
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
     volumes:
-    - $DATA/mediaserver/transmission:/config
-    - /mnt/movies/tmp:/downloads
-    - /mnt/movies/torrents:/watch
+      - $DATA/mediaserver/transmission:/config
+      - /mnt/movies/tmp:/downloads
+      - /mnt/movies/torrents:/watch
     ports:
-    - 51413:51413/tcp
-    - 51413:51413/udp
+      - 51413:51413/tcp
+      - 51413:51413/udp
     restart: unless-stopped
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.transmission.rule=Host(`transmission.bhasher.com`)"
-    - "traefik.http.services.transmission.loadbalancer.server.port=9091"
-    - "traefik.http.routers.transmission.tls=true"
-    - "traefik.http.routers.transmission.tls.certresolver=http"
-    - "traefik.http.routers.transmission.entrypoints=internalsecure"
-    - "traefik.http.routers.transmission.middlewares=authelia@docker"
-    - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.transmission.rule=Host(`transmission.bhasher.com`)"
+      - "traefik.http.services.transmission.loadbalancer.server.port=9091"
+      - "traefik.http.routers.transmission.tls=true"
+      - "traefik.http.routers.transmission.tls.certresolver=http"
+      - "traefik.http.routers.transmission.entrypoints=internalsecure"
+      - "traefik.http.routers.transmission.middlewares=authelia@docker"
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "homepage.group=Media"
+      - "homepage.weight=103"
+      - "homepage.name=Transmission"
+      - "homepage.icon=transmission.svg"
+      - "homepage.href=https://transmission.bhasher.com"
+      - "homepage.description=Torrents Manager"
+      - "homepage.widget.type=transmission"
+      - "homepage.widget.url=http://transmission:9091"
+      - 'homepage.widget.fields=["leech","seed","download","upload"]'
     networks:
-    - mediaserver
-    - external
+      - mediaserver
+      - external
 
   prowlarr:
     container_name: prowlarr
     image: lscr.io/linuxserver/prowlarr:latest
     environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Europe/Paris
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
     volumes:
-    - $DATA/mediaserver/prowlarr:/config
+      - $DATA/mediaserver/prowlarr:/config
     restart: unless-stopped
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.bhasher.com`)"
-    - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
-    - "traefik.http.routers.prowlarr.tls=true"
-    - "traefik.http.routers.prowlarr.tls.certresolver=http"
-    - "traefik.http.routers.prowlarr.entrypoints=internalsecure"
-    - "traefik.http.routers.prowlarr.middlewares=authelia@docker"
-    - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.bhasher.com`)"
+      - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
+      - "traefik.http.routers.prowlarr.tls=true"
+      - "traefik.http.routers.prowlarr.tls.certresolver=http"
+      - "traefik.http.routers.prowlarr.entrypoints=internalsecure"
+      - "traefik.http.routers.prowlarr.middlewares=authelia@docker"
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "homepage.group=Media Server"
+      - "homepage.name=Prowlarr"
+      - "homepage.icon=prowlarr.svg"
+      - "homepage.href=https://prowlarr.bhasher.com"
+      - "homepage.description=Torrent Provider Management"
     networks:
-    - mediaserver
-    - external
+      - mediaserver
+      - external
 
   flaresolverr:
     container_name: flaresolverr
     image: ghcr.io/flaresolverr/flaresolverr:latest
     environment:
-    - LOG_LEVEL=info
-    - LOG_HTML=false
-    - CAPTCHA_SOLVER=none
-    - TZ=Europe/Paris
+      - LOG_LEVEL=info
+      - LOG_HTML=false
+      - CAPTCHA_SOLVER=none
+      - TZ=Europe/Paris
     restart: unless-stopped
     labels:
-    - "com.centurylinklabs.watchtower.enable=true"
+      - "com.centurylinklabs.watchtower.enable=true"
     networks:
-    - mediaserver
+      - mediaserver
 
   bazarr:
     container_name: bazarr
     image: lscr.io/linuxserver/bazarr
     environment:
-    - TZ=Europe/Paris
-    - PUID=1000
-    - PGID=1000
-    volumes:
-    - $DATA/mediaserver/bazarr:/config
-    - /mnt/movies/movies:/movies
-    - /mnt/movies/series:/tv
-    restart: unless-stopped
-    labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.bazarr.rule=Host(`bazarr.bhasher.com`)"
-    - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
-    - "traefik.http.routers.bazarr.tls=true"
-    - "traefik.http.routers.bazarr.tls.certresolver=http"
-    - "traefik.http.routers.bazarr.entrypoints=internalsecure"
-    - "traefik.http.routers.bazarr.middlewares=authelia@docker"
-    - "com.centurylinklabs.watchtower.enable=true"
-    networks:
-    - mediaserver
-    - external
-
-  tdarr:
-    container_name: tdarr
-    image: ghcr.io/haveagitgat/tdarr:latest
-    restart: unless-stopped
-    environment:
       - TZ=Europe/Paris
       - PUID=1000
       - PGID=1000
-      #- UMASK_SET=002
-      #- serverIP=0.0.0.0
-      #- serverPort=8266
-      #- webUIPort=8265
-      - internalNode=true
-      - inContainer=true
-      #- ffmpegVersion=6
-      - nodeName=shp
-      #- NVIDIA_DRIVER_CAPABILITIES=all
-      #- NVIDIA_VISIBLE_DEVICES=all
     volumes:
-      - $DATA/mediaserver/tdarr/server:/app/server
-      - $DATA/mediaserver/tdarr/configs:/app/configs
-      - $DATA/mediaserver/tdarr/logs:/app/logs
-      - /mnt/movies/movies:/media/moves
-      - /mnt/movies/series:/media/tv
-      - /tmp/tdarr:/temp
-    devices:
-      - /dev/dri:/dev/dri
-    labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.tdarr.rule=Host(`tdarr.bhasher.com`)"
-    - "traefik.http.services.tdarr.loadbalancer.server.port=8265"
-    - "traefik.http.routers.tdarr.tls=true"
-    - "traefik.http.routers.tdarr.tls.certresolver=http"
-    - "traefik.http.routers.tdarr.entrypoints=internalsecure"
-    - "traefik.http.routers.tdarr.middlewares=authelia@docker"
-    - "com.centurylinklabs.watchtower.enable=true"
-    networks:
-    #- mediaserver
-    - external
-
-  movary:
-    container_name: movary
-    image: leepeuker/movary:latest
+      - $DATA/mediaserver/bazarr:/config
+      - /mnt/movies/movies:/movies
+      - /mnt/movies/series:/tv
     restart: unless-stopped
-    environment:
-    - TZ=Europe/Paris
-    #- PUID=1000
-    #- PGID=1000
-    - TMDB_API_KEY=${TMDB_API_KEY}
-    - DATABASE_MODE=mysql
-    - DATABASE_MYSQL_HOST=movary-db
-    - DATABASE_MYSQL_NAME=movary
-    - DATABASE_MYSQL_USER=movary
-    - DATABASE_MYSQL_PASSWORD=${MARIADB_ROOT}
-    - TMDB_ENABLE_IMAGE_CACHING=1
-    - APPLICATION_URL=http://movary
-    - JELLYFIN_DEVICE_ID=+y7tuKY2mhGFchizNYpII7Hb4Isz5r6t/Y46agVvoJs=
-    volumes:
-    - $DATA/mediaserver/movary/app:/app/storage:rw
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.movary.rule=Host(`movary.bhasher.com`)"
-    - "traefik.http.services.movary.loadbalancer.server.port=80"
-    - "traefik.http.routers.movary.tls=true"
-    - "traefik.http.routers.movary.tls.certresolver=http"
-    - "traefik.http.routers.movary.entrypoints=internalsecure"
-    - "traefik.http.routers.movary.middlewares=authelia@docker"
-    - "com.centurylinklabs.watchtower.enable=true"
-    depends_on:
-    - movary-db
+      - "traefik.enable=true"
+      - "traefik.http.routers.bazarr.rule=Host(`bazarr.bhasher.com`)"
+      - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
+      - "traefik.http.routers.bazarr.tls=true"
+      - "traefik.http.routers.bazarr.tls.certresolver=http"
+      - "traefik.http.routers.bazarr.entrypoints=internalsecure"
+      - "traefik.http.routers.bazarr.middlewares=authelia@docker"
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "homepage.group=Media Server"
+      - "homepage.name=Bazarr"
+      - "homepage.icon=bazarr.svg"
+      - "homepage.href=https://bazarr.bhasher.com"
+      - "homepage.description=Subtitle Management"
     networks:
-    - mediaserver
-    - external
-
-  movary-db:
-    container_name: movary-db
-    image: mysql:8
-    environment:
-    - MYSQL_DATABASE=movary
-    - MYSQL_USER=movary
-    - MYSQL_PASSWORD=${MARIADB_ROOT}
-    - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT}
-    volumes:
-    - $DATA/mediaserver/movary/db:/var/lib/mysql
-    networks:
-    - mediaserver
-
-  #sonarr_youtubedl:
-  #  image: whatdaybob/sonarr_youtubedl:latest
-  #  container_name: sonarr_youtubedl
-  #  volumes:
-  #  - $DATA/mediaserver/youtubedl:/config
-  #  - /mnt/movies/series:/sonarr_root
-  #  networks:
-  #  - mediaserver
+      - mediaserver
+      - external
 
 networks:
   mediaserver:
-

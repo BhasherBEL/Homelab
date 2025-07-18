@@ -4,25 +4,30 @@ services:
     image: mhzawadi/invoiceplane:latest
     restart: unless-stopped
     volumes:
-    - /etc/localtime:/etc/localtime:ro
-    - $DATA/invoiceplane/uploads:/var/www/html/uploads
-    - type: bind
-      source: $DATA/invoiceplane/ipconfig.php
-      target: /var/www/html/ipconfig.php
+      - /etc/localtime:/etc/localtime:ro
+      - $DATA/invoiceplane/uploads:/var/www/html/uploads
+      - type: bind
+        source: $DATA/invoiceplane/ipconfig.php
+        target: /var/www/html/ipconfig.php
     environment:
-    - TZ=Europe/Paris
-    - IP_URL=https://invoice.bhasher.com
+      - TZ=Europe/Paris
+      - IP_URL=https://invoice.bhasher.com
     labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.invoice.rule=Host(`invoice.bhasher.com`)"
-    - "traefik.http.services.invoice.loadbalancer.server.port=80"
-    - "traefik.http.routers.invoice.tls=true"
-    - "traefik.http.routers.invoice.tls.certresolver=http"
-    - "traefik.http.routers.invoice.entrypoints=internalsecure"
-    - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.invoice.rule=Host(`invoice.bhasher.com`)"
+      - "traefik.http.services.invoice.loadbalancer.server.port=80"
+      - "traefik.http.routers.invoice.tls=true"
+      - "traefik.http.routers.invoice.tls.certresolver=http"
+      - "traefik.http.routers.invoice.entrypoints=internalsecure"
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "homepage.group=Apps"
+      - "homepage.name=InvoicePlane"
+      - "homepage.icon=https://invoice.bhasher.com/assets/core/img/favicon.png"
+      - "homepage.href=https://invoice.bhasher.com"
+      - "homepage.description=Invoicing System"
     networks:
-    - external
-    - invoice
+      - external
+      - invoice
 
   invoiceplane-db:
     container_name: invoiceplane-db
@@ -35,7 +40,7 @@ services:
       - MYSQL_USER=invoiceplane
       - MYSQL_PASSWORD=${MARIADB_ROOT}
     networks:
-    - invoice
+      - invoice
 
 networks:
   invoice:
