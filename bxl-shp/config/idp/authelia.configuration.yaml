@@ -85,6 +85,11 @@ access_control:
       subject:
         - "group:admin"
 
+webauthn:
+  disable: false
+  enable_passkey_login: true
+  display_name: "Authelia"
+
 session:
   name: "auth_session"
   same_site: "lax"
