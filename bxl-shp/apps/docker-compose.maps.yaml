@@ -5,8 +5,7 @@ services:
     command: --load --serve
     restart: unless-stopped
     volumes:
-      - $DATA/opentripplanner/graph.obj:/var/opentripplanner/graph.obj
-      - $CONFIG/otp:/var/opentripplanner
+      - $DATA/opentripplanner:/var/opentripplanner
 
     labels:
       - "traefik.enable=true"
