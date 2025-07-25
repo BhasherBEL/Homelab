@@ -1,0 +1,26 @@
+services:
+  jupyter:
+    container_name: jupyter
+    image: quay.io/jupyter/base-notebook
+    command: "start-notebook.sh --NotebookApp.token='$JUPYTER_TOKEN'"
+    restart: unless-stopped
+    volumes:
+      - $DATA/jupyter:/home/jovyan/jupyter
+    environment:
+      - TZ=Europe/Paris
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jupyter.rule=Host(`jupyter.bhasher.com`)"
+      - "traefik.http.services.jupyter.loadbalancer.server.port=8888"
+      - "traefik.http.routers.jupyter.tls=true"
+      - "traefik.http.routers.jupyter.tls.certresolver=http"
+      - "traefik.http.routers.syncthing.middlewares=authelia@docker"
+      - "traefik.http.routers.jupyter.entrypoints=internalsecure,externalsecure"
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "homepage.group=Apps"
+      - "homepage.name=JupyterLab"
+      - "homepage.icon=jupyterlab.webp"
+      - "homepage.href=https://jupyter.bhasher.com"
+      - "homepage.description=Jupyter notebooks"
+    networks:
+      - external
