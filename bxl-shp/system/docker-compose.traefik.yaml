@@ -62,6 +62,8 @@ services:
       - "homepage.icon=traefik.svg"
       - "homepage.href=https://traefik.bhasher.com"
       - "homepage.description=Reverse Proxy"
+    cap_add:
+      - NET_ADMIN
     networks:
       - external
 

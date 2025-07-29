@@ -2,6 +2,12 @@ theme: dark
 
 server:
   address: 0.0.0.0:9091
+  endpoints:
+    rate_limits:
+      second_factor_totp:
+        enable: false
+      second_factor_duo:
+        enable: false
 
 log:
   level: debug
@@ -110,8 +116,6 @@ regulation:
   ban_time: 5m
 
 storage:
-  # local:
-  #   path: /data/db.sqlite3
   postgres:
     address: postgres:5432
     database: authelia
@@ -121,7 +125,7 @@ storage:
 notifier:
   disable_startup_check: true
   smtp:
-    address: "smtp://bhasher.com:587"
+    address: "smtp://smtp.bhasher.com:587"
     sender: no-reply@bhasher.com
 
 password_policy:
@@ -156,12 +160,15 @@ identity_providers:
         - "token"
         - "revocation"
         - "introspection"
+    # claims_policies:
+    #   grafana:
+    #     id_token: ["groups", "email", "preferred_username", "name"]
     clients:
       - client_id: grafana
         client_name: Grafana
         client_secret: "$argon2id$v=19$m=65536,t=3,p=4$dQfNyInvlh1Lgw3JXi7G6A$M/WaNpHJkAyaQcXIMsOTl0+gBWGPPVBoCm7NpEQfTpI"
         public: false
-        authorization_policy: one_factor
+        authorization_policy: two_factor
         redirect_uris:
           - https://grafana.bhasher.com/login/generic_oauth
         consent_mode: implicit

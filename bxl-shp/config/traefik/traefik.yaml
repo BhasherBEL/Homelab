@@ -3,23 +3,48 @@ http:
     truenas:
       rule: "Host(`truenas.bhasher.com`)"
       service: truenas
-      tls: 
+      tls:
         certresolver: http
       entrypoints: internalsecure
 
     mikrotik:
       rule: "Host(`router.bhasher.com`)"
       service: mikrotik
-      tls: 
+      tls:
         certresolver: http
       entrypoints: internalsecure
+
+    laptop:
+      rule: "Host(`laptop.local.bhasher.com`) || HostRegexp(`{subdomain:[a-z]+}.laptop.local.bhasher.com`)"
+      service: laptop
+      # entrypoints: internal
+
+    laptop-secure:
+      rule: "Host(`laptop.local.bhasher.com`) || HostRegexp(`{subdomain:[a-z]+}.laptop.local.bhasher.com`)"
+      service: laptop
+      tls:
+        certresolver: http
+      entrypoints: internalsecure
+
+    laptop-nginx:
+      rule: "(Host(`laptop.local.bhasher.com`) || HostRegexp(`{subdomain:[a-z]+}.laptop.local.bhasher.com`)) && PathPrefix(`/.well-known/acme-challenge/`)"
+      service: laptop
+      entrypoints: external
 
   services:
     truenas:
       loadBalancer:
         servers:
-        - url: http://192.168.1.201
+          - url: http://192.168.1.201
     mikrotik:
       loadBalancer:
         servers:
-        - url: http://192.168.1.1:8080
+          - url: http://192.168.1.1:8080
+    laptop:
+      loadBalancer:
+        servers:
+          - url: http://10.15.14.6
+    laptop-secure:
+      loadBalancer:
+        servers:
+          - url: https://10.15.14.6
